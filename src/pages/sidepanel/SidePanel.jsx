@@ -20,9 +20,9 @@ const SidePanel = props => {
     console.log("PAGE DATA:", pageData)
   }, [pageData]);
 
+  useEffect(() => {
   // ACTIVATION
   chrome.tabs.onActivated.addListener(async function activatedListener(activeInfo){
-    chrome.tabs.onActivated.removeListener(activatedListener);
       chrome.tabs.get(activeInfo.tabId, function(tab){
           setActiveURL(tab.url)
           console.log("SET LOCATION (ACTIVATED):", tab.url)
@@ -42,33 +42,72 @@ const SidePanel = props => {
           setPageData(textEls)
       })
     })
+
   });
 
-  // UPDATING
-  chrome.tabs.onUpdated.addListener(async function updatedListener(tabId, change, tab){
-    chrome.tabs.onUpdated.removeListener(updatedListener);
-    if(tab.active && change.url){
-      chrome.tabs.get(tabId, function(tab){
-            setActiveURL(tab.url)
-            console.log("SET LOCATION (UPDATED):", tab.url)
-              // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
-              setPageData([{text: "Loading"}])
-              chrome.scripting.executeScript({
-                target: {tabId: tabId, allFrames: false}, 
-                func: (()=>{return document.documentElement.innerHTML}),
-        }).then(injectionResults => {
-          const {frameId, result} = injectionResults[0]
-          const $ = cheerio.load(result);
-          var textEls = []
-          const $textEls = $('p, h1, h2, h3').each(function(i, el){
-                  textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
-                })
-          console.log("TEXTELS (UPDATED):", textEls);
-          setPageData(textEls)
-        })
+// chrome.tabs.onCreated.addListener(function (tab) {
+    
+// });
+
+
+chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, tab) {
+  if(tab.active && changeInfo.status === 'complete'){
+    chrome.tabs.get(tabId, function(tab){
+          setActiveURL(tab.url)
+          console.log("SET LOCATION (UPDATED):", tab.url)
+            // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
+            setPageData([{text: "Loading"}])
+            chrome.scripting.executeScript({
+              target: {tabId: tabId, allFrames: false}, 
+              func: (()=>{return document.documentElement.innerHTML}),
+      }).then(injectionResults => {
+        const {frameId, result} = injectionResults[0]
+        const $ = cheerio.load(result);
+        var textEls = []
+        const $textEls = $('p, h1, h2, h3').each(function(i, el){
+                textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+              })
+        console.log("TEXTELS (UPDATED):", textEls);
+        setPageData(textEls)
       })
-    }
-  });
+    })
+  }
+  // chrome.tabs.onUpdated.addListener(updatedListener);
+});
+  }, []);
+
+
+  // UPDATING
+  // chrome.tabs.onUpdated.addListener(async function updatedListener(tabId, change, tab){
+
+  //   console.log("TAB DATA:", tab.active, change)
+  //   if(tab.active && change.status === 'complete'){
+  //     chrome.tabs.get(tabId, function(tab){
+  //           setActiveURL(tab.url)
+  //           console.log("SET LOCATION (UPDATED):", tab.url)
+  //             // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
+  //             setPageData([{text: "Loading"}])
+  //             chrome.scripting.executeScript({
+  //               target: {tabId: tabId, allFrames: false}, 
+  //               func: (()=>{return document.documentElement.innerHTML}),
+  //       }).then(injectionResults => {
+  //         const {frameId, result} = injectionResults[0]
+  //         const $ = cheerio.load(result);
+  //         var textEls = []
+  //         const $textEls = $('p, h1, h2, h3').each(function(i, el){
+  //                 textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+  //               })
+  //         console.log("TEXTELS (UPDATED):", textEls);
+  //         setPageData(textEls)
+  //       })
+  //     })
+  //   }
+  //   if(tab.active && change.status === 'loading'){
+  //     chrome.tabs.onUpdated.removeListener(updatedListener);
+  //   }
+
+  //   return true;
+  // });
 
   // // TAB CREATION
   // useEffect(async () => {
