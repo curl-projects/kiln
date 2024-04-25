@@ -7,25 +7,49 @@ import withSuspense from '@src/shared/hoc/withSuspense';
 import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
 
 const SidePanel = props => {
-  const [myState, setMyState] = useState('');
-
   const theme = useStorage(exampleThemeStorage);
+  const [pageData, setPageData] = useState('');
+  const [activeURL, setActiveURL] = useState('');
+
+  (async () => {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    setActiveURL(tab.url);
+  })();
+
+  chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    if (tab.active) {
+      console.log("======= active tab url", tab.url);
+      setActiveURL(tab.url);
+    }
+  });
+  
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    if (tab.active) {
+      console.log("======= active tab url", tab.url);
+      setActiveURL(tab.url);
+    }
+  });
+  
+
+
+
+
+
+  useEffect(() => {
+    console.log('Page Data', pageData);
+  }, [pageData]);
+
+
 
   chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    setMyState(request.message);
-    console.log('REQUEST:', request);
+    if(request.messageDestination === 'sidePanel' && request.messageType === 'websiteContent') {
+      request.pageData ? setPageData(request.pageData) : console.error("No page data found in request")
+    }
   });
 
-  useEffect(() => {
-    console.log('STATE:', myState);
-  }, [myState]);
+  // HANDLE URL AND TAB CHANGES
 
-  useEffect(() => {
-    console.log('RUNNING');
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-      console.log('REQUEST:', request);
-    });
-  }, []);
 
   return (
     <div
@@ -34,10 +58,17 @@ const SidePanel = props => {
         backgroundColor: theme === 'light' ? '#fff' : '#000',
       }}>
       <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/pages/sidepanel/SidePanel.tsx</code> and save to reload.
-        </p>
+        <div style={{
+          height: '300px',
+          width: "100%",
+          overflow: "scroll",
+          fontSize: "8px",
+        }}>
+          {/* <p>
+            {pageData && pageData.map(e => e.text).join('')}
+          </p> */}
+          <h1>Active URL: {activeURL}</h1>
+        </div>
         <a
           className="App-link"
           href="https://reactjs.org"

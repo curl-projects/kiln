@@ -11,6 +11,8 @@
 
 - https://stackoverflow.com/questions/13917047/how-to-get-a-content-script-to-load-after-a-pages-javascript-has-executed/13917682#13917682
 
+- https://stackoverflow.com/questions/3652657/what-algorithm-does-readability-use-for-extracting-text-from-urls
+
 **To Do**
 - Read page context
     - Find action associated with page changing
