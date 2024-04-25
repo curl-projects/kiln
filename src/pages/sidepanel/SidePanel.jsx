@@ -16,49 +16,59 @@ const SidePanel = props => {
   const [activeURL, setActiveURL] = useState('');
   const [activeTabID, setActiveTabID] = useState('');
 
-  chrome.tabs.onActivated.addListener( async function activatedListener(activeInfo){
-  
+  useEffect(() => {
+    console.log("PAGE DATA:", pageData)
+  }, [pageData]);
+
+  // ACTIVATION
+  chrome.tabs.onActivated.addListener(async function activatedListener(activeInfo){
+    chrome.tabs.onActivated.removeListener(activatedListener);
       chrome.tabs.get(activeInfo.tabId, function(tab){
           setActiveURL(tab.url)
           console.log("SET LOCATION (ACTIVATED):", tab.url)
-            console.log("EXECUTE SCRIPT:", activeInfo.tabId)
-            console.log("ACTIVE INFO:", activeInfo, activeInfo.status)
-          // if(activeInfo.status === 'completed'){
+            // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
+            setPageData([{text: "Loading"}])
             chrome.scripting.executeScript({
               target: {tabId: activeInfo.tabId, allFrames: false}, 
-              files: ['src/pages/contentInjected/index.js']}) 
-          // }
-      });
-
-    chrome.tabs.onActivated.removeListener(activatedListener);
-
-    });
-
-  chrome.tabs.onUpdated.addListener(async (tabId, change, tab) => {
-      if (tab.active && change.url) {
-        setActiveURL(change.url)
-        console.log("SET LOCATION (UPDATED):", tab.url)
-        // var response = await chrome.tabs.sendMessage(tabId, {
-        //   messageDestination: "pageContent",
-        //   chromeMessageType: "getWebsiteContent",
-        // })
-
-        // console.log("RESPONSE:", response)
-      }
-
+              func: (()=>{return document.documentElement.innerHTML}),
+      }).then(injectionResults => {
+        const {frameId, result} = injectionResults[0]
+          const $ = cheerio.load(result);
+          var textEls = []
+          const $textEls = $('p, h1, h2, h3').each(function(i, el){
+                  textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+                })
+          console.log("TEXTELS (ACTIVATED):", textEls);
+          setPageData(textEls)
+      })
+    })
   });
 
-  chrome.runtime.onMessage.addListener(function messageListener(request, sender, sendResponse){
-    console.log("MESSAGE REQUEST", request)
-    if(request.messageDestination === 'sidePanel'){
-        console.log("Content response:", request.pageData || [])
+  // UPDATING
+  chrome.tabs.onUpdated.addListener(async function updatedListener(tabId, change, tab){
+    chrome.tabs.onUpdated.removeListener(updatedListener);
+    if(tab.active && change.url){
+      chrome.tabs.get(tabId, function(tab){
+            setActiveURL(tab.url)
+            console.log("SET LOCATION (UPDATED):", tab.url)
+              // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
+              setPageData([{text: "Loading"}])
+              chrome.scripting.executeScript({
+                target: {tabId: tabId, allFrames: false}, 
+                func: (()=>{return document.documentElement.innerHTML}),
+        }).then(injectionResults => {
+          const {frameId, result} = injectionResults[0]
+          const $ = cheerio.load(result);
+          var textEls = []
+          const $textEls = $('p, h1, h2, h3').each(function(i, el){
+                  textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+                })
+          console.log("TEXTELS (UPDATED):", textEls);
+          setPageData(textEls)
+        })
+      })
     }
-
-    chrome.runtime.onMessage.removeListener(messageListener);
-
-    return true;
   });
-
 
   // // TAB CREATION
   // useEffect(async () => {
@@ -71,8 +81,48 @@ const SidePanel = props => {
   //   tab && tab.active && console.log("URL changed (Tab Creation) ")
 
   // }, []);
+
+
+
+  return (
+    <div
+      className="App"
+      style={{
+        backgroundColor: theme === 'light' ? '#fff' : '#000',
+      }}>
+      <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
+        <p>Active URL: {activeURL}</p>
+        <p>Active Tab ID: {activeTabID}</p>
+        {pageError && <p style={{'color': 'red'}}>Page Error: {pageError}</p>}
+        <div style={{
+          height: '300px',
+          width: "100%",
+          overflow: "scroll",
+          fontSize: "8px",
+        }}>
+          <p>
+            {pageData && pageData.map(e => e.text).join('')}
+          </p>
   
-  // // TAB ACTIVATED
+        </div>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: theme === 'light' && '#0281dc', marginBottom: '10px' }}>
+          Learn React!
+        </a>
+        <button id="read-content">Action</button>
+      </header>
+    </div>
+  );
+};
+
+export default withErrorBoundary(withSuspense(SidePanel, <div> Loading ... </div>), <div> An error has occurred </div>);
+
+
+// TAB ACTIVATED
   // chrome.tabs.onActivated.addListener(async (activeInfo) => {
   //   const tab = await chrome.tabs.get(activeInfo.tabId);
   //   console.log("ACTIVE INFO:", activeInfo)
@@ -149,42 +199,3 @@ const SidePanel = props => {
   
 
   // // HANDLE URL AND TAB CHANGES
-
-
-
-  return (
-    <div
-      className="App"
-      style={{
-        backgroundColor: theme === 'light' ? '#fff' : '#000',
-      }}>
-      <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
-        <p>Active URL: {activeURL}</p>
-        <p>Active Tab ID: {activeTabID}</p>
-        {pageError && <p style={{'color': 'red'}}>Page Error: {pageError}</p>}
-        <div style={{
-          height: '300px',
-          width: "100%",
-          overflow: "scroll",
-          fontSize: "8px",
-        }}>
-          <p>
-            {pageData && pageData.map(e => e.text).join('')}
-          </p>
-  
-        </div>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: theme === 'light' && '#0281dc', marginBottom: '10px' }}>
-          Learn React!
-        </a>
-        <button id="read-content">Action</button>
-      </header>
-    </div>
-  );
-};
-
-export default withErrorBoundary(withSuspense(SidePanel, <div> Loading ... </div>), <div> An error has occurred </div>);

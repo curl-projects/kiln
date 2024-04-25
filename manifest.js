@@ -35,19 +35,19 @@ const manifest = {
   icons: {
     128: 'icon-128.png',
   },
-  content_scripts: [
-    {
-      matches: ['http://*/*', 'https://*/*'],
-      js: ['src/pages/contentInjected/index.js'],
-      all_frames: false,
-      // KEY for cache invalidation
-      // css: ['assets/css/contentStyle<KEY>.chunk.css'],
-    },
-    // {
-    //   matches: ['http://*/*', 'https://*/*'],
-    //   js: ['src/pages/contentUI/index.js'],
-    // },
-  ],
+  // content_scripts: [
+  //   {
+      // matches: ['http://*/*', 'https://*/*'],
+  //     // js: ['src/pages/contentInjected/index.js'],
+  //     // all_frames: false,
+  //     // KEY for cache invalidation
+  //     // css: ['assets/css/contentStyle<KEY>.chunk.css'],
+  //   },
+  //   // {
+  //   //   matches: ['http://*/*', 'https://*/*'],
+  //   //   js: ['src/pages/contentUI/index.js'],
+  //   // },
+  // ],
   devtools_page: 'src/pages/devtools/index.html',
   web_accessible_resources: [
     {

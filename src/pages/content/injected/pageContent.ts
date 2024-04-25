@@ -1,21 +1,23 @@
-// import refreshOnUpdate from 'virtual:reload-on-update-in-view';
+import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import * as cheerio from "cheerio";
 
-// refreshOnUpdate('pages/content/injected/pageContent');
+refreshOnUpdate('pages/content/injected/pageContent');
 
-console.log("HI!")
-const $ = cheerio.load(document.documentElement.innerHTML);
-var textEls = []
-    const $textEls = $('p, h1, h2, h3').each(function(i, el){
-      textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+(function pageContent(){
+  console.log("HI!")
+  const $ = cheerio.load(document.documentElement.innerHTML);
+  var textEls = []
+      const $textEls = $('p, h1, h2, h3').each(function(i, el){
+        textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
+      })
+    textEls;
+  
+    chrome.runtime.sendMessage({
+      messageDestination: 'sidePanel',
+      chromeMessageType: 'websiteContent',
+      pageData: textEls,
     })
-  textEls;
-
-  chrome.runtime.sendMessage({
-    messageDestination: 'sidePanel',
-    chromeMessageType: 'websiteContent',
-    pageData: textEls,
-  }, ()=>{console.log("SENT")})
+})()
 
 
 // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
