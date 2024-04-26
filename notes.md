@@ -25,7 +25,11 @@
 
 - https://stackoverflow.com/questions/51389227/send-message-to-content-script-after-page-load
 
-**To Do**
+- https://anik8das.medium.com/how-to-add-firebase-to-a-chrome-extension-on-manifest-v3-63a16a4080ef
+
+- https://medium.com/the-andela-way/authenticate-your-chrome-extension-user-through-your-web-app-dbdb96224e41
+
+**Done**
 - Read page context
     - Find action associated with page changing
     - Store in chrome storage until sidepanel is opened
@@ -36,3 +40,17 @@
 - Generate only when on a page with text (e.g. 
 not a search page)
 
+**To Do**
+- Implement some type of storage 
+    - Local storage for dealing with state and browser processing
+    - Prisma storage for database management
+        - Schematization and API service
+        - Consume goals from the extension
+            - Fetch API connection
+            - Set up the routes on the API side
+                - Fetch goals for user
+        - Authentication on the chrome extension
+            - Option: Extension authentication through a web app
+
+**Google Auth**
+- 
