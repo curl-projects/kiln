@@ -28,6 +28,7 @@ const SidePanel = props => {
   const [activeURL, setActiveURL] = useState('');
   const [activeTabID, setActiveTabID] = useState('');
   const [activeTabData, setActiveTabData] = useState({tabID: null, tabTitle: null, tabURL: null, windowId: null});
+  const [userInfo, setUserInfo] = useState({id: null, email: null});
 
   // useEffect(() => {
   //   console.log("PAGE DATA:", pageData)
@@ -36,10 +37,14 @@ const SidePanel = props => {
   useEffect(() => {
     console.log("TAB DATA:", activeTabData)
   }, [pageData]);
+  
+  useEffect(() => {
+    console.log("USER INFO:", userInfo)
+  }, [userInfo]);
 
   useEffect(() => {
-    chrome.identity.getProfileUserInfo({accountStatus: 'ANY'}, function(userInfo){
-      console.log('USER INFO', JSON.stringify(userInfo))
+    chrome.identity.getProfileUserInfo({accountStatus: 'ANY'}, function(profileInfo){
+      setUserInfo({...userInfo, id: profileInfo.id, email: profileInfo.email})
     })
   }, []);
 
@@ -120,6 +125,12 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
 
   async function fetchGoals(){
     console.log("FETCHING GOALS!")
+    const response = await fetch(`http://localhost:3000/retrieve-goals?userId=${userInfo.id}`, {
+      method: "GET"})
+    
+    const responseJSON = await response.json();
+  
+    console.log("RESPONSE JSON:", responseJSON)
   }
 
 

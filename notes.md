@@ -39,18 +39,22 @@
 - Content scripts
 - Generate only when on a page with text (e.g. 
 not a search page)
-
-**To Do**
-- Implement some type of storage 
-    - Local storage for dealing with state and browser processing
     - Prisma storage for database management
         - Schematization and API service
         - Consume goals from the extension
             - Fetch API connection
             - Set up the routes on the API side
                 - Fetch goals for user
-        - Authentication on the chrome extension
-            - Option: Extension authentication through a web app
+
+
+**To Do**
+- Implement some type of storage 
+    - Local storage for dealing with state and browser processing
+        - Integrate with session db for:
+            - Storing authentication details, etc. that persist across tab loads
+            - Caching generated text and processing, probably organized using tab ids
+    - Authentication on the chrome extension
+        - Fetch google information and load into state
 
 **Google Auth**
 - 
