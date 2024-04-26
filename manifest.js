@@ -28,7 +28,8 @@ permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'identit
     // default_popup: 'src/pages/popup/index.html',
     default_icon: 'icon-34.png',
   },
-  host_permissions: ["https://*/*", "http://localhost:3000"],
+  // host_permissions: ["https://*/*", "http://localhost:3000"],
+  host_permissions: ['<all_urls>'],
   chrome_url_overrides: {
     newtab: 'src/pages/newtab/index.html',
   },

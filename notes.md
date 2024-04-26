@@ -29,6 +29,21 @@
 
 - https://medium.com/the-andela-way/authenticate-your-chrome-extension-user-through-your-web-app-dbdb96224e41
 
+- https://rebeccamdeprey.com/blog/render-openai-stream-responses-with-react
+
+- https://javascriptcentric.medium.com/how-to-use-openai-with-react-212d7d632854
+
+- https://medium.com/@hxu296/serving-openai-stream-with-fastapi-and-consuming-with-react-js-part-1-8d482eb89702
+
+- https://markus.oberlehner.net/blog/building-a-chatgpt-client-with-remix-leveraging-response-streaming-for-a-chat-like-experience/
+
+- https://github.com/openai/openai-node/issues/341
+
+- https://medium.com/@joshua.v.sanger/implementing-toolformer-with-openai-and-remix-22997dd46499
+
+- https://dev.to/franciscomendes10866/building-real-time-applications-with-remixjs-server-sent-events-and-job-queues-315f 
+
+- https://github.com/openai/openai-node/issues/18
 **Done**
 - Read page context
     - Find action associated with page changing
@@ -45,6 +60,9 @@ not a search page)
             - Fetch API connection
             - Set up the routes on the API side
                 - Fetch goals for user
+- Authentication on the chrome extension
+    - Fetch google information and load into state
+    
 
 
 **To Do**
@@ -53,8 +71,21 @@ not a search page)
         - Integrate with session db for:
             - Storing authentication details, etc. that persist across tab loads
             - Caching generated text and processing, probably organized using tab ids
-    - Authentication on the chrome extension
-        - Fetch google information and load into state
+- Stream AI responses
+    - TODO: FIX CHAT RESPONSE STUFF
 
-**Google Auth**
-- 
+
+
+    - Wait for data to be loaded in
+    - Don't interrupt stream once it's started
+    - Show text incrementally as you stream in info
+
+- Figure out what goals are relevant to each page
+
+- Implement a saving mechanism that tracks links that are highly relevant to each page
+
+- Other Tasks
+    - Failure States
+    - Loading Hooks
+    - Caching
+
