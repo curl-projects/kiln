@@ -73,12 +73,16 @@ not a search page)
             - Caching generated text and processing, probably organized using tab ids
 - Stream AI responses
     - TODO: FIX CHAT RESPONSE STUFF
-
-
-
     - Wait for data to be loaded in
     - Don't interrupt stream once it's started
     - Show text incrementally as you stream in info
+
+- RELEVANCE:
+    - Could do vector embeddings or ask the AI 
+    - Probably just ask the AI
+
+
+
 
 - Figure out what goals are relevant to each page
 

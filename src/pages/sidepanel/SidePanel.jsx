@@ -1,6 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import logo from '@assets/img/logo.svg';
 import '@pages/sidepanel/SidePanel.css';
+import styles from "@pages/sidepanel/SidePanel.module.css"
 import useStorage from '@src/shared/hooks/useStorage';
 import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage';
 import withSuspense from '@src/shared/hoc/withSuspense';
@@ -26,13 +27,14 @@ function domain_from_url(url) {
 
 const SidePanel = props => {
   const theme = useStorage(exampleThemeStorage);
-  const [pageData, setPageData] = useState('');
   const [pageError, setPageError] = useState('');
   const [activeURL, setActiveURL] = useState('');
   const [activeTabID, setActiveTabID] = useState('');
-  const [activeTabData, setActiveTabData] = useState({tabID: null, tabTitle: null, tabURL: null, windowId: null});
+  const [activeTabData, setActiveTabData] = useState({tabID: null, tabTitle: null, tabURL: null, windowId: null, pageData: null});
   const [userInfo, setUserInfo] = useState({id: null, email: null});
   const [goals, setGoals] = useState([])
+  const [activeGoal, setActiveGoal] = useState(null);
+  const [metadataOpen, setMetadataOpen] = useState(true);
 
   // useEffect(() => {
   //   console.log("PAGE DATA:", pageData)
@@ -40,18 +42,37 @@ const SidePanel = props => {
 
   useEffect(() => {
     console.log("TAB DATA:", activeTabData)
-  }, [pageData]);
+  }, [activeTabData]);
   
+  // useEffect(() => {
+  //   console.log("USER INFO:", userInfo)
+  // }, [userInfo]);
+
   useEffect(() => {
-    console.log("USER INFO:", userInfo)
-  }, [userInfo]);
+    console.log("ACTIVE GOAL:", activeGoal)
+  }, [activeGoal]);
 
   useEffect(() => {
     chrome.identity.getProfileUserInfo({accountStatus: 'ANY'}, function(profileInfo){
       setUserInfo({...userInfo, id: profileInfo.id, email: profileInfo.email})
-      fetchGoals(profileInfo.id)
     })
   }, []);
+
+  useEffect(() => {
+    async function fetchGoals(){
+        if(userInfo?.id){
+        console.log("USERINFO:", userInfo)
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_DOMAIN}/retrieve-goals?userId=${userInfo.id}`, {method: "GET"})
+        const responseJSON = await response.json();
+        if(responseJSON.success){
+          setGoals(responseJSON.goals)
+        }
+        console.log("RESPONSE JSON:", responseJSON)
+    }
+    }
+
+    fetchGoals().catch(console.error)
+  }, [userInfo])
 
 
 // CONTENT REFRESH
@@ -59,9 +80,9 @@ const SidePanel = props => {
   // SIDEBAR CREATION
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     if(tab){
-      setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId})
+      console.log("FIRST TIME!")
+      setActiveTabData({...activeTabData, tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, pageData:[{text: "Loading"}], })
       
-      setPageData([{text: "Loading"}])
       chrome.scripting.executeScript({
         target: {tabId: tab.id, allFrames: false}, 
         func: (()=>{return document.documentElement.innerHTML}),
@@ -72,17 +93,17 @@ const SidePanel = props => {
           const $textEls = $('p, h1, h2, h3').each(function(i, el){
                   textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
                 })
-          setPageData(textEls)
+          console.log("SECOND TIME!")
+          setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
       })
     };
 
   // ACTIVATION
   chrome.tabs.onActivated.addListener(async function activatedListener(activeInfo){
       chrome.tabs.get(activeInfo.tabId, function(tab){ 
-          setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId})
+          setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, pageData: [{text: "Loading"}]})
           console.log("SET LOCATION (ACTIVATED):", tab.url)
             // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
-            setPageData([{text: "Loading"}])
             chrome.scripting.executeScript({
               target: {tabId: activeInfo.tabId, allFrames: false}, 
               func: (()=>{return document.documentElement.innerHTML}),
@@ -93,7 +114,8 @@ const SidePanel = props => {
           const $textEls = $('p, h1, h2, h3').each(function(i, el){
                   textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
                 })
-          setPageData(textEls)
+          setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
+
       })
     })
 
@@ -103,9 +125,8 @@ const SidePanel = props => {
 chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, tab) {
   if(tab.active && changeInfo.status === 'complete'){
     chrome.tabs.get(tabId, function(tab){
-        setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, tabWebsite: null})
+        setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, tabWebsite: null, pageData: [{text: "Loading"}]})
           console.log("SET LOCATION (UPDATED):", tab.url)
-            setPageData([{text: "Loading"}])
             chrome.scripting.executeScript({
               target: {tabId: tabId, allFrames: false}, 
               func: (()=>{return document.documentElement.innerHTML}),
@@ -116,8 +137,8 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
         const $textEls = $('p, h1, h2, h3').each(function(i, el){
                 textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
               })
-        console.log("TEXTELS (UPDATED):", textEls);
-        setPageData(textEls)
+        // console.log("TEXTELS (UPDATED):", textEls);
+        setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
       })
     })
   }
@@ -125,60 +146,84 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
 });
   }, []);
 
-  async function fetchGoals(userId){
-    console.log("FETCHING GOALS!")
-    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_DOMAIN}/retrieve-goals?userId=${userId}`, {method: "GET"})
-    
-    const responseJSON = await response.json();
-    if(responseJSON.success){
-      setGoals(responseJSON.goals)
+  function makeGoalActive(goalId){
+    if(activeGoal && activeGoal.id === goalId){
+      setActiveGoal(null)
     }
-  
-    console.log("RESPONSE JSON:", responseJSON)
+    else{
+      setActiveGoal(goals.filter(goal => goal.id === goalId)[0])
+    }
   }
 
 
-
   return (
-    <div
-      className="sidepanelWrapper"
-      style={{
-        backgroundColor: theme === 'light' ? '#fff' : '#000',
-      }}>
-        <div className='panelTopAccentWrapper'>
-          <div className='accentTopEyebrowWrapper'>
-            <p className='accentEyebrow'>Ariadne</p>
+    <div className={styles.sidepanelWrapper}>
+        <div className={styles.panelTopAccentWrapper}>
+          <div className={styles.accentTopEyebrowWrapper}>
+            <p className={styles.accentEyebrow}>Ariadne</p>
             <div style={{flex: 1}}/>
-            <div className='accentTopIconWrapper'>
-              <div className='smallCircle'style={{backgroundColor: "#FEAC85"}}/>
-              <div className='smallCircle'style={{backgroundColor: "#BEBEBC"}}/>
-              <div className='smallCircle'style={{backgroundColor: "#344148"}}/>
+            <div className={styles.accentTopIconWrapper} 
+            style={{cursor: "pointer"}}
+            onClick={()=>setMetadataOpen(prevState => !prevState)}>
+              <div className={styles.smallCircle} style={{backgroundColor: "#FEAC85"}}/>
+              <div className={styles.smallCircle} style={{backgroundColor: "#BEBEBC"}}/>
+              <div className={styles.smallCircle} style={{backgroundColor: "#344148"}}/>
             </div>
           </div>
-          <div className='accentLine'/>
-          <p className='accentSecondaryEyebrow'>{activeTabData.tabTitle || "Unknown"}</p>
+          <div className={styles.accentLine}/>
+          <p className={styles.accentSecondaryEyebrow}>{activeTabData.tabTitle || "Unknown"}</p>
         </div>
-        <div className='mainTextWrapper'>
-          <h1 className='mainText'>{activeTabData.tabTitle}</h1>
-          <div className='mainTextLine'/>
+        {metadataOpen && 
+          <div className={styles.metadataPanel}>
+             <div className={styles.metadataInnerPanel}>
+              <p className={styles.metadataText}>
+                {activeTabData.tabTitle || "Unknown"}
+              </p>
+            </div>
+            <div className={styles.metadataInnerPanel}>
+              <p className={styles.metadataText}>
+                {activeTabData.pageData ? activeTabData.pageData.map(e => e.text).join('') : "No text found"}
+              </p>
+            </div>
+            <div className={styles.metadataInnerPanel}>
+              <ChatResponse 
+                goals={goals}
+                activeTabData={activeTabData}
+              />
+            </div>
+          </div>
+        }
+        <div className={styles.mainTextWrapper}>
+          <h1 className={styles.mainText}>{activeTabData.tabTitle}</h1>
+          <div className={styles.mainTextLine}/>
         </div>
-        {/* <div className='descriptionTextWrapper'>
-          <p className='descriptionText'>
-            <span className='descriptionTextPast'>
+        {/* <div className={styles.descriptionTextWrapper'>
+          <p className={styles.descriptionText'>
+            <span className={styles.descriptionTextPast'>
 
             </span>
-            <span className='descriptionTextPresent'>
+            <span className={styles.descriptionTextPresent'>
               Hello, welcome to the extension.
             </span>
           </p>
         </div> */}
-        <div className='goalsWrapper'>
-          <div className='goalsInnerWrapper'>
-            <GoalCardTwo />
-            <GoalCardTwo />
-            <GoalCardTwo />
+        <div className={styles.goalsWrapper}>
+          <div className={styles.goalsInnerWrapper}>
+            {goals && goals.map((goal)=>
+              <GoalCardTwo
+                key={goal.id}
+                id={goal.id}
+                category={goal.category}
+                description={goal.description}
+                title={goal.title}
+                isActive={activeGoal && activeGoal.id === goal.id}
+                makeGoalActive={makeGoalActive}
+              />
+            )}
           </div>
-          <GoalCardDetail />
+          {activeGoal &&
+            <GoalCardDetail activeGoal={activeGoal}/>
+          }
         </div>
 
 

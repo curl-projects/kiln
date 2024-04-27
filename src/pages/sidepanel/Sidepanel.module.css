@@ -1,0 +1,148 @@
+
+.sidepanelWrapper{
+    height: 100vh;
+    width: 100vw;
+    border: 2px solid green;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .panelTopAccentWrapper{
+    width: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-left: 20px;
+  }
+  
+  .accentTopEyebrowWrapper{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .accentTopIconWrapper{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    margin-right: 30px;
+  }
+  
+  .smallCircle{
+    border-radius: 100%;
+    height: 18px;
+    width: 18px;
+  }
+  
+  .accentEyebrow{
+    font-size: 18px;
+    color: #CCCFCC; 
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    line-height: 0px;
+    margin-bottom: 0.6em;
+    margin-top: 0.6em;
+    position: relative;
+    left: 10px;
+  }
+  
+  .accentSecondaryEyebrow{
+    font-size: 10px;
+    /* color: #CCCFCC;  */
+    color: #FEAC85;
+    font-weight: bold;
+    letter-spacing: -0.1em;
+    position: relative;
+    left: 10px;
+    bottom: 6px;
+    text-transform: uppercase;
+    padding-right: 40px;
+  }
+  
+  .accentLine{
+    width: inherit;
+    height: 2px;
+    background-color: #CCCFCC;
+  }
+
+  .metadataPanel{
+    padding-left: 40px;
+    padding-right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .metadataInnerPanel{
+    max-height: 200px;
+    overflow: scroll;
+    border: 1px solid #CCCFCC;
+    padding: 10px;
+  }
+
+  .metadataText{
+
+  }
+  
+  .mainTextWrapper{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  
+  
+  .mainText{
+    font-size: 20px;
+    color: #7F847D;
+    letter-spacing: -0.06em;
+    position: relative;
+    left: 10px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-right: 12px;
+    line-height: 1.1em;
+  }
+  
+  .mainTextLine{
+    width: inherit;
+    height: 2px;
+    margin-top: 5px;
+    background-color: #7F847D
+  }
+  
+  
+  .descriptionTextWrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .descriptionText{
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: bold;
+    color: #62605B;
+    letter-spacing: -0.02em;
+  }
+  
+  .goalsWrapper{
+    height: fit-content;
+    width: 100%;
+    overflow: hidden;
+    padding-left: 10px;
+    padding-top: 10px;
+  }
+  
+  .goalsInnerWrapper{
+    /* width: 100%; */
+    overflow: scroll;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+    padding-right: 40px;
+    padding-bottom: 20px;
+  }

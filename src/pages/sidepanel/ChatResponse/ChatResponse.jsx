@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-export const ChatResponse = () => {
+export const ChatResponse = (props) => {
     const [data, setData] = useState('');
     const [error, setError] = useState(null);
     const url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/ai-completion`;
   
   function fetchAI(){
     const fetchData = async () => {
+        if(props.goals.length > 0 && props.activeTabData.tabTitle && true){
         try {
             console.log("URL:", url)
             const response = await fetch(url);
@@ -59,10 +60,11 @@ export const ChatResponse = () => {
                 }
             };
 
-            readStream();
-        } catch (e) {
-            setError('Failed to fetch data.');
-            console.error('Fetch failed:', e);
+                readStream();
+            } catch (e) {
+                setError('Failed to fetch data.');
+                console.error('Fetch failed:', e);
+            }
         }
     };
 
@@ -71,11 +73,11 @@ export const ChatResponse = () => {
 
   
   return (
-    <div>
-    <p>{data}</p>
+    <>
       <button onClick={fetchAI}>Fetch AI</button>
-      {error & <p>Error: {Error}</p>}
-    </div>
+      <p>{data}</p>
+
+    </>
   );
 };
 
