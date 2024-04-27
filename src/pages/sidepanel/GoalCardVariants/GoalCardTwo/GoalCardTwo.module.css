@@ -1,0 +1,155 @@
+
+.goalBox{
+    border: 1px solid #EEEEEC;
+    min-width: 180px;
+    flex: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.goalBox:hover{
+    transform: scale(1.05);
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+  
+  
+  .goalBadgeWrapper{
+    display: flex;
+    height: 70px;
+    width: 100%;
+    position: relative;
+    overflow: clip;
+  }
+  
+  .goalBadgeInnerCircle{
+    border-radius: 100%;
+    position: absolute;
+    height: 140px;
+    width: 140px;
+    right: 0;
+    top: 0;
+    background-color: #EFF1EF;
+    transform: translate(50%, -50%); 
+  }
+  
+  .goalBadgeOuterCircle{
+    border-radius: 100%;
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%); 
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .goalMetadataWrapper{
+    margin-top: 10px;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .goalMetadataLabelWrapper{
+    display: flex;
+    gap: 12px;
+    margin-left: 20px;
+  }
+  
+  .goalMetadataLabelIcon{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #62605B;
+    position: relative;
+    top: 2px;
+  }
+  
+  .goalMetadataLabel{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #62605B;
+  }
+  
+  .goalMetadataNumberBox{
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid #b4b2ac;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    height: fit-content;
+    margin-right: 20px;
+  }
+  
+  .goalMetadataNumber{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #62605B;
+    line-height: 0px;
+  }
+  
+  .goalTitleWrapper{
+    margin-top: 10px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    overflow: clip;
+  }
+  
+  .goalTitleEyebrowWrapper{
+    display: flex;
+    margin-left: 10px;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .goalTitleEyebrow{
+    font-size: 10px;
+    color: #B9BCB8; 
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    line-height: 0px;
+    margin-bottom: 0.6em;
+    margin-top: 0.6em;
+  }
+  
+  .goalTitleEyebrowLine{
+    width: 100%;
+    height: 2px;
+    background-color: #B9BCB8;
+  }
+  
+  .goalInnerTitleWrapper{
+    display: flex;
+    flex-direction: column;
+    margin-left: 5px;
+    width: 100%;
+  }
+  
+  .goalTitle{
+    font-size: 20px;
+    color: #7F847D;
+    letter-spacing: -0.06em;
+    font-weight: bold;
+    position: relative;
+    left: 4px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-right: 12px;
+    line-height: 1.1em;
+  }
+  
+  .goalTitleLine{
+    width: 100%;
+    height: 2px;
+    background-color: #7F847D;
+  }

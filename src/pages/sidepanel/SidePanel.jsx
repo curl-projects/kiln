@@ -8,6 +8,9 @@ import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
 
 import * as cheerio from "cheerio";
 import { ChatResponse } from './ChatResponse/ChatResponse';
+import GoalCardOne from './GoalCardVariants/GoalCardOne/GoalCardOne.jsx';
+import GoalCardTwo from './GoalCardVariants/GoalCardTwo/GoalCardTwo.jsx';
+import GoalCardDetail from './GoalCardDetail/GoalCardDetail.jsx';
 
 function domain_from_url(url) {
   var result
@@ -138,11 +141,48 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
 
   return (
     <div
-      className="App"
+      className="sidepanelWrapper"
       style={{
         backgroundColor: theme === 'light' ? '#fff' : '#000',
       }}>
-      <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
+        <div className='panelTopAccentWrapper'>
+          <div className='accentTopEyebrowWrapper'>
+            <p className='accentEyebrow'>Ariadne</p>
+            <div style={{flex: 1}}/>
+            <div className='accentTopIconWrapper'>
+              <div className='smallCircle'style={{backgroundColor: "#FEAC85"}}/>
+              <div className='smallCircle'style={{backgroundColor: "#BEBEBC"}}/>
+              <div className='smallCircle'style={{backgroundColor: "#344148"}}/>
+            </div>
+          </div>
+          <div className='accentLine'/>
+          <p className='accentSecondaryEyebrow'>{activeTabData.tabTitle || "Unknown"}</p>
+        </div>
+        <div className='mainTextWrapper'>
+          <h1 className='mainText'>{activeTabData.tabTitle}</h1>
+          <div className='mainTextLine'/>
+        </div>
+        {/* <div className='descriptionTextWrapper'>
+          <p className='descriptionText'>
+            <span className='descriptionTextPast'>
+
+            </span>
+            <span className='descriptionTextPresent'>
+              Hello, welcome to the extension.
+            </span>
+          </p>
+        </div> */}
+        <div className='goalsWrapper'>
+          <div className='goalsInnerWrapper'>
+            <GoalCardTwo />
+            <GoalCardTwo />
+            <GoalCardTwo />
+          </div>
+          <GoalCardDetail />
+        </div>
+
+
+      {/* <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
         <p>Active URL: {activeTabData.tabURL}</p>
         <p>Active Tab ID: {activeTabData.tabID}</p>
         <p>Title: {activeTabData.tabTitle}</p>
@@ -190,7 +230,7 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
         </div>
         <button onClick={fetchGoals}>Click here to refetch goals</button>
         
-      </header>
+      </header> */}
     </div>
   );
 };
