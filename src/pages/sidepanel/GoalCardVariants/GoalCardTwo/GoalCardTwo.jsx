@@ -28,9 +28,37 @@ export default function GoalCardTwo(props){
             <div className={styles.goalTitleLine}/>
             </div>
         </div>
-        <div className={styles.relevanceBox}>
-            <p className={styles.relevanceNumber}>95%</p>
-        </div>
+        {props.goalRanking 
+            ? 
+            <div className={styles.relevanceBox} style={{
+                backgroundColor: {
+                    'High': "#F97032",
+                    "Medium": "#FEAD82",
+                    "Low": "#FDECE3",
+                }[props.goalRanking],
+                borderColor: {
+                    'High': "#9F3A0C",
+                    "Medium": "#D2652C",
+                    "Low": "#E2BFAD",
+                }[props.goalRanking],
+            }}>
+                <p className={styles.relevanceNumber} style={{ color: "7F847D" }}>
+                    {/* {{'High': "Relevant",
+                    "Medium": "Somewhat Relevant",
+                    "Low": "Not Relevant",
+                    }[props.goalRanking]} */}
+                    {{'High': "",
+                    "Medium": "",
+                    "Low": "",
+                    }[props.goalRanking]}
+                    
+                    </p>
+            </div>
+            :
+            <div className={styles.relevanceBox}>
+                <p className={styles.relevanceNumber}>...</p>
+            </div>
+        }
         </div>
     )
 }

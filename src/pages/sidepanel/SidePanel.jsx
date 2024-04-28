@@ -7,8 +7,9 @@ import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage';
 import withSuspense from '@src/shared/hoc/withSuspense';
 import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
 
-import * as cheerio from "cheerio";
-import { ChatResponse } from './ChatResponse/ChatResponse';
+import cheerio from "cheerio";
+
+import AIOrchestration from './AIOrchestration/AIOrchestration';
 import GoalCardOne from './GoalCardVariants/GoalCardOne/GoalCardOne.jsx';
 import GoalCardTwo from './GoalCardVariants/GoalCardTwo/GoalCardTwo.jsx';
 import GoalCardDetail from './GoalCardDetail/GoalCardDetail.jsx';
@@ -30,11 +31,14 @@ const SidePanel = props => {
   const [pageError, setPageError] = useState('');
   const [activeURL, setActiveURL] = useState('');
   const [activeTabID, setActiveTabID] = useState('');
-  const [activeTabData, setActiveTabData] = useState({tabID: null, tabTitle: null, tabURL: null, windowId: null, pageData: null});
+  const [activeTabData, setActiveTabData] = useState({tabID: null, tabTitle: null, tabURL: null, windowId: null});
+  const [pageData, setPageData] = useState(null);
   const [userInfo, setUserInfo] = useState({id: null, email: null});
   const [goals, setGoals] = useState([])
   const [activeGoal, setActiveGoal] = useState(null);
-  const [metadataOpen, setMetadataOpen] = useState(true);
+  const [activeGoalSummary, setActiveGoalSummary] = useState("")
+  const [metadataOpen, setMetadataOpen] = useState(false);
+  const [goalRanking, setGoalRanking] = useState(null)
 
   // useEffect(() => {
   //   console.log("PAGE DATA:", pageData)
@@ -43,6 +47,10 @@ const SidePanel = props => {
   useEffect(() => {
     console.log("TAB DATA:", activeTabData)
   }, [activeTabData]);
+
+  useEffect(() => {
+    console.log("GOAL RANKING:", goalRanking)
+  }, [goalRanking]);
   
   // useEffect(() => {
   //   console.log("USER INFO:", userInfo)
@@ -81,7 +89,8 @@ const SidePanel = props => {
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     if(tab){
       console.log("FIRST TIME!")
-      setActiveTabData({...activeTabData, tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, pageData:[{text: "Loading"}], })
+      setActiveTabData({...activeTabData, tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId})
+      setPageData([{text: "Loading"}])
       
       chrome.scripting.executeScript({
         target: {tabId: tab.id, allFrames: false}, 
@@ -94,14 +103,15 @@ const SidePanel = props => {
                   textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
                 })
           console.log("SECOND TIME!")
-          setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
+          setPageData(textEls)
       })
     };
 
   // ACTIVATION
   chrome.tabs.onActivated.addListener(async function activatedListener(activeInfo){
       chrome.tabs.get(activeInfo.tabId, function(tab){ 
-          setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, pageData: [{text: "Loading"}]})
+          setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId})
+          setPageData([{text: "Loading"}])
           console.log("SET LOCATION (ACTIVATED):", tab.url)
             // console.log("EXECUTE SCRIPT (ACTIVATED):", activeInfo.tabId)
             chrome.scripting.executeScript({
@@ -114,7 +124,7 @@ const SidePanel = props => {
           const $textEls = $('p, h1, h2, h3').each(function(i, el){
                   textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
                 })
-          setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
+          setPageData(textEls)
 
       })
     })
@@ -125,7 +135,8 @@ const SidePanel = props => {
 chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, tab) {
   if(tab.active && changeInfo.status === 'complete'){
     chrome.tabs.get(tabId, function(tab){
-        setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, tabWebsite: null, pageData: [{text: "Loading"}]})
+        setActiveTabData({tabID: tab.id, tabTitle: tab.title, tabURL: tab.url, windowId: tab.windowId, tabWebsite: null})
+        setPageData([{text: "Loading"}])
           console.log("SET LOCATION (UPDATED):", tab.url)
             chrome.scripting.executeScript({
               target: {tabId: tabId, allFrames: false}, 
@@ -138,7 +149,7 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
                 textEls.push({tag: $(this).get(0).tagName, text: $(this).text().trim()})
               })
         // console.log("TEXTELS (UPDATED):", textEls);
-        setActiveTabData((prevState) => {return {...prevState, pageData: textEls}})
+        setPageData(textEls)
       })
     })
   }
@@ -182,31 +193,18 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
             </div>
             <div className={styles.metadataInnerPanel}>
               <p className={styles.metadataText}>
-                {activeTabData.pageData ? activeTabData.pageData.map(e => e.text).join('') : "No text found"}
+                {pageData ? pageData.map(e => e.text).join('') : "No text found"}
               </p>
             </div>
             <div className={styles.metadataInnerPanel}>
-              <ChatResponse 
-                goals={goals}
-                activeTabData={activeTabData}
-              />
             </div>
           </div>
         }
         <div className={styles.mainTextWrapper}>
-          <h1 className={styles.mainText}>{activeTabData.tabTitle}</h1>
+          <h1 className={styles.mainText}>{activeGoalSummary}</h1>
           <div className={styles.mainTextLine}/>
         </div>
-        {/* <div className={styles.descriptionTextWrapper'>
-          <p className={styles.descriptionText'>
-            <span className={styles.descriptionTextPast'>
-
-            </span>
-            <span className={styles.descriptionTextPresent'>
-              Hello, welcome to the extension.
-            </span>
-          </p>
-        </div> */}
+  
         <div className={styles.goalsWrapper}>
           <div className={styles.goalsInnerWrapper}>
             {goals && goals.map((goal)=>
@@ -218,14 +216,39 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
                 title={goal.title}
                 isActive={activeGoal && activeGoal.id === goal.id}
                 makeGoalActive={makeGoalActive}
+                goalRanking={goalRanking && goalRanking[goal.id]}
               />
             )}
           </div>
           {activeGoal &&
-            <GoalCardDetail activeGoal={activeGoal}/>
+            <GoalCardDetail 
+              activeGoal={activeGoal}
+              activeGoalSummary={activeGoalSummary}
+              />
           }
+          <AIOrchestration
+                goals={goals}
+                activeTabData={activeTabData}
+                pageData={pageData}
+                activeGoal={activeGoal}
+                setActiveGoalSummary={setActiveGoalSummary}
+                setGoalRanking={setGoalRanking}
+                setActiveGoal={setActiveGoal}
+              />
         </div>
 
+
+
+ {/* <div className={styles.descriptionTextWrapper'>
+          <p className={styles.descriptionText'>
+            <span className={styles.descriptionTextPast'>
+
+            </span>
+            <span className={styles.descriptionTextPresent'>
+              Hello, welcome to the extension.
+            </span>
+          </p>
+        </div> */}
 
       {/* <header className="App-header" style={{ color: theme === 'light' ? '#000' : '#fff' }}>
         <p>Active URL: {activeTabData.tabURL}</p>

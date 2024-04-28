@@ -93,3 +93,9 @@ not a search page)
     - Loading Hooks
     - Caching
 
+
+**Bugs**
+- Handle error case when the extension isn't allowed to access URL contents
+
+- Want to classify relevance first, and then use that to figure out which goals to show. Only generate the AI response for each goal when it's opened.
+- Add system message
