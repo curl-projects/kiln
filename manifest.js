@@ -15,7 +15,7 @@ const manifest = {
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting'],
+permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'identity', 'identity.email'],
   side_panel: {
     default_path: 'src/pages/sidepanel/index.html',
   },
@@ -28,7 +28,8 @@ const manifest = {
     // default_popup: 'src/pages/popup/index.html',
     default_icon: 'icon-34.png',
   },
-  host_permissions: ["https://*/*"],
+  // host_permissions: ["https://*/*", "http://localhost:3000"],
+  host_permissions: ['<all_urls>'],
   chrome_url_overrides: {
     newtab: 'src/pages/newtab/index.html',
   },

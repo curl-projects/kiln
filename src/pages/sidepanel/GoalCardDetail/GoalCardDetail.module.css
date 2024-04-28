@@ -1,0 +1,86 @@
+.goalsDetailWrapper{
+    flex: 1;
+}
+
+.goalMetadataOuterWrapper{
+    margin-left: 40px;
+}
+
+.goalMetadataInnerWrapper{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .goalMetadataLabelWrapper{
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  
+  .goalMetadataLabelIcon{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #62605B;
+    position: relative;
+    top: 2px;
+  }
+  
+  .goalMetadataLabel{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #62605B;
+  }
+  
+  .goalMetadataNumberBox{
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid #b4b2ac;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    height: fit-content;
+    margin-right: 40px;
+  }
+  
+  .goalMetadataNumber{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #62605B;
+    line-height: 0px;
+  }
+  
+  .goalMetadataLine{
+    height: 2px;
+    width: 100%;
+    background-color: #B9BCB8;
+    position: relative;
+    bottom: 2px;
+  }
+
+  .goalDescriptionWrapper{
+    margin-left: 20px;
+  }
+
+  .goalDescription{
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    color: #7F847D;
+    font-weight: 550;
+    padding-right: 20px;
+  }
+
+  .goalDescriptionLine{
+    height: 2px;
+    width: 100%;
+    background-color: #B9BCB8;
+    position: relative;
+    bottom: 2px;
+  }
