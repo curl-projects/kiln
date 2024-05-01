@@ -51,6 +51,7 @@ function GoalView(props){
                     <Task 
                         task={task}
                         key={index}
+                        activeTabData={props.activeTabData}
                     />
                 )
                 }

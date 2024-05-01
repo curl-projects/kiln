@@ -54,7 +54,7 @@ export default function SidePanel(props){
         <div className={styles.sidepanelWrapper}>
           {activeGoal 
             ? <GoalView 
-                goal={activeGoal}
+                goal={goalData.goals.filter(goal => goal.id === activeGoal.id)[0]}
                 setActiveGoal={setActiveGoal}
                 activeTabData={activeTabData}
             />

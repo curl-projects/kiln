@@ -220,7 +220,7 @@ chrome.tabs.onUpdated.addListener(function updatedListener(tabId, changeInfo, ta
               />
             )}
           </div>
-          {activeGoal &&
+        {activeGoal &&
             <GoalCardDetail 
               activeGoal={activeGoal}
               activeGoalSummary={activeGoalSummary}

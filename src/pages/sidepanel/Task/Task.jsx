@@ -3,16 +3,38 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { useState, useEffect } from 'react';
 import AutosaveText from '../AutosaveText/AutosaveText';
 import { updateTask } from '../../api-funcs/tasks';
+import { createLink } from '../../api-funcs/links';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-export default function Task({ task }){
+
+export default function Task({ task, ...props }){
     const [descriptionOpen, setDescriptionOpen] = useState(true);
     const [linksOpen, setLinksOpen] = useState(true);
     const [taskCompleted, setTaskCompleted] = useState(false);
+    const queryClient = useQueryClient()
 
     useEffect(()=>{
         console.log("TASK:", task)
     }, [task])
-    
+
+    const linksMutation = useMutation({
+        mutationFn: createLink,
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['goals']})
+        },
+        onError: (data) => {
+            console.error("MUTATION ERROR:", data)
+        }
+    })
+
+    useEffect(() => {
+        linksMutation.reset()
+    }, [])
+
+    useEffect(() => {
+        console.log("LINKS MUTATION:", linksMutation.status, linksMutation.isLoading)
+    }, [linksMutation.isLoading, linksMutation.isSuccess, linksMutation.isError, linksMutation.isIdle])
+
     return(
         <div className={styles.taskOuterWrapper}>
             <div className={styles.taskInnerWrapper}>
@@ -23,7 +45,6 @@ export default function Task({ task }){
                     <p className={styles.taskEyebrow}>{task.completed ? "Completed" : "Incomplete"}</p>
                 </div>
                 <div className={styles.taskTitleWrapper}>
-                    {/* <p className={styles.taskTitle} contentEditable>{task.title || "Untitled"} </p> */}
                     <AutosaveText 
                         className={styles.taskTitle} 
                         content={task.title}
@@ -43,9 +64,13 @@ export default function Task({ task }){
                     <div className={styles.detailAccentLine}/>
                     {descriptionOpen &&
                         <div className={styles.taskDescriptionWrapper}>
-                            <p className={styles.taskDescription} contentEditable>
-                            {task.description || "No description"}
-                            </p>
+                            <AutosaveText 
+                                className={styles.taskDescription} 
+                                content={task.description}
+                                mutationFn={updateTask}
+                                objectId={task.id}
+                                field="description"
+                                />
                         </div>
                     }
                     </div>
@@ -56,7 +81,18 @@ export default function Task({ task }){
                         }} onClick={()=>setLinksOpen(prevState => !prevState)}/>
                         <p className={styles.taskDetailTitle} onClick={()=>setLinksOpen(prevState => !prevState)}>Links</p>
                         <div style={{flex: 1}}/>
-                        <p className={styles.taskDetailAction}>Add Current Page</p>
+                        <p 
+                            className={styles.taskDetailAction} 
+                            onClick={() => linksMutation.mutate({
+                                linkTitle: props.activeTabData.tabTitle,
+                                linkURL: props.activeTabData.tabURL,
+                                taskId: task.id,
+                                })}>
+                                {linksMutation.status === 'pending' && "Adding Current Page"}
+                                {linksMutation.status === 'success' && "Added Current Page"}
+                                {linksMutation.status === 'error' && "Error Adding Page"}
+                                {linksMutation.status === 'idle' && "Add Current Page"}
+                                </p>
                     </div>
                     <div className={styles.detailAccentLine}/>
                     {linksOpen &&
@@ -64,7 +100,7 @@ export default function Task({ task }){
                             {(task.links && task.links.length !== 0) ? 
                                 task.links.map((link, index) => (
                                 <div className={styles.taskLinkWrapper} key={index}>
-                                    <p className={styles.taskLinkTitle}>{link.title}</p>
+                                    <a className={styles.taskLinkTitle} href={link.url} target="_blank">{link.title}</a>
                                     <p className={styles.taskLinkDescription} contentEditable>{link.description}</p>
                                 </div>
                                 ))
