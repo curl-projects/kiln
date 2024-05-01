@@ -98,6 +98,17 @@
     flex-direction: row;
     padding-right: 30px;
     margin-bottom: 8px;
+    align-items: center;
+}
+
+.goalActionSeparator{
+  border: 100%;
+  background-color: #FEAC85;
+  height: 4px;
+  width: 4px;
+  margin-left: 8px;
+  margin-right: 8px;
+
 }
 
 .goalAction{

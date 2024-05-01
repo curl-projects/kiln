@@ -43,6 +43,8 @@ function GoalView(props){
             <div className={styles.tasksWrapper}>
                 <div className={styles.goalActionBar}>
                     <div style={{flex: 1}}/>
+                    <p className={styles.goalAction}>Collapse Cards</p>
+                    <div className={styles.goalActionSeparator}/>
                     <p className={styles.goalAction} onClick={() => {
                         taskMutation.mutate({ goalId: props.goal.id})
                     }}>Add New Task</p>
@@ -52,6 +54,7 @@ function GoalView(props){
                         task={task}
                         key={index}
                         activeTabData={props.activeTabData}
+                        goal={props.goal}
                     />
                 )
                 }

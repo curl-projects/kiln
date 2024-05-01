@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import '@pages/sidepanel/index.css';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import SidePanel from '@pages/sidepanel/SidePanel.jsx';
+import { ReactQueryDevtoolsPanel } from 'react-query-devtools';
 
 refreshOnUpdate('pages/sidepanel');
 import {
@@ -20,8 +21,9 @@ function init() {
   const root = createRoot(appContainer);
   root.render(
     <QueryClientProvider client={queryClient}>
-      <SidePanel />
+        <SidePanel />
     </QueryClientProvider>
+    
   );
 }
 

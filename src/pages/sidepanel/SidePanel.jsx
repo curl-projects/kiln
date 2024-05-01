@@ -4,15 +4,15 @@ import styles from "@pages/sidepanel/SidePanel.module.css"
 import GoalCard from "./GoalCard/GoalCard.jsx"
 import GoalView from './GoalView/GoalView.jsx';
 import { useQuery } from '@tanstack/react-query'
-import useActiveTabDataUpdater from './useActiveTabData';
-
-// import cheerio from "cheerio";
+import useActiveTabDataUpdater from './hooks/useActiveTabData.js';
+import { ReactQueryDevtoolsPanel } from 'react-query-devtools';
 
 import { fetchGoals } from "../api-funcs/goals.js"
 
 export default function SidePanel(props){
-    const [userInfo, setUserInfo] = useState({id: null, email: null});
     const [activeGoal, setActiveGoal] = useState(null)
+    const [userInfo, setUserInfo] = useState({id: null, email: null});
+  
 
     const { activeTabData, pageData } = useActiveTabDataUpdater();
     
@@ -23,22 +23,23 @@ export default function SidePanel(props){
       })
     }, []);
 
-
     const { status: goalStatus, data: goalData, error: goalError, refetch: refetchGoals } = useQuery({ 
       queryKey: ['goals', userInfo], 
       queryFn: () => fetchGoals(userInfo.id),
       enabled: !!userInfo.id
   });
+
     useEffect(() => {
       refetchGoals()
     }, [])
 
-    useEffect(() => {
-      console.log("ACTIVE TAB DATA:", activeTabData)
-    }, [activeTabData, pageData]);
+
+    // useEffect(() => {
+    //   console.log("ACTIVE TAB DATA:", activeTabData)
+    // }, [activeTabData, pageData]);
 
     useEffect(() => {
-      console.log("GOAL DATA::", goalData)
+      console.log("GOAL DATA:", goalData)
     }, [goalData]);
 
 
@@ -57,6 +58,7 @@ export default function SidePanel(props){
                 goal={goalData.goals.filter(goal => goal.id === activeGoal.id)[0]}
                 setActiveGoal={setActiveGoal}
                 activeTabData={activeTabData}
+                
             />
             :
               <>
@@ -69,6 +71,7 @@ export default function SidePanel(props){
                   />
               )}
             </>
+
           }
         <p onClick={()=>setActiveGoal(null)}>Back</p>
         </div>
