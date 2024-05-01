@@ -7,6 +7,7 @@ import { createLink } from '../../api-funcs/links';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from '../Link/Link';
 import { FiX } from "react-icons/fi";
+import { RxDragHandleDots2 } from "react-icons/rx";
 import { deleteTask } from '../../api-funcs/tasks';
 
 export default function Task({ task, ...props }){
@@ -52,6 +53,9 @@ export default function Task({ task, ...props }){
 
     return(
         <div className={styles.taskOuterWrapper}>
+            <p className={styles.taskHandle}>
+                <RxDragHandleDots2 />
+            </p>
             <div className={styles.taskInnerWrapper}>
                 <div className={styles.taskEyebrowWrapper} onClick={()=>setTaskCompleted(prevState => !prevState)}>
                     <div className={styles.taskCompleteCircle} style={{
