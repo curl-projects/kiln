@@ -1,0 +1,122 @@
+.goalViewWrapper{
+    height: 100%;
+    width: 100%;
+}
+
+/* GOAL ACCENT */
+.panelTopAccentWrapper{
+    width: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: 20px;
+  }
+  
+  .accentTopEyebrowWrapper{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .accentTopIconWrapper{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    margin-right: 30px;
+  }
+  
+  .smallCircle{
+    border-radius: 100%;
+    height: 18px;
+    width: 18px;
+  }
+  
+  .accentEyebrow{
+    font-size: 18px;
+    color: #CCCFCC; 
+    font-weight: bold;
+    letter-spacing: -0.06em;
+    line-height: 18px;
+    margin-bottom: 0.6em;
+    margin-top: 0.6em;
+    position: relative;
+    left: 10px;
+    padding-right: 60px;
+  }
+  
+  .accentSecondaryEyebrow{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    /* color: #CCCFCC;  */
+    color: #FEAC85;
+    font-weight: bold;
+    letter-spacing: -0.1em;
+    position: relative;
+    left: 10px;
+    bottom: 6px;
+    text-transform: uppercase;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+  
+  .accentLine{
+    width: inherit;
+    height: 2px;
+    background-color: #CCCFCC;
+  }
+
+/* ASSISTANT TEXT */
+  
+.mainTextWrapper{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  
+  
+  .mainText{
+    font-size: 20px;
+    color: #7F847D;
+    letter-spacing: -0.06em;
+    position: relative;
+    left: 10px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-right: 12px;
+    line-height: 1.1em;
+  }
+  
+  .mainTextLine{
+    width: inherit;
+    height: 2px;
+    margin-top: 5px;
+    background-color: #7F847D
+  }
+
+.goalActionBar{
+    display: flex;
+    flex-direction: row;
+    padding-right: 30px;
+    margin-bottom: 8px;
+}
+
+.goalAction{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FEAC85;
+    text-transform: uppercase;
+    margin: 0px;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+}
+
+.goalAction:hover{
+    text-decoration: underline;
+}
+  
+.tasksWrapper{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+}

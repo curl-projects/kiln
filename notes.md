@@ -44,6 +44,10 @@
 - https://dev.to/franciscomendes10866/building-real-time-applications-with-remixjs-server-sent-events-and-job-queues-315f 
 
 - https://github.com/openai/openai-node/issues/18
+
+- https://stackoverflow.com/questions/62340697/react-query-how-to-usequery-when-button-is-clicked
+
+
 **Done**
 - Read page context
     - Find action associated with page changing
@@ -99,3 +103,6 @@ not a search page)
 
 - Want to classify relevance first, and then use that to figure out which goals to show. Only generate the AI response for each goal when it's opened.
 - Add system message
+
+
+- Avoid nested component waterfalls for the goals view
