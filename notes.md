@@ -108,3 +108,9 @@ not a search page)
 - Avoid nested component waterfalls for the goals view
 
 - TODO: add the queryCaching feature thingy to make everything much faster
+
+- AI MEMORY:
+    - Vector Store?
+    - Conversational memory?
+    - Tracking engagement over time
+    - 

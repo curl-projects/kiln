@@ -1,0 +1,57 @@
+
+.mainTextWrapper{
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  
+  
+  .mainText{
+    font-size: 20px;
+    color: #7F847D;
+    letter-spacing: -0.06em;
+    position: relative;
+    left: 10px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-right: 12px;
+    line-height: 1.1em;
+    margin-right: 16px;
+  }
+  
+  .mainTextLine{
+    width: inherit;
+    height: 2px;
+    margin-top: 5px;
+    background-color: #7F847D
+  }
+
+  .chatAction{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FEAC85;
+    text-transform: uppercase;
+    margin: 0px;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+  }
+
+  .chatAction:hover{
+    text-decoration: underline;
+  }
+
+  .userReplyWrapper{
+    max-width: 88%;
+  }
+
+
+  .userReply{
+    font-size: 16px;
+    color: #FEAD82;
+    letter-spacing: -0.06em;
+    font-weight: 550;
+    margin-top: 4px;
+    position: relative;
+    left: 10px;
+    outline: none;
+  }

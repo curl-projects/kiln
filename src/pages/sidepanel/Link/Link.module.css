@@ -25,3 +25,17 @@
     outline: none;
     border: none;
 }
+
+.linkAIAction{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #CCCFCC;
+    cursor: pointer;
+    margin: 4px;
+}
+
+.linkAIAction:hover{
+    text-transform: underline;
+}

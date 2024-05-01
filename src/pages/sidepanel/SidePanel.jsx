@@ -58,6 +58,8 @@ export default function SidePanel(props){
                 goal={goalData.goals.filter(goal => goal.id === activeGoal.id)[0]}
                 setActiveGoal={setActiveGoal}
                 activeTabData={activeTabData}
+
+                goals={goalData.goals}
                 
             />
             :

@@ -67,7 +67,7 @@
   }
 
 /* ASSISTANT TEXT */
-  
+/*   
 .mainTextWrapper{
     margin-left: 10px;
     margin-top: 10px;
@@ -92,6 +92,17 @@
     margin-top: 5px;
     background-color: #7F847D
   }
+
+
+  .userReply{
+    font-size: 18px;
+    color: #FEAD82;
+    letter-spacing: -0.06em;
+    font-weight: 550;
+    margin-top: 4px;
+    position: relative;
+    left: 10px;
+  } */
 
 .goalActionBar{
     display: flex;

@@ -6,7 +6,8 @@ import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createTask } from "../../api-funcs/tasks";
 import { useEffect } from "react";
-
+import ContentEditable from 'react-contenteditable';
+import MainTextChat from "../MainTextChat/MainTextChat";
 
 function GoalView(props){
     const queryClient = useQueryClient()
@@ -36,10 +37,12 @@ function GoalView(props){
                 <div className={styles.accentLine}/>
                 <p className={styles.accentSecondaryEyebrow} onClick={() => props.setActiveGoal(null)}>BACK</p>
             </div>
-            <div className={styles.mainTextWrapper}>
-                <h1 className={styles.mainText}>Welcome</h1>
-                <div className={styles.mainTextLine}/>
-            </div>
+            <MainTextChat 
+                aiData = {{
+                    activeGoal: props.goal,
+                    goals: props.goals,
+                }}
+            />
             <div className={styles.tasksWrapper}>
                 <div className={styles.goalActionBar}>
                     <div style={{flex: 1}}/>

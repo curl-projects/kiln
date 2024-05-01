@@ -32,6 +32,16 @@
     transition: all 0.5s ease-in-out;
 }
 
+.deleteButton{
+    color: #CCCFCC;
+    font-size: 18px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    margin: 0;
+    margin-right: 14px;
+
+}
+
 .taskCompleteCircle{
     border-radius: 100%;
     border: 2px solid #FEAC85;

@@ -7,7 +7,7 @@ import { streamAIResponse } from '../../utils/streamAIResponse';
 export default function AutosaveText(props) {
     // TODO: avoid triggering when component first mounts
 
-    const [textState, setTextState] = useState(props.content || "Capture your thoughts here!");
+    const [textState, setTextState] = useState(props.content);
     const queryClient = useQueryClient()
     const isMounted = useRef(false);
 
@@ -17,14 +17,16 @@ export default function AutosaveText(props) {
             setTextState("")
             let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
             let data = props.aiData
-            let promptType='description'
+            let promptType=props.promptType
             streamAIResponse(url, setTextState, data, promptType)
             console.log("STREAM CONCLUDED:")   
+        }
+        else{
+            console.error("AI NOT ENABLED")
         }
       }, [props.aiEnabled, props.aiData]);
 
     useEffect(() => {
-        console.log("SETTING CHILD FUNCTION")
         props.setChildFunction && props.setChildFunction(() => generateAI)
     }, [props.setChildFunction])
 
@@ -38,8 +40,16 @@ export default function AutosaveText(props) {
     }, 1000), []); // 1000ms debounce time, adjust as needed
 
     useEffect(() => {
-        setTextState(props.content || "Untitled");
-    }, [props.content]);
+        if(props.updateType === 'link'){
+            setTextState(props.content || "");
+        }
+        else if(props.updateType === 'task'){
+            setTextState(props.content || "No description");
+        }
+        else{
+            setTextState(props.content || "Untitled");
+        }
+    }, [props.content, props.updateType]);
 
 
     const textMutation = useMutation({
@@ -51,31 +61,60 @@ export default function AutosaveText(props) {
             console.log("SETTING QUERY DATA:", data)
             
             // update cache -- this only works for tasks
-            let newData = {
-                ...currentQueryCache,
-            goals: currentQueryCache.goals.map(goal =>
-                    goal.id === props.goalId ? {
-                        ...goal,
-                        tasks: goal.tasks.map(task =>
-                            task.id === props.objectId ? {
-                                ...task,
-                                [props.field]: data[props.field]
-                            } : task
-                        )
-                    } : goal
-                )
-            };
-
-            console.log("NEW DATA:", newData)
+            if(props.updateType === 'task'){
+                let newData = {
+                    ...currentQueryCache,
+                goals: currentQueryCache.goals.map(goal =>
+                        goal.id === props.goalId ? {
+                            ...goal,
+                            tasks: goal.tasks.map(task =>
+                                task.id === props.objectId ? {
+                                    ...task,
+                                    [props.field]: data[props.field]
+                                } : task
+                            )
+                        } : goal
+                    )
+                };
+                queryClient.setQueriesData(['goals'], newData)
+            }
+            else if(props.updateType === 'link'){
+                // TODO: cache update
+                let newData = {
+                    ...currentQueryCache,
+                    goals: currentQueryCache.goals.map(goal =>
+                        goal.id === props.goalId ? {
+                            ...goal,
+                            tasks: goal.tasks.map(task =>
+                                task.id === props.taskId ? {
+                                    ...task,
+                                    links: task.links.map(link =>
+                                        link.id === props.linkId ? {
+                                            ...link,
+                                            [props.field]: props.newValue
+                                        } : link
+                                    )
+                                } : task
+                            )
+                        } : goal
+                    )
+                };
+                
+                
+                queryClient.setQueriesData(['goals'], newData)
+            }
+        
+            else{
+                console.error("No Update Type,", props.updateType)
+            }
 
     
-            queryClient.setQueriesData(['goals'], newData)
         },
         onError: (error) => {
             console.error("Mutation Error", error);
         }
     });
-
+ 
 
     const handleChange = (e) => {
         const newText = e.target.value;
