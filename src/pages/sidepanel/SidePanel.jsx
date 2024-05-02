@@ -42,6 +42,11 @@ export default function SidePanel(props){
       console.log("GOAL DATA:", goalData)
     }, [goalData]);
 
+    useEffect(() => {
+      console.log("USER INFO:", userInfo)
+    }, [userInfo]);
+
+
 
     if(goalStatus === 'pending'){
       <div>Loading</div>
@@ -75,7 +80,6 @@ export default function SidePanel(props){
             </>
 
           }
-        <p onClick={()=>setActiveGoal(null)}>Back</p>
         </div>
     )
 }

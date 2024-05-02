@@ -1,3 +1,5 @@
+import { useMutation } from '@tanstack/react-query'
+ 
 export async function streamAIResponse(url, setterFunction, data, promptType){
     try{
         const options = {
@@ -76,4 +78,13 @@ export async function streamAIResponse(url, setterFunction, data, promptType){
     catch(e){
         console.error("Stream AI Response Error:", e)
     }
+}
+
+export function useStreamAI() {
+    const mutation = useMutation({
+        mutationFn: ({ url, setterFunction, data, promptType }) => 
+        streamAIResponse(url, setterFunction, data, promptType)
+    });
+
+    return mutation;
 }

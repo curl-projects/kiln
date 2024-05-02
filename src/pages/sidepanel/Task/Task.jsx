@@ -10,7 +10,7 @@ import { FiX } from "react-icons/fi";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { deleteTask } from '../../api-funcs/tasks';
 
-export default function Task({ task, ...props }){
+export default function Task({ task, suggested, ...props }){
     const [descriptionOpen, setDescriptionOpen] = useState(false);
     const [linksOpen, setLinksOpen] = useState(false);
     const [taskCompleted, setTaskCompleted] = useState(false);
@@ -53,54 +53,69 @@ export default function Task({ task, ...props }){
 
     return(
         <div className={styles.taskOuterWrapper}>
+            {!suggested &&
             <p className={styles.taskHandle}>
                 <RxDragHandleDots2 />
-            </p>
+            </p>}
             <div className={styles.taskInnerWrapper}>
                 <div className={styles.taskEyebrowWrapper} onClick={()=>setTaskCompleted(prevState => !prevState)}>
-                    <div className={styles.taskCompleteCircle} style={{
-                        backgroundColor: task.completed ? "#FEAC85" : "unset"
-                    }}/>
-                    <p className={styles.taskEyebrow}>{task.completed ? "Completed" : "Incomplete"}</p>
-                    <div style={{flex: 1}}/>
-                    <p className={styles.deleteButton} onClick={() => {
-                        deleteTaskMutation.mutate({
-                            taskId: task.id
-                        })
-                    }}><FiX/></p>
+                    {suggested ? 
+                    <>
+                        <p className={styles.taskEyebrow}>Suggested</p>
+                    </>
+                    :
+                    <>
+                        <div className={styles.taskCompleteCircle} style={{
+                            backgroundColor: taskCompleted ? "#FEAC85" : "unset"
+                        }}/>
+                        <p className={styles.taskEyebrow}>{taskCompleted ? "Completed" : "Incomplete"}</p>
+                        <div style={{flex: 1}}/>
+                        <p className={styles.deleteButton} onClick={() => {
+                            deleteTaskMutation.mutate({
+                                taskId: task.id
+                            })
+                        }}><FiX/></p>
+                    </>
+                    }
                 </div>
                 <div className={styles.taskTitleWrapper}>
-                <AutosaveText 
-                    className={styles.taskTitle} 
-                    content={task.title}
-                    mutationFn={updateTask}
-                    updateType="task"
-                    promptType="taskTitle"
-                    objectId={task.id}
-                    field="title"
-                    goalId={props.goal.id}
-                    />
+                {suggested ?
+                    <p className={styles.taskTitle}>Title</p>
+                    :
+                    <AutosaveText
+                        className={styles.taskTitle} 
+                        content={task.title}
+                        mutationFn={updateTask}
+                        updateType="task"
+                        promptType="taskTitle"
+                        objectId={task.id}
+                        field="title"
+                        goalId={props.goal.id}
+                        />
+                }
                 </div>
-                <div className={styles.taskDetailsOuterWrapper}>
-                   <TaskDetail 
-                    task={task}
-                    goal={props.goal}
-                    detailType="Description"
-                    activeTabData={props.activeTabData}
-                    extraProps={{
-
-                    }}
-                   />
+                {!suggested &&
+                    <div className={styles.taskDetailsOuterWrapper}>
                     <TaskDetail 
                         task={task}
                         goal={props.goal}
-                        detailType="Links"
+                        detailType="Description"
                         activeTabData={props.activeTabData}
                         extraProps={{
-                            linksMutation: linksMutation
+
                         }}
                     />
-                </div>
+                        <TaskDetail 
+                            task={task}
+                            goal={props.goal}
+                            detailType="Links"
+                            activeTabData={props.activeTabData}
+                            extraProps={{
+                                linksMutation: linksMutation
+                            }}
+                        />
+                    </div>
+                }
             </div>
         </div>
     )

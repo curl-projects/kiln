@@ -17,6 +17,7 @@
     display: flex;
     flex-direction: row;
     width: 100%;
+    align-items: center;
   }
   
   .accentTopIconWrapper{
@@ -110,6 +111,20 @@
     padding-right: 30px;
     margin-bottom: 8px;
     align-items: center;
+    border-bottom: 2px solid #B9BCB8;
+    margin-left: 20px;
+}
+
+.goalActionBarHeader{
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 18px;
+  font-weight: bold;
+  color: #B9BCB8;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0px;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
 }
 
 .goalActionSeparator{
@@ -138,10 +153,10 @@
 }
   
 .tasksWrapper{
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 0px;
+    padding-bottom: 40px;
     padding-left: 10px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
 }

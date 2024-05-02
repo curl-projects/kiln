@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import ContentEditable from 'react-contenteditable';
 import MainTextChat from "../MainTextChat/MainTextChat";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import Timer from "../Timer/Timer";
+import { TimerProvider } from "../TimerProvider/TimerProvider";
 
 function GoalView(props){
     const [tasksList, setTasksList] = useState([])
@@ -53,13 +55,14 @@ function GoalView(props){
 
     };
 
-
     return(
+        <TimerProvider>
         <div className={styles.goalViewWrapper}>
             <div className={styles.panelTopAccentWrapper}>
                 <div className={styles.accentTopEyebrowWrapper}>
                     <p className={styles.accentEyebrow}>{props.goal.title}</p>
                     <div style={{flex: 1}}/>
+                    <Timer />
                 </div>
                 <div className={styles.accentLine}/>
                 <p className={styles.accentSecondaryEyebrow} onClick={() => props.setActiveGoal(null)}>BACK</p>
@@ -72,9 +75,10 @@ function GoalView(props){
             />
             <div className={styles.tasksWrapper}>
                 <div className={styles.goalActionBar}>
+                    <p className={styles.goalActionBarHeader}>Tasks</p>
                     <div style={{flex: 1}}/>
-                    <p className={styles.goalAction}>Collapse Cards</p>
-                    <div className={styles.goalActionSeparator}/>
+                    {/* <p className={styles.goalAction}>Collapse Cards</p>
+                    <div className={styles.goalActionSeparator}/> */}
                     <p className={styles.goalAction} onClick={() => {
                         taskMutation.mutate({ goalId: props.goal.id})
                     }}>Add New Task</p>
@@ -110,8 +114,18 @@ function GoalView(props){
                     )}
                     </Droppable>
                 </DragDropContext>
+                <div className={styles.goalActionBar}>
+                    <div style={{flex: 1}}/>
+                    <p className={styles.goalAction}>Collapse Cards</p>
+                    <div className={styles.goalActionSeparator}/>
+                    <p className={styles.goalAction} onClick={() => {
+                        taskMutation.mutate({ goalId: props.goal.id})
+                    }}>Add New Task</p>
+                </div>
+                <Task suggested={true}/>
             </div>
         </div>
+        </TimerProvider>
     )
 }
 

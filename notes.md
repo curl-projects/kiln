@@ -114,3 +114,8 @@ not a search page)
     - Conversational memory?
     - Tracking engagement over time
     - 
+
+- Add a timer and use it to coordinate activity 
+- Add suggested tasks
+
+- Maybe suggested functionality like bubbles below the box?
