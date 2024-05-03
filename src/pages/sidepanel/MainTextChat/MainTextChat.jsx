@@ -110,11 +110,11 @@ export default function MainTextChat(props){
             }
 
             <div className={styles.userReplyWrapper}>
-                {aiState !== "Welcome" && <p className={styles.chatAction} onClick={() => {
+                {/* {aiState !== "Welcome" && <p className={styles.chatAction} onClick={() => {
                     setSubmittedTextState("")
                     setAIState("")
                     setAIState("Welcome")
-                }}>Clear Response</p>}
+                }}>Clear Response</p>} */}
                 <ContentEditable 
                     innerRef={contentEditable}
                     tagName="p"

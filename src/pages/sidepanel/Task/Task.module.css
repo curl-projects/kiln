@@ -23,6 +23,43 @@
     left: -10px;
 }
 
+.taskCircle{
+    font-size: 20px;
+    position: absolute;
+    top: 43px;
+    left: -10px;
+    height: 14px;
+    width: 14px;
+    border-radius: 100%;
+    border: 2px solid #CCCFCC;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taskIndexNumber{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 1000;
+    color: #7F847D;
+    line-height: 0px;
+    flex-shrink: 0;
+}
+
+.taskLinkingLine{
+    width: 2px;
+    height: 100%;
+    position: absolute;
+    top: 60px;
+    left: -2px;
+    background-color: #CCCFCC;
+}
+
+
+
+
+
 .taskInnerWrapper{
     /* background-color: #FCFDFC;
     border: 1px solid #EEEEEC; */

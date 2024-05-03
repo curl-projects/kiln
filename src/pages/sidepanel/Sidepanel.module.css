@@ -1,7 +1,6 @@
 .sidepanelWrapper{
     height: 100vh;
     width: 100vw;
-    border: 2px solid green;
     overflow-x: hidden;
     overflow-y: scroll;
     display: flex;

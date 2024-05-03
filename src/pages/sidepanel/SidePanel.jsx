@@ -8,14 +8,19 @@ import useActiveTabDataUpdater from './hooks/useActiveTabData.js';
 import { ReactQueryDevtoolsPanel } from 'react-query-devtools';
 
 import { fetchGoals } from "../api-funcs/goals.js"
-
+// import { injectContentScript } from './ContentScriptControls/injectContentScript.js';
+import { useInjectContentScript } from './ContentScriptControls/useInjectContentScript.js';
+import ContentScriptControls from './ContentScriptControls/ContentScriptControls.jsx';
 export default function SidePanel(props){
     const [activeGoal, setActiveGoal] = useState(null)
     const [userInfo, setUserInfo] = useState({id: null, email: null});
   
+    const { activeTabData, pageData, rawPageData } = useActiveTabDataUpdater();
+    const { injectedDomains, domain } = useInjectContentScript(activeTabData.tabURL, activeTabData.tabID);
 
-    const { activeTabData, pageData } = useActiveTabDataUpdater();
-    
+    useEffect(()=>{
+      console.log("INJECTED DOMAINS", injectedDomains)
+    }, [injectedDomains])
 
     useEffect(() => {
       chrome.identity.getProfileUserInfo({accountStatus: 'ANY'}, function(profileInfo){
@@ -33,10 +38,9 @@ export default function SidePanel(props){
       refetchGoals()
     }, [])
 
-
     // useEffect(() => {
-    //   console.log("ACTIVE TAB DATA:", activeTabData)
-    // }, [activeTabData, pageData]);
+    //   console.log("RAW PAGE DATA:", rawPageData)
+    // }, [rawPageData]);
 
     useEffect(() => {
       console.log("GOAL DATA:", goalData)
@@ -59,7 +63,10 @@ export default function SidePanel(props){
     return(
         <div className={styles.sidepanelWrapper}>
           {activeGoal 
-            ? <GoalView 
+            ? 
+            <>
+            
+            <GoalView 
                 goal={goalData.goals.filter(goal => goal.id === activeGoal.id)[0]}
                 setActiveGoal={setActiveGoal}
                 activeTabData={activeTabData}
@@ -67,6 +74,7 @@ export default function SidePanel(props){
                 goals={goalData.goals}
                 
             />
+            </>
             :
               <>
               {goalData?.goals && goalData.goals.map((goal)=>
@@ -77,6 +85,7 @@ export default function SidePanel(props){
                       setActiveGoal={setActiveGoal}
                   />
               )}
+              <ContentScriptControls domain={domain} injectedDomains={injectedDomains}/>
             </>
 
           }

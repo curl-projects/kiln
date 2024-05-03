@@ -47,6 +47,11 @@
 
 - https://stackoverflow.com/questions/62340697/react-query-how-to-usequery-when-button-is-clicked
 
+- https://stackoverflow.com/questions/77992304/import-a-node-module-in-a-content-script-of-a-chrome-extension-vite-and-react
+
+- https://stackoverflow.com/questions/36599147/proper-way-to-inject-react-component-onto-page-in-chrome-extension
+
+- https://dev.to/anobjectisa/build-a-chrome-extension-using-reactjs-38o7
 
 **Done**
 - Read page context
@@ -119,3 +124,15 @@ not a search page)
 - Add suggested tasks
 
 - Maybe suggested functionality like bubbles below the box?
+
+
+- THINGS TO DO:
+    - AI MEMORY: SHORT-TERM & LONG-TERM
+    - SUGGESTED TASKS
+    - INJECTING CONTENT DIRECTLY INTO THE PAGE
+    - IDENTIFYING DIVS TO HIGHLIGHT
+
+
+    - SUBDOMAINS!!
+
+    - 

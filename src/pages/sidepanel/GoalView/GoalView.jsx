@@ -12,6 +12,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Timer from "../Timer/Timer";
 import { TimerProvider } from "../TimerProvider/TimerProvider";
 
+// import { FloatingDiv } from "../FloatingComponents/FloatingDiv"; 
+
 function GoalView(props){
     const [tasksList, setTasksList] = useState([])
 
@@ -101,6 +103,7 @@ function GoalView(props){
                                             {...provided.dragHandleProps}
                                         >
                                             <Task 
+                                                index={index}
                                                 task={task}
                                                 activeTabData={props.activeTabData}
                                                 goal={props.goal}
@@ -115,14 +118,23 @@ function GoalView(props){
                     </Droppable>
                 </DragDropContext>
                 <div className={styles.goalActionBar}>
+                    <p className={styles.goalActionBarHeader}>Suggested Tasks</p>
                     <div style={{flex: 1}}/>
-                    <p className={styles.goalAction}>Collapse Cards</p>
-                    <div className={styles.goalActionSeparator}/>
-                    <p className={styles.goalAction} onClick={() => {
+                    {/* <p className={styles.goalAction}>Collapse Cards</p>
+                    <div className={styles.goalActionSeparator}/> */}
+                    {/* <p className={styles.goalAction} onClick={() => {
                         taskMutation.mutate({ goalId: props.goal.id})
-                    }}>Add New Task</p>
+                    }}>Add New Task</p> */}
                 </div>
-                <Task suggested={true}/>
+                <div style={{height: "400px", width: "400px", border: "2px solid black"}}>
+                    {/* <FloatingDiv config={{ mass: 20, tension: 170, friction: 26 }}>
+                        I'm floating!
+                    </FloatingDiv>
+                    <FloatingDiv config={{ mass: 20, tension: 170, friction: 26 }}>
+                        I'm floating!
+                    </FloatingDiv> */}
+                </div>
+                {/* <Task suggested={true}/> */}
             </div>
         </div>
         </TimerProvider>

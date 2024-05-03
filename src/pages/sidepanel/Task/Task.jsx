@@ -54,9 +54,17 @@ export default function Task({ task, suggested, ...props }){
     return(
         <div className={styles.taskOuterWrapper}>
             {!suggested &&
-            <p className={styles.taskHandle}>
-                <RxDragHandleDots2 />
-            </p>}
+            // <p className={styles.taskHandle}>
+            //     <RxDragHandleDots2 />
+            // </p>
+            <>
+            <div className={styles.taskCircle}>
+                <p className={styles.taskIndexNumber}>{props.index+1}</p>
+            </div>
+            <div className={styles.taskLinkingLine} />
+            </>
+            
+            }
             <div className={styles.taskInnerWrapper}>
                 <div className={styles.taskEyebrowWrapper} onClick={()=>setTaskCompleted(prevState => !prevState)}>
                     {suggested ? 
