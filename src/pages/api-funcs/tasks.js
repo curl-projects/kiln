@@ -15,6 +15,7 @@ export async function createTask(newTask){
 }
 
 export async function updateTask(taskData){
+    console.log("SENDING TO BACKEND")
     const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_DOMAIN}/update-task`, {
         method: "POST", 
         headers: {

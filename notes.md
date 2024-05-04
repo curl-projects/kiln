@@ -135,4 +135,18 @@ not a search page)
 
     - SUBDOMAINS!!
 
-    - 
+- MARKDOWN FOR CHATBOT RESPONSE
+
+- Architecture
+    - Decoupled relevance pipeline and hook
+    - Pipeline for uploading tasks as they're created, and deleting them when they're destroyed.
+    - Use metadata filtering for goals, tasks, etc.
+        - Descriptions should be included.
+        - Build some replicable system for including pinecone set up/tear down in the CRUD queries for objects in the database
+
+- Flow
+1. Split up every sentence in the 
+
+
+1. malia gets to GG park around 7pm
+2. 17 minutes home, 11 minutes walk, 10 minutes waiting, 10 minutes walgreens, 25 minutes cycle = 73 minutes 
