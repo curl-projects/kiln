@@ -14,7 +14,7 @@ function matchesInjectedDomains(domainArray, injectedDomains) {
 }
 
 export default function ContentScriptControls({domain, injectedDomains, ...props}){
-    console.log("DOMAIN:", domain)
+
     return(
         <div className={styles.controlsWrapper}>
             <p>DOMAIN: {domain.join("/")}</p>
@@ -24,8 +24,6 @@ export default function ContentScriptControls({domain, injectedDomains, ...props
             <button 
                 onClick={()=>{
                     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                        console.log("TAB:", tabs[0].id)
-                        console.log("ACTION KEYWORD:", injectedDomains[domain[0]].actionKeyword)
                         chrome.tabs.sendMessage(tabs[0].id, {action: injectedDomains[domain[0]].actionKeyword})
                         .then(response => {
                             console.log("TAB RESPONSE:", response)

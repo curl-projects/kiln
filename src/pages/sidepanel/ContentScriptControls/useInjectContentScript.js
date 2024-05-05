@@ -17,7 +17,6 @@ export function useInjectContentScript(url, tabID) {
         if (!url || !tabID) return;
 
         let domain = extractDomainAndPathSegments(url);
-        console.log("HI HOOK")
         chrome.scripting.executeScript({
             target: { tabId: tabID },
             function: handleDomainScript,

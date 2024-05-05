@@ -11,12 +11,11 @@ export default function AutosaveText(props) {
     const queryClient = useQueryClient()
     const isMounted = useRef(false);
 
-    useEffect(()=>{
-        console.log("TEXT STATE CHANGING", textState)
-    }, [textState])
+    // useEffect(()=>{
+    //     console.log("TEXT STATE CHANGING", textState)
+    // }, [textState])
 
     const generateAI = useCallback(() => {
-        console.log("EXECUTING GENERATE AI")
         if(props.aiEnabled){
             setTextState("")
             let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
@@ -36,8 +35,6 @@ export default function AutosaveText(props) {
 
     // Setup a debounced mutation function
     const debouncedSave = useCallback(debounce((newText) => {
-
-        console.log("DEBOUNCED EXECUTING")
         textMutation.mutate({
             objectId: props.objectId,
             field: props.field,
@@ -46,7 +43,6 @@ export default function AutosaveText(props) {
     }, 1000), []); // 1000ms debounce time, adjust as needed
 
     useEffect(() => {
-        console.log("PROPS.CONTENT", props.content)
         if(props.updateType === 'link'){
             setTextState(props.content || "");
         }
@@ -84,7 +80,6 @@ export default function AutosaveText(props) {
                     )
                 };
 
-                console.log("NEW DATA:", newData)
                 queryClient.setQueriesData(['goals'], newData)
             }
             else if(props.updateType === 'link'){

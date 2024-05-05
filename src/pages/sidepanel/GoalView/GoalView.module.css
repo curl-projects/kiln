@@ -18,8 +18,29 @@
     flex-direction: row;
     width: 100%;
     align-items: center;
+    height: 40px;
+  }
+
+  .backIconWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
   }
   
+  .backIconWrapper:hover{
+    transform: scale(1.02);
+  }
+
+  .backIcon{
+    position: relative;
+    bottom: -4px;
+    color: #CCCFCC;
+    margin: 0;
+  }
+
   .accentTopIconWrapper{
     display: flex;
     flex-direction: row;
@@ -43,9 +64,80 @@
     margin-top: 0.6em;
     position: relative;
     left: 10px;
-    padding-right: 60px;
+    transition: all 0.5s ease-in-out;
   }
-  
+
+  .focusModeOuterWrapper{
+    /* display: flex; */
+    /* flex-direction: column; */
+    gap: 4px;
+    position: relative;
+  }
+
+  .focusModeInnerWrapper{
+    display: flex;
+    gap: 4px;
+  }
+
+  .focusModeWrapper{
+    border: 2px solid #CCCFCC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    height: fit-content;
+    position: relative;
+    flex-shrink: 0;
+    width: fit-content;
+    transition: all 0.5s ease-in-out;
+    cursor: pointer;
+  }
+
+  .focusModeWrapper:hover{
+    transform: scale(1.05);
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+  }
+
+  .focusMode{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 800;
+    color: #B9BCB8;
+    line-height: 0px;
+    flex-shrink: 0; 
+    transition: all 0.5s ease-in-out;
+    padding-left: 14px;
+    padding-right: 14px;
+
+
+  }
+
+  /* .focusModeBox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    height: 20px;
+    width: 20px;
+    border: 2px solid #CCCFCC;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+    flex-shrink: 0;
+  }
+
+  .focusModeBox:hover{
+    transform: scale(1.05);
+  }
+
+  .focusModeBoxText{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 8px;
+    font-weight: 800;
+    color: #b9bcb8;
+    line-height: 0px;
+    text-transform: uppercase;
+  }
+   */
   .accentSecondaryEyebrow{
     font-family: "IBM Plex Mono", monospace;
     font-size: 10px;
@@ -65,45 +157,8 @@
     width: inherit;
     height: 2px;
     background-color: #CCCFCC;
+    margin-bottom: 10px;
   }
-
-/* ASSISTANT TEXT */
-/*   
-.mainTextWrapper{
-    margin-left: 10px;
-    margin-top: 10px;
-  }
-  
-  
-  .mainText{
-    font-size: 20px;
-    color: #7F847D;
-    letter-spacing: -0.06em;
-    position: relative;
-    left: 10px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding-right: 12px;
-    line-height: 1.1em;
-  }
-  
-  .mainTextLine{
-    width: inherit;
-    height: 2px;
-    margin-top: 5px;
-    background-color: #7F847D
-  }
-
-
-  .userReply{
-    font-size: 18px;
-    color: #FEAD82;
-    letter-spacing: -0.06em;
-    font-weight: 550;
-    margin-top: 4px;
-    position: relative;
-    left: 10px;
-  } */
 
 .goalActionBar{
     display: flex;

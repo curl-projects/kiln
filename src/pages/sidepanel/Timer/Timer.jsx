@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import styles from './Timer.module.css';
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
-import { useTimer } from '../TimerProvider/TimerProvider';
+import { useFocus } from '@pages/sidepanel/FocusProvider/FocusProvider';
 
 export default function Timer() {
-    const { time, toggleTimer, isActive} = useTimer();
-
+    const { time, toggleTimer, isActive} = useFocus();
 
     const formatTime = (time) => {
         const hours = Math.floor(time / 3600);

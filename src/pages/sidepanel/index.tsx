@@ -14,9 +14,15 @@ import {
 
 function init() {
   const appContainer = document.querySelector('#app-container');
+
   if (!appContainer) {
     throw new Error('Can not find #app-container');
   }
+
+  if(appContainer instanceof HTMLElement){
+    appContainer.style.position= 'relative';
+  }
+
   const queryClient = new QueryClient();
   const root = createRoot(appContainer);
   root.render(

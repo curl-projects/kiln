@@ -42,9 +42,9 @@ export default function Task({ task, suggested, ...props }){
         }
     })
 
-    useEffect(()=>{
-        console.log("STATUS:", deleteTaskMutation.status)
-    }, [deleteTaskMutation.status])
+    // useEffect(()=>{
+    //     console.log("STATUS:", deleteTaskMutation.status)
+    // }, [deleteTaskMutation.status])
 
 
     if(deleteTaskMutation.status === 'pending' || deleteTaskMutation.status === 'success'){
@@ -100,7 +100,7 @@ export default function Task({ task, suggested, ...props }){
                         field="title"
                         goalId={props.goal.id}
                         />
-                }
+                } 
                 </div>
                 {!suggested &&
                     <div className={styles.taskDetailsOuterWrapper}>

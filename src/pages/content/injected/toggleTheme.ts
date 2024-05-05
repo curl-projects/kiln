@@ -3,6 +3,7 @@ import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 
 refreshOnUpdate('pages/content/injected/toggleTheme');
 
+console.log("TOGGLE THEME:")
 async function toggleTheme() {
   console.log('initial theme!', await exampleThemeStorage.get());
   await exampleThemeStorage.toggle();

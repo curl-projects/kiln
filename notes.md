@@ -150,3 +150,11 @@ not a search page)
 
 1. malia gets to GG park around 7pm
 2. 17 minutes home, 11 minutes walk, 10 minutes waiting, 10 minutes walgreens, 25 minutes cycle = 73 minutes 
+
+**When you open a new page**
+1. Identify relevant tasks, and reorganize task list
+    1. Make the "ADD PAGE" button very rivisble 
+2. Provide three things to think about
+
+*TODO*
+- Stop stream if they spam enter

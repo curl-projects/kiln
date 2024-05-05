@@ -33,6 +33,10 @@
     transform: translate(50%, -50%); 
     transition: all 0.5s ease-in-out;
   }
+
+  .goalBadgeInnerCircle:hover{
+    background-color: rgba(254, 172, 133, 0.5);
+  }
   
   .goalBadgeOuterCircle{
     border-radius: 100%;
@@ -44,6 +48,10 @@
     transform: translate(50%, -50%); 
     background-color: rgba(255, 255, 255, 0.5);
     transition: all 0.5s ease-in-out;
+  }
+
+  .goalBadgeOuterCircle:hover{
+    background-color: rgba(254, 172, 133, 0.5);
   }
   
   .goalMetadataWrapper{
@@ -149,12 +157,14 @@
     margin-bottom: 0px;
     padding-right: 12px;
     line-height: 1.1em;
+    transition: all 0.3s ease-in-out;
   }
   
   .goalTitleLine{
     width: 100%;
     height: 2px;
     background-color: #7F847D;
+    transition: all 0.3s ease-in-out;
   }
 
   .relevanceBox{

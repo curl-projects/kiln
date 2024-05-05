@@ -2,7 +2,7 @@ import ContentEditable from 'react-contenteditable';
 import styles from './MainTextChat.module.css'
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { streamAIResponse } from '../../utils/streamAIResponse';
-import { useTimer } from '../TimerProvider/TimerProvider';
+import { useFocus } from '../FocusProvider/FocusProvider';
 import { useStreamAI } from '../../utils/streamAIResponse';
 import LinearProgress from '@mui/material/LinearProgress';
   
@@ -13,8 +13,9 @@ export default function MainTextChat(props){
     const [aiState, setAIState] = useState("Welcome")
     const contentEditable = useRef();
     const textStateRef = useRef(textState)
-    const { on, time } = useTimer();
+    const { on, time } = useFocus();
     const mutation = useStreamAI();
+    const [hasAttention, setHasAttention] = useState(false);
 
     useEffect(()=>{
         let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
@@ -23,15 +24,16 @@ export default function MainTextChat(props){
             url: url,
             setterFunction: setAIState,
             data: {
+                ...props.aiData
             },
-            promptType: "sayHello"
+            promptType: props.initialPrompt || "sayHello"
         })
     }, [])
 
 
     // TIMER MESSAGES
     useEffect(()=>{
-        on('start', () => {
+        on('timerStart', () => {
             let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
             let data = {
                 timerEvent: "Timer started",
@@ -49,14 +51,12 @@ export default function MainTextChat(props){
     }, [on])
 
     useEffect(()=>{
-        console.log("MUTATION STATUS:", mutation.status)
         if(mutation.status === 'error'){
-            console.log("MUTATION ERROR:", mutation.error.message)
+            console.error("MUTATION ERROR:", mutation.error.message)
         }
     }, [mutation.status])
 
     useEffect(()=>{
-        console.log("TEXT STATE:", textState)
         textStateRef.current = textState;
     }, [textState])
 
@@ -65,7 +65,6 @@ export default function MainTextChat(props){
         console.log("KEY:", key)
         if(keyCode === 13 && !e.shiftKey){
             e.preventDefault() 
-            console.log("KEYPRESS TEXT STATE:", textStateRef.current);
             setAIState("")
             setSubmittedTextState(textStateRef.current)
             setTextState("")
@@ -109,12 +108,14 @@ export default function MainTextChat(props){
                 : <div className={styles.mainTextLine}/>
             }
 
-            <div className={styles.userReplyWrapper}>
-                {/* {aiState !== "Welcome" && <p className={styles.chatAction} onClick={() => {
-                    setSubmittedTextState("")
-                    setAIState("")
-                    setAIState("Welcome")
-                }}>Clear Response</p>} */}
+            <div className={styles.userReplyWrapper}
+                onMouseEnter={()=>setHasAttention(true)}
+                onMouseLeave={()=>setHasAttention(false)}
+            >
+                <div className={styles.userReplyTopLine} style={{
+                        backgroundColor: hasAttention ? "rgba(254, 172, 133, 1)" : "#b9bcb8"
+                    }}
+                />
                 <ContentEditable 
                     innerRef={contentEditable}
                     tagName="p"
@@ -124,19 +125,24 @@ export default function MainTextChat(props){
                         console.log("CHANGED:", e.target.value)
                         setTextState(e.target.value)
                     }}
+                    style={{
+                        color: hasAttention ? "rgba(254, 172, 133, 1)" : "#b9bcb8"
+                    }}
 
                     onFocus={()=> {
-                        console.log("FOCUSED")
                         if(textState === "Any thoughts?"){
                             setTextState("")
-                    }
+                        }
+                        setHasAttention(true)
                     }}
                     onBlur={() => {
                         if(contentEditable.current.innerHTML === ""){
-                            console.log("BLURRED:")
                             setTextState("Any thoughts?")
                         }
+                        setHasAttention(false)
+
                     }}
+
                     onKeyDown={handleKeyPress}
                 />
             </div>
