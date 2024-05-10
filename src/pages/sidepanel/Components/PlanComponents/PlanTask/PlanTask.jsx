@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 import styles from "./PlanTask.module.css";
 
-const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, taskLabel }, ref) => {
+const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, taskLabel, onToggleCollapse }, ref) => {
   const [content, setContent] = useState(task.content);
 
   // Generate styles for indentation lines
@@ -39,19 +39,26 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
     setContent(e.target.value);
   };
 
-  const CheckboxIcon = task.checked ? FaCheckCircle : FaRegCircle;
-
   return (
     <div className={styles.taskOuterWrapper}>
     <div className={styles.taskIndexWrapper}>
-      <span className={styles.taskIndex}>{taskLabel}</span>
+      <div 
+        className={styles.taskIndexButton} 
+        style={{
+          backgroundColor: task.collapsed ? "unset" : "#CCCFCC"
+        }}
+        onClick={() => onToggleCollapse(task.id)}/>
+      <span className={styles.taskIndex} style={{
+        textDecoration: task.checked ? 'line-through' : 'none'
+      }}>{task.checked ? "C" : taskLabel}</span>
     </div>
     <div className={styles.taskWrapper} style={{paddingLeft: `${task.level * 20}px`}}>
       {indentStyles()}
-      {/* <span>ORDER: {task.order}</span>
-      <span>LEVEL: {task.level}</span> */}
       <div className={styles.taskInnerWrapper}>
-        <div className={styles.taskCompleteBox} onClick={() => onToggleCheck(task.id)}/>
+        <div className={styles.taskCompleteBox} onClick={() => onToggleCheck(task.id)} style={{
+          backgroundColor: task.checked ? '#7F847D' : 'unset',
+          borderColor: task.checked ? '#7F847D' : '#7f847d'
+        }}/>
         <input
           ref={ref}
           type="text"

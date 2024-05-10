@@ -11,16 +11,37 @@
 }
 
 .taskIndexWrapper{
-    width: 30px;
+    width: 50px;
     flex-grow: 0;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+
+}
+
+.taskIndexButton{
+    height: 6px;
+    width: 6px;
+    border-radius: 100%;
+    border: 1px solid #CCCFCC;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.taskIndexButton:hover{
+    background-color: rgba(204, 207, 204, 0.5);
+    transform: scale(1.05);
 }
 
 .taskIndex{
     font-family: "IBM Plex Mono", monospace;
     font-style: italic;
     font-weight: bold;
-    font-size: 8px;
+    color: #7F847D;
+    font-size: 14px;
     letter-spacing: -0.03em;
     z-index: 10000;
 

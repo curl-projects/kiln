@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Task from '../PlanTask/PlanTask.jsx';
 
 const initialTasks = [
-  { id: '1', content: 'Sample Task', level: 0, checked: false, parentId: null, order: 0 },
+  { id: '1', content: 'Sample Task', level: 0, checked: false, parentId: null, order: 0, collapsed: false },
   // Additional initial tasks can be added here
 ];
 
@@ -112,6 +112,17 @@ function TaskList() {
     }
   }, [tasks]);  // Dependency on tasks to trigger whenever it changes
 
+  const handleToggleCollapse = (taskId) => {
+    const newTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, collapsed: !task.collapsed };
+      }
+      return task;
+    });
+    setTasks(newTasks);
+  };
+
+
   const handleAddTask = (currentId) => {
     const index = tasks.findIndex(task => task.id === currentId);
     const newTask = {
@@ -119,7 +130,8 @@ function TaskList() {
       content: '',
       level: tasks[index].level,
       checked: false,
-      parentId: tasks[index].parentId
+      parentId: tasks[index].parentId,
+      collapsed: false,
     };
     let newTasks = [...tasks.slice(0, index + 1), newTask, ...tasks.slice(index + 1)];
     newTasks = updateTaskOrder(newTasks);
@@ -160,9 +172,8 @@ function TaskList() {
     }, 0);
 };
 
-
-
   const handleIndentTask = (currentId, increase) => {
+    console.log("HANDLING INDENT!", increase)
     const index = tasks.findIndex(task => task.id === currentId);
     if (increase && index > 0 && tasks[index - 1].level >= tasks[index].level) {
       const updatedTasks = tasks.map((task, i) => (i === index ? { ...task, level: task.level + 1 } : task));
@@ -173,27 +184,86 @@ function TaskList() {
     }
   };
 
-  const handleToggleCheck = (currentId) => {
-    const updatedTasks = tasks.map(task => task.id === currentId ? { ...task, checked: !task.checked } : task);
-    setTasks(updatedTasks);
-  };
+  const handleToggleCheck = (taskId) => {
+    let newTasks = [...tasks];
+    const taskIndex = newTasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) return; // Task not found, exit function
+
+    // Toggle the checked state of the task
+    const isChecked = !newTasks[taskIndex].checked;
+    newTasks[taskIndex] = {
+        ...newTasks[taskIndex],
+        checked: isChecked
+    };
+
+    // Recursively check all children
+    const checkChildren = (index) => {
+        const startLevel = newTasks[index].level;
+        for (let i = index + 1; i < newTasks.length && newTasks[i].level > startLevel; i++) {
+            if (newTasks[i].level === startLevel + 1) {
+                newTasks[i] = { ...newTasks[i], checked: isChecked };
+                checkChildren(i); // Recursive call for deeper levels
+            }
+        }
+    };
+
+    // Check all children if the task is being checked
+    checkChildren(taskIndex);
+
+    setTasks(newTasks);
+};
+
+  const renderTasks = () => {
+    const taskStack = [];
+    return tasks.map((task, index) => {  // Capture the index here
+        while (taskStack.length > 0 && taskStack[taskStack.length - 1].level >= task.level) {
+            taskStack.pop();
+        }
+
+        const isCollapsed = taskStack.some(t => t.collapsed);
+
+        if (taskStack.length === 0 || !isCollapsed) {
+            taskStack.push(task);
+            return (
+                <Task
+                    key={task.id}
+                    ref={el => taskRefs.current[index] = el}  // Use index for ref setting
+                    task={task}
+                    taskLabel={calculateTaskIndex(tasks, task.id)}
+                    onAdd={() => handleAddTask(task.id)}
+                    onDelete={() => handleDeleteTask(task.id)}
+                    onIndent={handleIndentTask}
+                    onToggleCheck={() => handleToggleCheck(task.id)}
+                    onToggleCollapse={handleToggleCollapse}
+                />
+            );
+        }
+
+        return null;
+    });
+};
+
+
 
   return (
     <div className={styles.taskContainer}>
-      {tasks.map((task, index) => (
-        <Task
-          key={task.id}
-          ref={el => taskRefs.current[index] = el}
-          task={task}
-          taskLabel={calculateTaskIndex(tasks, task.id)}
-          onAdd={handleAddTask}
-          onDelete={handleDeleteTask}
-          onIndent={handleIndentTask}
-          onToggleCheck={handleToggleCheck}
-        />
-      ))}
+      {renderTasks()}
     </div>
   );
 }
 
 export default TaskList;
+
+
+// {tasks.map((task, index) => (
+  // <Task
+  //   key={task.id}
+  //   ref={el => taskRefs.current[index] = el}
+  //   task={task}
+  //   taskLabel={calculateTaskIndex(tasks, task.id)}
+  //   onAdd={handleAddTask}
+  //   onDelete={handleDeleteTask}
+  //   onIndent={handleIndentTask}
+  //   onToggleCheck={handleToggleCheck}
+  // />
+// ))}
