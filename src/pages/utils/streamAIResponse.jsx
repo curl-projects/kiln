@@ -27,7 +27,6 @@ export async function streamAIResponse(url, setterFunction, data, promptType){
             const reader = response.body.getReader();
             
             const readStream = async () => {
-                // console.log("Reading Stream")
                 try {
                     const { done, value } = await reader.read();
             
@@ -44,7 +43,6 @@ export async function streamAIResponse(url, setterFunction, data, promptType){
     
                     if (eventLines[0] === 'close') {
                         // When no more data, exit the function
-                        // console.log('Stream finished.');
                         return;
                     }
                     // Decode the stream data and append it to state

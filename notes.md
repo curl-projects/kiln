@@ -53,6 +53,10 @@
 
 - https://dev.to/anobjectisa/build-a-chrome-extension-using-reactjs-38o7
 
+- https://medium.com/code-monkey/react-aquarium-3b61ce79abae
+
+- https://github.com/kaizhelam/Koi-Fish
+
 **Done**
 - Read page context
     - Find action associated with page changing
@@ -71,12 +75,10 @@ not a search page)
                 - Fetch goals for user
 - Authentication on the chrome extension
     - Fetch google information and load into state
-    
-
 
 **To Do**
 - Implement some type of storage 
-    - Local storage for dealing with state and browser processing
+    - Local storage for dealing with state and browser processing and other things
         - Integrate with session db for:
             - Storing authentication details, etc. that persist across tab loads
             - Caching generated text and processing, probably organized using tab ids
@@ -102,6 +104,9 @@ not a search page)
     - Loading Hooks
     - Caching
 
+- Do this
+    - Do this first   
+
 
 **Bugs**
 - Handle error case when the extension isn't allowed to access URL contents
@@ -114,10 +119,7 @@ not a search page)
 
 - TODO: add the queryCaching feature thingy to make everything much faster
 
-- AI MEMORY:
-    - Vector Store?
-    - Conversational memory?
-    - Tracking engagement over time
+   
     - 
 
 - Add a timer and use it to coordinate activity 

@@ -1,0 +1,26 @@
+.AIWrapper{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    padding-left: 24px;
+}
+
+.AIIConWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.AITextWrapper{
+
+}
+
+.AIText{
+  color: #898E87;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  font-weight: 550;
+  line-height: 24px;
+  margin: 0;
+}

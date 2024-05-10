@@ -1,0 +1,20 @@
+.taskItem {
+    position: relative;
+    padding-left: 20px;
+  }
+  
+.indentLine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+  }
+  
+  .taskInput {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    outline: none;
+  }
+  

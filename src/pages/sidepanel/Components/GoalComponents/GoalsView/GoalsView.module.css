@@ -1,0 +1,10 @@
+.goalsViewWrapper{
+    padding-top: 10px;
+}
+
+.goalCardWrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 20px;
+}
