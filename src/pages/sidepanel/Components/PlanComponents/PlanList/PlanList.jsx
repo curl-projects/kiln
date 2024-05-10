@@ -1,7 +1,15 @@
 import styles from "./PlanList.module.css"
 import React, { useState, useRef, useEffect } from 'react';
 import Task from '../PlanTask/PlanTask.jsx';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const initialTasks = [
   { id: '1', content: 'Sample Task', level: 0, checked: false, parentId: null, order: 0, collapsed: false },
@@ -39,7 +47,6 @@ function getRomanIndex(index) {
   }
   return result;
 }
-
 
 function calculateTaskIndex(tasks, taskId) {
   // Find the task in the list
@@ -92,17 +99,21 @@ function calculateTaskIndex(tasks, taskId) {
   return parentPrefix + indexStr;  // Correctly formatted full index without excessive periods
 }
 
-
 function TaskList() {
   const [tasks, setTasks] = useState(initialTasks);
   const taskRefs = useRef([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const updateTaskOrder = (tasks) => {
     // Assign an order based on current array index
     return tasks.map((task, index) => ({ ...task, order: index }));
   };
-
-  
 
   useEffect(() => {
     console.log("TASKS:", tasks)
@@ -123,7 +134,6 @@ function TaskList() {
     });
     setTasks(newTasks);
   };
-
 
   const handleAddTask = (currentId) => {
     const index = tasks.findIndex(task => task.id === currentId);
@@ -172,7 +182,7 @@ function TaskList() {
             }
         }
     }, 0);
-};
+  };
 
   const handleIndentTask = (currentId, increase) => {
     const index = tasks.findIndex(task => task.id === currentId);
@@ -193,75 +203,66 @@ function TaskList() {
     // Toggle the checked state of the task
     const isChecked = !newTasks[taskIndex].checked;
     newTasks[taskIndex] = {
-        ...newTasks[taskIndex],
-        checked: isChecked
+      ...newTasks[taskIndex],
+      checked: isChecked
     };
 
     // Recursively check all children
     const checkChildren = (index) => {
-        const startLevel = newTasks[index].level;
-        for (let i = index + 1; i < newTasks.length && newTasks[i].level > startLevel; i++) {
-            if (newTasks[i].level === startLevel + 1) {
-                newTasks[i] = { ...newTasks[i], checked: isChecked };
-                checkChildren(i); // Recursive call for deeper levels
-            }
-        }
+      const startLevel = newTasks[index].level;
+      for (let i = index + 1; i < newTasks.length && newTasks[i].level > startLevel; i++) {
+          if (newTasks[i].level === startLevel + 1) {
+              newTasks[i] = { ...newTasks[i], checked: isChecked };
+              checkChildren(i); // Recursive call for deeper levels
+          }
+      }
     };
 
     // Check all children if the task is being checked
     checkChildren(taskIndex);
 
     setTasks(newTasks);
-};
+  };
 
-const onDragEnd = (result) => {
-  const { draggableId, destination } = result;
+  const onDragEnd = (event) => {
+    const { active, over } = event;
+    const { id: activeId } = active;
+    const { id: overId } = over;
 
-  if (!destination) {
-    return;
-  }
+    if (activeId !== overId) {
+      const oldIndex = tasks.findIndex((task) => task.id === activeId);
+      const newIndex = tasks.findIndex((task) => task.id === overId);
 
-  const newTasks = Array.from(tasks);
-  const draggedTaskIndex = newTasks.findIndex((task) => task.id === draggableId);
-  var draggedTask = newTasks[draggedTaskIndex];
+      const newTasks = arrayMove(tasks, oldIndex, newIndex);
 
-  console.log("DRAGGED TASK", draggedTask)
+      const draggedTask = newTasks[newIndex];
 
-  // Find the children of the dragged task
-  const childTasks = [];
-  for (let i = draggedTaskIndex + 1; i < newTasks.length; i++) {
-    if (newTasks[i].level <= draggedTask.level) {
-      break;
+      if (newIndex === 0) {
+        draggedTask.level = 0;
+        draggedTask.parentId = null;
+      } else {
+        const previousTask = newTasks[newIndex - 1];
+        draggedTask.level = previousTask.level;
+        draggedTask.parentId = previousTask.parentId;
+      }
+
+      // Update the levels of the dragged task's children
+      const childTasks = [];
+      for (let i = newIndex + 1; i < newTasks.length; i++) {
+        if (newTasks[i].level <= draggedTask.level) {
+          break;
+        }
+        childTasks.push(newTasks[i]);
+      }
+
+      childTasks.forEach((childTask) => {
+        childTask.level = childTask.level - draggedTask.level + draggedTask.level + 1;
+      });
+
+      const updatedTasks = updateTaskOrder(newTasks);
+      setTasks(updatedTasks);
     }
-    childTasks.push(newTasks[i]);
-  }
-
-  // Remove the dragged task and its children from the list
-  newTasks.splice(draggedTaskIndex, 1 + childTasks.length);
-
-
-    
-  if (destination.index === 0) {
-    draggedTask.level = 0;
-    draggedTask.parentId = null;
-    
-  } else {
-    const previousTask = tasks[destination.index];
-    draggedTask.level = previousTask.level;
-    draggedTask.parentId = previousTask.parentId;
-  }
-
-  // Insert the dragged task and its children at the destination index
-  newTasks.splice(destination.index, 0, draggedTask, ...childTasks);
-
-  // Update the levels of the dragged task's children
-  childTasks.forEach((childTask) => {
-    childTask.level = childTask.level - draggedTask.level + draggedTask.level + 1;
-  });
-
-  const updatedTasks = updateTaskOrder(newTasks);
-  setTasks(updatedTasks);
-};
+  };
 
   const renderTasks = () => {
     const taskStack = [];
@@ -275,65 +276,40 @@ const onDragEnd = (result) => {
         if (taskStack.length === 0 || !isCollapsed) {
             taskStack.push(task);
             return (
-              <Draggable key={task.id} draggableId={task.id} index={index}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    <Task
-                        key={task.id}
-                        ref={el => taskRefs.current[index] = el}  // Use index for ref setting
-                        task={task}
-                        taskLabel={calculateTaskIndex(tasks, task.id)}
-                        onAdd={() => handleAddTask(task.id)}
-                        onDelete={() => handleDeleteTask(task.id)}
-                        onIndent={handleIndentTask}
-                        onToggleCheck={() => handleToggleCheck(task.id)}
-                        onToggleCollapse={handleToggleCollapse}
-                    />
-                  </div>
-                )}
-              </Draggable>
-
+              <Task
+                  key={task.id}
+                  task={task}
+                  ref={el => taskRefs.current[index] = el}  // Use index for ref setting
+                  taskLabel={calculateTaskIndex(tasks, task.id)}
+                  onAdd={() => handleAddTask(task.id)}
+                  onDelete={() => handleDeleteTask(task.id)}
+                  onIndent={handleIndentTask}
+                  onToggleCheck={() => handleToggleCheck(task.id)}
+                  onToggleCollapse={handleToggleCollapse}
+              />
             );
         }
 
         return null;
     });
-};
-
-
+  };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="tasks">
-        {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef}>
-            <div className={styles.taskContainer}>
-              {renderTasks()}
-            </div>
-          {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={onDragEnd}
+    >
+      <SortableContext
+        items={tasks}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className={styles.taskContainer}>
+          {renderTasks()}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
 export default TaskList;
-
-
-// {tasks.map((task, index) => (
-  // <Task
-  //   key={task.id}
-  //   ref={el => taskRefs.current[index] = el}
-  //   task={task}
-  //   taskLabel={calculateTaskIndex(tasks, task.id)}
-  //   onAdd={handleAddTask}
-  //   onDelete={handleDeleteTask}
-  //   onIndent={handleIndentTask}
-  //   onToggleCheck={handleToggleCheck}
-  // />
-// ))}
