@@ -1,3 +1,65 @@
+.taskOuterWrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.taskWrapper{
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.taskIndexWrapper{
+    width: 30px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.taskIndex{
+    font-family: "IBM Plex Mono", monospace;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 8px;
+    letter-spacing: -0.03em;
+    z-index: 10000;
+
+}
+
+.taskInnerWrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.taskCompleteBox{    
+    border: 2px solid #7f847d;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    height: 10px;
+    width: 10px;
+}
+
+
+.taskCompleteBox:hover{
+    transform: scale(1.03);
+}
+
+.taskInput{
+    padding: 8px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    font-family: "IBM Plex Mono", monospace;
+}
+
+
+
+/* 
+
 .taskItem {
     position: relative;
     padding-left: 20px;
@@ -17,4 +79,4 @@
     border: none;
     outline: none;
   }
-  
+   */

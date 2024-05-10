@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaCheckCircle, FaRegCircle } from 'react-icons/fa';
+import styles from "./PlanTask.module.css";
 
-const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, indexLabel, index }, ref) => {
+const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, taskLabel }, ref) => {
   const [content, setContent] = useState(task.content);
 
   // Generate styles for indentation lines
@@ -12,8 +13,9 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
         position: 'absolute',
         top: 0,
         bottom: 0,
-        left: `${10 + i * 20}px`,
-        width: '1px',
+        backgroundColor: "#DFE2DF",
+        left: `${6 + i * 20}px`,
+        width: '2px',
         backgroundColor: '#CCC'
       }} />);
     }
@@ -40,20 +42,28 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
   const CheckboxIcon = task.checked ? FaCheckCircle : FaRegCircle;
 
   return (
-    <div style={{ position: 'relative', paddingLeft: `${task.level * 20}px`, display: 'flex', alignItems: 'center' }}>
-      <CheckboxIcon onClick={() => onToggleCheck(task.id)} style={{ cursor: 'pointer', marginRight: '10px' }} />
+    <div className={styles.taskOuterWrapper}>
+    <div className={styles.taskIndexWrapper}>
+      <span className={styles.taskIndex}>{taskLabel}</span>
+    </div>
+    <div className={styles.taskWrapper} style={{paddingLeft: `${task.level * 20}px`}}>
       {indentStyles()}
-      <span>ORDER: {task.order}</span>
-      <span>LEVEL: {task.level}</span>
-      <input
-        ref={ref}
-        type="text"
-        value={content}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        style={{ textDecoration: task.checked ? 'line-through' : 'none', flex: 1 }}
-        placeholder="Type your task here..."
-      />
+      {/* <span>ORDER: {task.order}</span>
+      <span>LEVEL: {task.level}</span> */}
+      <div className={styles.taskInnerWrapper}>
+        <div className={styles.taskCompleteBox} onClick={() => onToggleCheck(task.id)}/>
+        <input
+          ref={ref}
+          type="text"
+          value={content}
+          className={styles.taskInput}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          style={{ textDecoration: task.checked ? 'line-through' : 'none', flex: 1 }}
+          placeholder="Type your task here..."
+        />
+      </div>
+    </div>
     </div>
   );
 });

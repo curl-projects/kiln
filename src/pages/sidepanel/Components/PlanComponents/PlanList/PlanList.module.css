@@ -1,0 +1,7 @@
+.taskContainer {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #ccc; /* Optional, just for visual */
+  }
+  
