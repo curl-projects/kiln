@@ -1,6 +1,6 @@
 import styles from '@pages/sidepanel/SidePanel.module.css';
 import { useState, useEffect } from 'react';
-
+import "./Sidepanel.css"
 import GoalsView from './Components/GoalComponents/GoalsView/GoalsView.jsx';
 import PlanView from './Components/PlanComponents/PlanView/PlanView.jsx';
 

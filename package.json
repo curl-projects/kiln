@@ -43,6 +43,7 @@
     "react-dom": "18.2.0",
     "react-draggable": "^4.4.6",
     "react-icons": "^5.1.0",
+    "react-nestable": "^3.0.2",
     "react-query-devtools": "^2.6.3",
     "renature": "^0.11.1",
     "styled-components": "^6.1.9",

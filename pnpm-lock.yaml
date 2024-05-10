@@ -59,6 +59,9 @@ dependencies:
   react-icons:
     specifier: ^5.1.0
     version: 5.1.0(react@18.2.0)
+  react-nestable:
+    specifier: ^3.0.2
+    version: 3.0.2
   react-query-devtools:
     specifier: ^2.6.3
     version: 2.6.3(react-query@2.26.4)(react@18.2.0)
@@ -2477,6 +2480,10 @@ packages:
     resolution: {integrity: sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==}
     engines: {node: '>=6.0'}
     dev: true
+
+  /classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+    dev: false
 
   /cli-cursor@4.0.0:
     resolution: {integrity: sha512-VGtlMu3x/4DOtIUwEkRezxUZ2lBacNJCHash0N0WeZDBS+7Ux1dm3XWAgWYxLJFMMdOeXMHXorshEFhbMSGelg==}
@@ -5173,6 +5180,18 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
+  /react-addons-shallow-compare@15.6.3:
+    resolution: {integrity: sha512-EDJbgKTtGRLhr3wiGDXK/+AEJ59yqGS+tKE6mue0aNXT6ZMR7VJbbzIiT6akotmHg1BLj46ElJSb+NBMp80XBg==}
+    dependencies:
+      object-assign: 4.1.1
+    dev: false
+
+  /react-addons-update@15.6.3:
+    resolution: {integrity: sha512-wBkjgx5cR0XTjZEz5jl2kScChrjI9T7rWVdaM0dLiIdHSgeHycLRdHPPiTgKk7vK18Od4rXmLJv91qofBXlE0A==}
+    dependencies:
+      object-assign: 4.1.1
+    dev: false
+
   /react-beautiful-dnd@13.1.1(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-0Lvs4tq2VcrEjEgDXHjT98r+63drkKEgqyxdA7qD3mvKwga6a5SscbdLPO2IExotU1jW8L0Ksdl0Cj2AF67nPQ==}
     peerDependencies:
@@ -5239,6 +5258,16 @@ packages:
 
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
+
+  /react-nestable@3.0.2:
+    resolution: {integrity: sha512-jIBwrDTz0Iqpun10+suZ2ySnFCCT7nk47c4iQqbKSeZhU7CsY9ecUJPQrt4Ksj9WBMjS/IrQjx5OhZE7/2pWEw==}
+    dependencies:
+      classnames: 2.5.1
+      react: 18.2.0
+      react-addons-shallow-compare: 15.6.3
+      react-addons-update: 15.6.3
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /react-query-devtools@2.6.3(react-query@2.26.4)(react@18.2.0):
     resolution: {integrity: sha512-pSvWq5Q8zgIP7QbF0+4BerCHLaLn5HPzce7sIXYqz4XEizcYJHkJtcrAwn6bUkCu5JmAt1Y7fViQtZwOIG2SYA==}

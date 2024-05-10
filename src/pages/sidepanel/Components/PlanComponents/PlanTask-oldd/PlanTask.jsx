@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaCheckCircle, FaRegCircle } from 'react-icons/fa';
 import styles from "./PlanTask.module.css";
 
-const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, taskLabel, onToggleCollapse }, ref) => {
+const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck, taskLabel, onToggleCollapse, onContentChange }, ref) => {
   const [content, setContent] = useState(task.content);
 
   // Generate styles for indentation lines
@@ -36,7 +36,7 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
   };
 
   const handleChange = (e) => {
-    setContent(e.target.value);
+    onContentChange(task.id, e.target.value);
   };
 
   return (
@@ -62,7 +62,7 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
         <input
           ref={ref}
           type="text"
-          value={content}
+          value={task.content}
           className={styles.taskInput}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
