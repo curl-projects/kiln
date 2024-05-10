@@ -43,7 +43,7 @@ const Task = React.forwardRef(({ task, onAdd, onDelete, onIndent, onToggleCheck,
     <div style={{ position: 'relative', paddingLeft: `${task.level * 20}px`, display: 'flex', alignItems: 'center' }}>
       <CheckboxIcon onClick={() => onToggleCheck(task.id)} style={{ cursor: 'pointer', marginRight: '10px' }} />
       {indentStyles()}
-      <span>INDEX: {index}</span>
+      <span>ORDER: {task.order}</span>
       <span>LEVEL: {task.level}</span>
       <input
         ref={ref}
