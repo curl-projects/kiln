@@ -57,6 +57,10 @@
 
 - https://github.com/kaizhelam/Koi-Fish
 
+- https://github.com/tshaddix/webext-redux
+
+- https://medium.com/@byeduardoac/optimising-chrome-extensions-part-1-beyond-redux-post-manifest-v3-c4e04d509264
+
 **Done**
 - Read page context
     - Find action associated with page changing

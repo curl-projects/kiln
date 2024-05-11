@@ -47,6 +47,7 @@ function getRomanIndex(index) {
   }
   return result;
 }
+
 function calculateTaskIndex(tasks, taskId) {
   // Find the task in the list
   const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -98,10 +99,16 @@ function calculateTaskIndex(tasks, taskId) {
   return parentPrefix + indexStr;  // Correctly formatted full index without excessive periods
 }
 
-function TaskList() {
+function TaskList({ focusedTask, setFocusedTask, ...props}) {
   const [tasks, setTasks] = useState(initialTasks);
   const taskRefs = useRef([]);
   const [draggedItem, setDraggedItem] = useState(null);
+
+
+
+  useEffect(()=>{
+    console.log("FOCUSED TASK:", focusedTask)
+  }, [focusedTask])
 
 
   const sensors = useSensors(
@@ -116,14 +123,35 @@ function TaskList() {
     return tasks.map((task, index) => ({ ...task, order: index }));
   };
 
+  const getFocusedTask = () => {
+    // Iterate through the taskRefs array to find the currently focused element
+    if(taskRefs){
+      for (let i = 0; i < taskRefs.current.length; i++) {
+        const taskInput = taskRefs.current[i];
+        if (taskInput === document.activeElement) {
+          // If a focused element is found, return the corresponding task ID
+          return tasks[i];
+        }
+      }
+      // Return null if no task input is focused
+      return null;
+    }
+  };  
+  
+
   useEffect(() => {
-    console.log("TASKS:", tasks)
     // Check if the tasks array is empty and add a new task if it is
+    const focusedTaskObj = getFocusedTask();
+    if(focusedTaskObj){
+      setFocusedTask(focusedTaskObj)
+    }
+
     if (tasks.length === 0) {
       setTasks([
         { id: '1', content: '', level: 0, checked: false, parentId: null, order: 0 }
       ])
     }
+
   }, [tasks]);  // Dependency on tasks to trigger whenever it changes
 
   const handleToggleCollapse = (taskId) => {
@@ -334,7 +362,9 @@ function TaskList() {
             onToggleCheck={() => handleToggleCheck(task.id)}
             onToggleCollapse={handleToggleCollapse}
             handleContentChange={handleContentChange}
-          />
+            isFocusedTask={focusedTask && (focusedTask.id === task.id)}
+            setFocusedTask={setFocusedTask}
+            />
         );
       }
 

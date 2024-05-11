@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import App from '@pages/content/ui/app';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import injectedStyle from './injected.css?inline';
+import ContentSyncProvider from './ContentSyncProvider/ContentSyncProvider';
 
 refreshOnUpdate('pages/content');
 
@@ -29,5 +30,7 @@ shadowRoot.appendChild(styleElement);
  */
 
 createRoot(rootIntoShadow).render(
+    <ContentSyncProvider>
         <App />
+    </ContentSyncProvider>
 );

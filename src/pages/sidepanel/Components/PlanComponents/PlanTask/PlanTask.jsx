@@ -11,7 +11,9 @@ const Task = React.forwardRef(({
   onToggleCheck,
   taskLabel,
   onToggleCollapse,
-  handleContentChange
+  handleContentChange,
+  isFocusedTask,
+  setFocusedTask
 }, ref) => {
   
   const [content, setContent] = useState(task.content);
@@ -80,14 +82,16 @@ const Task = React.forwardRef(({
           <div
             className={styles.taskIndexButton}
             style={{
-              backgroundColor: task.collapsed ? 'unset' : '#CCCFCC'
+              backgroundColor: task.collapsed ? 'unset' : '#CCCFCC',
+              borderColor: isFocusedTask ? "FEAD82" : "#CCCFCC"
             }}
             onClick={() => onToggleCollapse(task.id)}
           />
           <span
             className={styles.taskIndex} {...attributes} {...listeners}
             style={{
-              textDecoration: task.checked ? 'line-through' : 'none'
+              textDecoration: task.checked ? 'line-through' : 'none',
+              color: isFocusedTask ? '#FEAD82' : '#7F847D'
             }}
           >
             {task.checked ? 'C' : taskLabel}
@@ -104,7 +108,7 @@ const Task = React.forwardRef(({
               onClick={() => onToggleCheck(task.id)}
               style={{
                 backgroundColor: task.checked ? '#7F847D' : 'unset',
-                borderColor: task.checked ? '#7F847D' : '#7F847D'
+                borderColor: isFocusedTask ? "#FEAD82" : (task.checked ? '#7F847D' : '#7F847D')
               }}
             />
             <input
@@ -114,9 +118,12 @@ const Task = React.forwardRef(({
               className={styles.taskInput}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
+              onFocus={()=>setFocusedTask(task)}
+              onBlur={()=>setFocusedTask(null)}
               style={{
                 textDecoration: task.checked ? 'line-through' : 'none',
-                flex: 1
+                flex: 1,
+                color: isFocusedTask ? '#FEAD82' : '#7F847D'
               }}
               placeholder='Type your task here...'
             />

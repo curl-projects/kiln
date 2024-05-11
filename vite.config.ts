@@ -36,7 +36,7 @@ export default defineConfig({
         panel: resolve(pagesDir, 'panel', 'index.html'),
         contentInjected: resolve(pagesDir, 'content', 'injected', 'index.ts'),
         contentUI: resolve(pagesDir, 'content', 'ui', 'index.ts'),
-        background: resolve(pagesDir, 'background', 'index.ts'),
+        background: resolve(pagesDir, 'background', 'index.jsx'),
         contentStyle: resolve(pagesDir, 'content', 'style.scss'),
         popup: resolve(pagesDir, 'popup', 'index.html'),
         newtab: resolve(pagesDir, 'newtab', 'index.html'),
