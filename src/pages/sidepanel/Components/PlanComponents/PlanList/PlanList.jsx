@@ -1,7 +1,7 @@
 import styles from "./PlanList.module.css"
 import React, { useState, useRef, useEffect } from 'react';
 import Task from '../PlanTask/PlanTask.jsx';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
@@ -47,7 +47,6 @@ function getRomanIndex(index) {
   }
   return result;
 }
-
 function calculateTaskIndex(tasks, taskId) {
   // Find the task in the list
   const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -102,6 +101,8 @@ function calculateTaskIndex(tasks, taskId) {
 function TaskList() {
   const [tasks, setTasks] = useState(initialTasks);
   const taskRefs = useRef([]);
+  const [draggedItem, setDraggedItem] = useState(null);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -195,6 +196,16 @@ function TaskList() {
     }
   };
 
+  const handleContentChange = (taskId, newContent) => {
+    // Create a new tasks list with the updated content for the specific task
+    const updatedTasks = tasks.map((task) => 
+      task.id === taskId ? { ...task, content: newContent } : task
+    );
+    setTasks(updatedTasks);
+  };
+
+
+
   const handleToggleCheck = (taskId) => {
     let newTasks = [...tasks];
     const taskIndex = newTasks.findIndex(task => task.id === taskId);
@@ -223,8 +234,31 @@ function TaskList() {
 
     setTasks(newTasks);
   };
+  // Capture the active task and its children when starting to drag
+  const onDragStart = (event) => {
+    const { active } = event;
+    const { id: activeId } = active;
+    const activeIndex = tasks.findIndex((task) => task.id === activeId);
+    const draggedTask = tasks[activeIndex];
+    const childTasks = [];
 
+    // Find children of the dragged task
+    for (let i = activeIndex + 1; i < tasks.length; i++) {
+      if (tasks[i].level <= draggedTask.level) break;
+      childTasks.push(tasks[i]);
+    }
+
+    setDraggedItem({ task: draggedTask, children: childTasks });
+  };
+
+  // Handle dropping of tasks and updating their new positions
   const onDragEnd = (event) => {
+    console.log("OVER", event.over, event.active)
+
+    if(!event.over){
+      setDraggedItem(null);
+      return;
+    };
     const { active, over } = event;
     const { id: activeId } = active;
     const { id: overId } = over;
@@ -233,71 +267,67 @@ function TaskList() {
       const oldIndex = tasks.findIndex((task) => task.id === activeId);
       const newIndex = tasks.findIndex((task) => task.id === overId);
 
-      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+      // Remove the dragged task and its children from the original position
+      const newTasks = [...tasks];
+      newTasks.splice(oldIndex, 1 + draggedItem.children.length);
 
-      const draggedTask = newTasks[newIndex];
+      // Insert the dragged task and its children at the new position
+      const newEffectiveIndex = newIndex > oldIndex ? newIndex - draggedItem.children.length : newIndex;
+      newTasks.splice(newEffectiveIndex, 0, draggedItem.task, ...draggedItem.children);
 
-      if (newIndex === 0) {
-        draggedTask.level = 0;
-        draggedTask.parentId = null;
-      } else {
-        const previousTask = newTasks[newIndex - 1];
-        draggedTask.level = previousTask.level;
-        draggedTask.parentId = previousTask.parentId;
-      }
-
-      // Update the levels of the dragged task's children
-      const childTasks = [];
-      for (let i = newIndex + 1; i < newTasks.length; i++) {
-        if (newTasks[i].level <= draggedTask.level) {
-          break;
-        }
-        childTasks.push(newTasks[i]);
-      }
-
-      childTasks.forEach((childTask) => {
-        childTask.level = childTask.level - draggedTask.level + draggedTask.level + 1;
-      });
-
+      // Update the task order
       const updatedTasks = updateTaskOrder(newTasks);
       setTasks(updatedTasks);
     }
+
+    setDraggedItem(null); // Reset the dragged item after dropping
   };
 
+  // Render tasks in the main list, excluding those currently being dragged
   const renderTasks = () => {
     const taskStack = [];
-    return tasks.map((task, index) => {  // Capture the index here
-        while (taskStack.length > 0 && taskStack[taskStack.length - 1].level >= task.level) {
-            taskStack.pop();
+    return tasks.map((task, index) => {
+      // Adjust the task stack for managing hierarchical levels
+      while (taskStack.length > 0 && taskStack[taskStack.length - 1].level >= task.level) {
+        taskStack.pop();
+      }
+
+      const isCollapsed = taskStack.some(t => t.collapsed);
+
+      // Skip rendering if the task or any of its parents are collapsed
+      if (taskStack.length === 0 || !isCollapsed) {
+        taskStack.push(task);
+
+        // Skip rendering if the task is currently being dragged
+        if (draggedItem && (task.id === draggedItem.task.id || draggedItem.children.some(child => child.id === task.id))) {
+          return null;
         }
 
-        const isCollapsed = taskStack.some(t => t.collapsed);
+        return (
+          <Task
+            key={task.id}
+            task={task}
+            ref={el => taskRefs.current[index] = el}
+            taskLabel={calculateTaskIndex(tasks, task.id)}
+            onAdd={() => handleAddTask(task.id)}
+            onDelete={() => handleDeleteTask(task.id)}
+            onIndent={handleIndentTask}
+            onToggleCheck={() => handleToggleCheck(task.id)}
+            onToggleCollapse={handleToggleCollapse}
+            handleContentChange={handleContentChange}
+          />
+        );
+      }
 
-        if (taskStack.length === 0 || !isCollapsed) {
-            taskStack.push(task);
-            return (
-              <Task
-                  key={task.id}
-                  task={task}
-                  ref={el => taskRefs.current[index] = el}  // Use index for ref setting
-                  taskLabel={calculateTaskIndex(tasks, task.id)}
-                  onAdd={() => handleAddTask(task.id)}
-                  onDelete={() => handleDeleteTask(task.id)}
-                  onIndent={handleIndentTask}
-                  onToggleCheck={() => handleToggleCheck(task.id)}
-                  onToggleCollapse={handleToggleCollapse}
-              />
-            );
-        }
-
-        return null;
+      return null;
     });
   };
 
   return (
-    <DndContext 
+    <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
       <SortableContext
@@ -308,6 +338,16 @@ function TaskList() {
           {renderTasks()}
         </div>
       </SortableContext>
+      <DragOverlay>
+        {draggedItem && (
+          <div>
+            <Task task={draggedItem.task} taskLabel={calculateTaskIndex(tasks, draggedItem.task.id)} />
+            {draggedItem.children.map((child) => (
+              <Task key={child.id} task={child} taskLabel={calculateTaskIndex(tasks, child.id)} />
+            ))}
+          </div>
+        )}
+      </DragOverlay>
     </DndContext>
   );
 }

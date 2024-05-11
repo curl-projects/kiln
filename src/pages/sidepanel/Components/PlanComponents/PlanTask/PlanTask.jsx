@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from "./PlanTask.module.css";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -10,10 +10,17 @@ const Task = React.forwardRef(({
   onIndent,
   onToggleCheck,
   taskLabel,
-  onToggleCollapse
+  onToggleCollapse,
+  handleContentChange
 }, ref) => {
   
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(task.content);
+
+  useEffect(()=>{
+    if(handleContentChange){
+      handleContentChange(task.id, content)
+    }
+  }, [content])
 
   const {
     attributes,
@@ -69,7 +76,7 @@ const Task = React.forwardRef(({
       style={style}
     >
       <div className={styles.taskOuterWrapper} id={task.id}>
-        <div className={styles.taskIndexWrapper} {...attributes} {...listeners}>
+        <div className={styles.taskIndexWrapper}>
           <div
             className={styles.taskIndexButton}
             style={{
@@ -78,7 +85,7 @@ const Task = React.forwardRef(({
             onClick={() => onToggleCollapse(task.id)}
           />
           <span
-            className={styles.taskIndex}
+            className={styles.taskIndex} {...attributes} {...listeners}
             style={{
               textDecoration: task.checked ? 'line-through' : 'none'
             }}
