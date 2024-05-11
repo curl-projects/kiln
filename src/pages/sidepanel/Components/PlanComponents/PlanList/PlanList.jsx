@@ -264,23 +264,42 @@ function TaskList() {
     const { id: overId } = over;
 
     if (activeId !== overId) {
-      const oldIndex = tasks.findIndex((task) => task.id === activeId);
-      const newIndex = tasks.findIndex((task) => task.id === overId);
+        const oldIndex = tasks.findIndex((task) => task.id === activeId);
+        const newIndex = tasks.findIndex((task) => task.id === overId);
 
-      // Remove the dragged task and its children from the original position
-      const newTasks = [...tasks];
-      newTasks.splice(oldIndex, 1 + draggedItem.children.length);
+        // Create a copy of tasks and remove the dragged task with its children
+        const newTasks = [...tasks];
+        newTasks.splice(oldIndex, 1 + draggedItem.children.length);
 
-      // Insert the dragged task and its children at the new position
-      const newEffectiveIndex = newIndex > oldIndex ? newIndex - draggedItem.children.length : newIndex;
-      newTasks.splice(newEffectiveIndex, 0, draggedItem.task, ...draggedItem.children);
+        // Determine the effective index where the dragged task should be inserted
+        const newEffectiveIndex = newIndex > oldIndex ? newIndex - draggedItem.children.length : newIndex;
 
-      // Update the task order
-      const updatedTasks = updateTaskOrder(newTasks);
-      setTasks(updatedTasks);
+        // Insert the dragged task and its children at the new position
+        newTasks.splice(newEffectiveIndex, 0, draggedItem.task, ...draggedItem.children);
+
+        // Adjust the level of the dragged task if necessary
+        if (newEffectiveIndex > 0) {
+            const aboveTask = newTasks[newEffectiveIndex - 1];
+            const targetLevel = aboveTask.level + 1;
+            if (draggedItem.task.level > targetLevel) {
+                draggedItem.task.level = targetLevel;
+            }
+        }
+
+        // Re-calculate the levels of child tasks relative to the new level of the parent
+        let baseLevel = draggedItem.task.level;
+        draggedItem.children.forEach((child) => {
+            child.level = baseLevel + 1;
+            baseLevel += 1;
+        });
+
+        // Update tasks with the newly ordered and leveled tasks
+        const updatedTasks = updateTaskOrder(newTasks);
+        setTasks(updatedTasks);
     }
 
-    setDraggedItem(null); // Reset the dragged item after dropping
+    setDraggedItem(null);
+
   };
 
   // Render tasks in the main list, excluding those currently being dragged
