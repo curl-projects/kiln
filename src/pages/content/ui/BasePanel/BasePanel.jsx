@@ -1,69 +1,107 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useSpring, animated } from '@react-spring/web';
+import { FaCog } from 'react-icons/fa';
+import Draggable from 'react-draggable';
+import PanelButton from './PanelButton/PanelButton';
+import PanelLogic from "../PanelLogic/PanelLogic.jsx";
 
+const POSITIONS = {
+  bottom: { bottom: 0, left: '50%', transform: 'translateX(-50%)' },
+  top: { top: 0, left: '50%', transform: 'translateX(-50%)' },
+  left: { top: '50%', left: 0, transform: 'translateY(-50%)' },
+  right: { top: '50%', right: 0, transform: 'translateY(-50%)' },
+};
 
-// BasePanel now accepts a props object with a config specifying the keys to listen for
-export default function BasePanel({ config, type }) {
-  const [storedData, setStoredData] = useState({});
+export default function BasePanel({ children, config, type, side = 'bottom', forceOpen = false }) {
+  const [isCollapsed, setCollapsed] = useState(!forceOpen);
+  const contentRef = useRef(null);
+  const [springStyles, api] = useSpring(() => ({
+    width: forceOpen ? 300 : 40,
+    gridTemplateRows: forceOpen ? '1fr' : '0fr',
+    config: { tension: 170, friction: 26 },
+  }));
 
-  // Function to load data from storage initially based on the keys in the config
-  const loadStoredData = () => {
-    // Retrieve only the keys specified in the config
-    chrome.storage.local.get(config.keys, (result) => {
-      const initialData = {};
-      config.keys.forEach((key) => {
-        if (result[key] !== undefined) {
-          initialData[key] = result[key];
-        }
-        else{
-            console.warn(`Warning: Key '${key}' is missing from storage. ${type} Component`);
-        }
+  useEffect(() => {
+    if (forceOpen && isCollapsed) {
+      setCollapsed(false);
+      api.start({
+        width: 300,
+        gridTemplateRows: '1fr',
       });
-      setStoredData(initialData);
-    });
-  };
+    }
+  }, [forceOpen, isCollapsed, api]);
 
-// Function to update component state when storage changes
-  const handleStorageChange = (changes, areaName) => {
-    console.log("Handling storage change")
-    if (areaName === 'local') {
-      let hasChanges = false;
-      const newData = { ...storedData };
-
-      config.keys.forEach((key) => {
-        if (changes[key]) {
-          newData[key] = changes[key].newValue;
-          hasChanges = true;
-        } else if (newData[key] === undefined) {
-          console.warn(`Warning: Key '${key}' is missing from the updated storage data.`);
-        }
+  const handleMouseEnter = () => {
+    if (!forceOpen) {
+      setCollapsed(false);
+      api.start({
+        width: 300,
+        gridTemplateRows: '1fr',
       });
-
-      if (hasChanges) {
-        setStoredData(newData);
-      }
     }
   };
 
+  const handleMouseLeave = () => {
+    if (!forceOpen) {
+      setCollapsed(true);
+      api.start({
+        width: 40,
+        gridTemplateRows: '0fr',
+      });
+    }
+  };
 
-  // Initialize data and set up the listener
-  useEffect(() => {
-    loadStoredData();
-    chrome.storage.onChanged.addListener(handleStorageChange);
-
-    // Clean up the listener on component unmount
-    return () => {
-      chrome.storage.onChanged.removeListener(handleStorageChange);
-    };
-  }, []);
-
-  useEffect(()=>{
-    console.log(`Stored Data (${type}):`, storedData)
-  }, [storedData])
+  const positionStyle = POSITIONS[side] || POSITIONS.bottom;
 
   return (
-    <div>
-      <h1>Stored Data</h1>
-      <pre>{JSON.stringify(storedData, null, 2)}</pre>
-    </div>
+    <PanelLogic config={config} type={type}>
+      <Draggable disabled={isCollapsed}>
+        <animated.div
+          style={{
+            ...springStyles,
+            ...basePanelStyle,
+            ...positionStyle,
+            display: 'grid',
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div
+            ref={contentRef}
+            style={{
+              overflow: 'hidden',
+              minHeight: 0,
+            }}
+          >
+            {isCollapsed && !forceOpen ? (
+              <div
+                style={{
+                  width: '100%',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <PanelButton type='localAI' />
+              </div>
+            ) : (
+              children
+            )}
+          </div>
+        </animated.div>
+      </Draggable>
+    </PanelLogic>
   );
 }
+
+const basePanelStyle = {
+  border: '2px solid #EEEEEC',
+  backgroundColor: '#FCFDFC',
+  boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.25)',
+  minHeight: '40px',
+  minWidth: '40px',
+  zIndex: 10000000000,
+  position: 'fixed',
+  cursor: 'grab',
+};

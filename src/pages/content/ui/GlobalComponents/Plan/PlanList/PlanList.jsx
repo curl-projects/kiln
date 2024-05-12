@@ -1,4 +1,3 @@
-import styles from "./PlanList.module.css"
 import React, { useState, useRef, useEffect } from 'react';
 import Task from '../PlanTask/PlanTask.jsx';
 import { DndContext, DragOverlay, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -384,7 +383,7 @@ function PlanList({...props}) {
         items={tasks}
         strategy={verticalListSortingStrategy}
       >
-        <div className={styles.taskContainer}>
+        <div style={taskContainerStyle}>
           {renderTasks()}
         </div>
       </SortableContext>

@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import App from '@pages/content/ui/app';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import injectedStyle from './injected.css?inline';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 refreshOnUpdate('pages/content');
 
@@ -21,6 +22,8 @@ const styleElement = document.createElement('style');
 styleElement.innerHTML = injectedStyle;
 shadowRoot.appendChild(styleElement);
 
+const queryClient = new QueryClient();
+
 /**
  * https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/pull/174
  *
@@ -29,5 +32,7 @@ shadowRoot.appendChild(styleElement);
  */
 
 createRoot(rootIntoShadow).render(
+    <QueryClientProvider client={queryClient}>
         <App />
+    </QueryClientProvider>
 );

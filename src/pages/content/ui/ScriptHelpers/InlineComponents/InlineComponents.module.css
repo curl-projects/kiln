@@ -1,0 +1,39 @@
+.inlineWrapper{
+    display: inline-block;
+}
+
+.completedRow{
+    display: flex;
+    align-items: center;
+    height: 10px;
+}
+
+.taskCompleteCircle{
+    border-radius: 100%;
+    border: 2px solid rgba(254, 172, 133, 0.5);
+    height: 6px;
+    width: 6px;
+    margin-right: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.taskEyebrow{
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    color: rgba(254, 172, 133, 0.5);
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    transition: all 0.5s ease-in-out;
+}
+
+.taskTitleWrapper{
+
+}
+
+.taskTitle{
+    color: #FEAC85;
+    margin: 0px;
+}

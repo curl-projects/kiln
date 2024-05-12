@@ -42,7 +42,9 @@ const manifest = {
       js: ['src/pages/contentInjected/index.js'],
       all_frames: false,
       // KEY for cache invalidation
-      css: ['assets/css/contentStyle<KEY>.chunk.css'],
+      css: [
+        'assets/css/contentStyle<KEY>.chunk.css',
+    ],
     },
     {
       matches: ['http://*/*', 'https://*/*'],

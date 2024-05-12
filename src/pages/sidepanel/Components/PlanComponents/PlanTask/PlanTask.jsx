@@ -119,7 +119,7 @@ const Task = React.forwardRef(({
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               onFocus={()=>setFocusedTask(task)}
-              onBlur={()=>setFocusedTask(null)}
+              onBlur={()=>setFocusedTask(task)}
               style={{
                 textDecoration: task.checked ? 'line-through' : 'none',
                 flex: 1,

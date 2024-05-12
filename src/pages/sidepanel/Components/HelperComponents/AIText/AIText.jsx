@@ -1,6 +1,5 @@
 import styles from './AIText.module.css';
 import { useState, useEffect } from 'react';
-import ContentEditable from 'react-contenteditable';
 import { useStreamAI } from '../../../Hooks/streamAI';
 import { renderText } from '../../../Helpers/ProcessingFuncs/renderText.jsx';
 import Firefly from '../Firefly/Firefly';
