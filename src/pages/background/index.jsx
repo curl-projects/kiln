@@ -10,8 +10,6 @@ reloadOnUpdate('pages/content/style.scss');
 
 console.log('background loaded');
 
-chrome.storage.local.set({finnKey: "hello"});
-
 // Allows users to open the side panel by clicking on the action toolbar icon
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(error => console.error(error));
 
@@ -144,6 +142,7 @@ async function mutate(endpoint, data = {}) {
 }
 
 async function stream(endpoint, data = {}, promptType, streamName){
+    console.log("STARTING STREAM")
     try{
         let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
 

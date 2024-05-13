@@ -1,6 +1,4 @@
-import styles from '@pages/sidepanel/SidePanel.module.css';
 import { useState, useEffect } from 'react';
-import "./Sidepanel.css"
 import GoalsView from './Components/GoalComponents/GoalsView/GoalsView.jsx';
 import PlanView from './Components/PlanComponents/PlanView/PlanView.jsx';
 
@@ -22,4 +20,15 @@ export default function SidePanel(){
       }
     </div>
   )
+}
+
+const styles = {
+  sidepanelWrapper: {
+    height: "500px",
+    width: "300px",
+    overflowX: "hidden",
+    overflowY: "scroll",
+    padding: '20px',
+    boxSizing: "border-box"
+  }
 }

@@ -37,18 +37,18 @@ export default function BasePanel({ config, type, children }) {
   };
 
   const stream = (options) => {
-    const {endpoint, data, promptType, streamName} = options
+    const { endpoint, data, promptType, streamName } = options;
     
     chrome.runtime.sendMessage(
       {
-          action: 'stream', 
-          endpoint: endpoint,
-          data: data,
-          promptType: promptType,
-          streamName: streamName
+        action: 'stream', 
+        endpoint,
+        data,
+        promptType,
+        streamName,
       },
-    )
-  }
+    );
+  };
 
   // Set up storage listener
   useEffect(() => {
@@ -75,9 +75,15 @@ export default function BasePanel({ config, type, children }) {
     };
   }, [config.keys]);
 
+  // Dynamically construct the context value
+  const contextValue = { mutate, stream };
+  config.keys.forEach(key => {
+    contextValue[key] = storedData.hasOwnProperty(key) ? storedData[key] : null;
+  });
+
   return (
-      <BasePanelContext.Provider value={{ data: storedData, mutate, stream }}>
-          {children}
-      </BasePanelContext.Provider>
+    <BasePanelContext.Provider value={contextValue}>
+      {children}
+    </BasePanelContext.Provider>
   );
 }

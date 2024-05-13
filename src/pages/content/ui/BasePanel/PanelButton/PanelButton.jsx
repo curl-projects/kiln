@@ -10,6 +10,8 @@ export default function PanelButton({type, setCollapsed}){
                         'localAI': <RiFocusFill />,
                         'globalAI': <PiMapTrifoldBold />,
                         'planList': <GrTask />,
+                        'taskLog': <GrTask />,
+                        'sidePanel': <PiMapTrifoldBold />
                     }[type]
                 }
         </div>
@@ -20,10 +22,10 @@ const styles = {
     panelButtonWrapper: {
         height: '30px',
         width: '30px',
-        border: "3px solid #7F847D",
+        border: "2px solid #7F847D",
         display: 'flex',
         alignItems: 'center',
-        fontSize: '24px',
+        fontSize: '14px',
         color: "#7F847D",
         justifyContent: 'center',
         borderRadius: '100%',

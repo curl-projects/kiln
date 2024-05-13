@@ -98,11 +98,10 @@ function calculateTaskIndex(tasks, taskId) {
   return parentPrefix + indexStr;  // Correctly formatted full index without excessive periods
 }
 
-function PlanList({...props}) {
+function PlanList({focusedTask, setFocusedTask, ...props}) {
   const [tasks, setTasks] = useState(initialTasks);
   const taskRefs = useRef([]);
   const [draggedItem, setDraggedItem] = useState(null);
-  const [focusedTask, setFocusedTask] = useState(null);
 
 
 
