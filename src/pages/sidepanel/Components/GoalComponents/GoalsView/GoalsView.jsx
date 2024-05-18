@@ -6,6 +6,7 @@ import { useDatabase } from '../../../Helpers/Providers/DatabaseProvider';
 
 export default function GoalsView({ activeGoal, setActiveGoal }){
     const { goals } = useDatabase();
+    
     return(
         <div className={styles.goalsViewWrapper}>
             <AIText aiData={{}} promptType="sayHello"/>

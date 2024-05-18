@@ -1,5 +1,5 @@
 import { useEffect, useContext } from "react";
-import { BasePanelContext } from '@pages/content/ui/PanelLogic/PanelLogic.jsx';
+import { useChromeSync } from '@pages/content/ui/PanelLogic/PanelLogic.jsx';
 import Firefly from "@pages/content/ui/ScriptHelpers/Firefly.jsx";
 
 const styles = {
@@ -38,7 +38,7 @@ export default function GlobalAIText({ streamName, promptType }) {
     streamName: streamName
   };
 
-  const { stream, ...contextData } = useContext(BasePanelContext);
+  const { stream, ...contextData } = useChromeSync();
 
   useEffect(() => {
     stream(streamOptions);

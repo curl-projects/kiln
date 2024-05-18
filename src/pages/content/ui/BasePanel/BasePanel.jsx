@@ -13,44 +13,36 @@ export default function BasePanel({ children, config, type, edge = 'bottom', pos
   const draggableRef = useRef(null);
 
   const defaultHeight = '40px';
-  const [contentHeight, setContentHeight] = useState(defaultHeight);
+  const defaultWidth = '40px';
 
-  const [ref, { height }] = useMeasure();
+  const [ref, { height, width }] = useMeasure();
 
   const [springStyles, animate] = useSpring(() => ({
-    height: isCollapsed ? defaultHeight : `${contentHeight}px`,
+    height: isCollapsed ? defaultHeight : `${height}px`,
+    width: isCollapsed ? defaultWidth : `${width}px`,
     config: { tension: 170, friction: 26 },
-  }), [isCollapsed, contentHeight]);
+  }), [isCollapsed, height, width]);
+
+//   useEffect(()=>{
+//     console.log("WIDTH:", width)
+//     console.log("HEIGHT:", height)
+//   }, [width, height])
 
   useEffect(() => {
     animate.start({
-      height: isCollapsed ? defaultHeight : `${contentHeight}px`,
+      height: isCollapsed ? defaultHeight : `${height}px`,
+      width: isCollapsed ? defaultWidth : `${width}px`,
     });
-  }, [animate, isCollapsed, contentHeight]);
+  }, [animate, isCollapsed, height, width]);
 
-  useEffect(() => {
-    if (height > 0) {
-      setContentHeight(height);
-    }
-  }, [height]);
-
-  useEffect(()=>{
-    console.log("HEIGHT:", height)
-  }, [height])
-
-  useEffect(() => {
-    setContentHeight(height)
-    
-    const handleResize = () => {
-      setContentHeight(height);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+//   useEffect(() => {
+//     if (height > 0) {
+//       setContentHeight(height);
+//     }
+//     if (width > 0) {
+//       setContentWidth(width);
+//     }
+//   }, [height, width]);
 
   const handleResetPosition = () => {
     if (draggableRef.current) {
@@ -80,6 +72,7 @@ export default function BasePanel({ children, config, type, edge = 'bottom', pos
         defaultPosition={initialPosition}
         onStart={() => setInitialPosition({ x: draggableRef.current.state.x, y: draggableRef.current.state.y })}
         handle=".goalsExtensionPanelHandle"
+        
       >
         <animated.div
           style={{
@@ -96,51 +89,55 @@ export default function BasePanel({ children, config, type, edge = 'bottom', pos
             style={{
               overflow: 'hidden',
               minHeight: '0px',
+              minWidth: '0px',
+              width: 'fit-content',
+              height: 'fit-content',
               display: "grid",
             }}
           >
-            {!isCollapsed && (
-              <div className='controlsRow' style={styles.controlsRow}> 
+            {!isCollapsed
+            
+            ? (
+            <>
+                <div className='controlsRow' style={styles.controlsRow}> 
                 <div style={{flex: 1}} className='goalsExtensionPanelHandle'/>
                 <button
-                  className="reset-button"
-                  style={styles.controlButton}
-                  onClick={handleResetPosition}
+                    className="reset-button"
+                    style={styles.controlButton}
+                    onClick={handleResetPosition}
                 >
-                  <FaUndo />
+                    <FaUndo />
                 </button>
                 <button
-                  className="force-open-button"
-                  style={{
+                    className="force-open-button"
+                    style={{
                     ...styles.controlButton,
-                    color: forceOpen ? '#FEAD82' : 'inherit'
-                  }}
-                  onClick={() => setForceOpen(!forceOpen)}
+                    color: forceOpen ? '#FEAD82' : '#7F847D'
+                    }}
+                    onClick={() => setForceOpen(!forceOpen)}
                 >
-                  <FaThumbtack />
+                    <FaThumbtack />
                 </button>
+                </div>
+                <div className='goalsExtensionPanelHandle' style={{display: 'contents'}}>
+                    {children}
+                </div>
+            </>
+            )
+            : (
+            <div
+                className="goalsExtensionPanelHandle"
+                style={{
+                  width: '100%',
+                  height: '40px',
+                  display: isCollapsed ? 'flex' : 'none',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <PanelButton type={type} />
               </div>
             )}
-            <div
-              style={{
-                display: isCollapsed ? 'none' : 'block',
-              }}
-              className='goalsExtensionPanelHandle'
-            >
-              {children}
-            </div>
-            <div
-              className="goalsExtensionPanelHandle"
-              style={{
-                width: '100%',
-                height: '40px',
-                display: isCollapsed ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <PanelButton type={type} />
-            </div>
           </div>
         </animated.div>
       </Draggable>
@@ -157,6 +154,9 @@ const styles = {
     minWidth: '40px',
     zIndex: 10000000000,
     cursor: 'grab',
+    // display: 'flex',
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   controlsRow: {
     display: "flex",

@@ -5,12 +5,11 @@ import Separator from '@pages/content/ui/ScriptHelpers/Separator/Separator.jsx';
 import GlobalAIText from '@pages/content/ui/GlobalComponents/GlobalAIText/GlobalAIText.jsx';
 import GoalCard, { NewGoalCard } from '@pages/content/ui/GlobalComponents/GoalCard/GoalCard.jsx';
 
-import { useContext } from "react";
-import { BasePanelContext } from '@pages/content/ui/PanelLogic/PanelLogic.jsx'
+import { useChromeSync } from '@pages/content/ui/PanelLogic/PanelLogic.jsx'
 
 
 export default function GoalsView({ activeGoal, setActiveGoal }){
-    const { goals } = useContext(BasePanelContext);
+    const { goals } = useChromeSync();
 
     useEffect(()=>{
         setActiveGoal(null)

@@ -3,6 +3,7 @@ import App from '@pages/content/ui/app';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import injectedStyle from './injected.css?inline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ShadowHostProvider from "@pages/content/ui/ScriptHelpers/ShadowHostProvider/ShadowHostProvider.jsx"
 
 refreshOnUpdate('pages/content');
 
@@ -33,6 +34,8 @@ const queryClient = new QueryClient();
 
 createRoot(rootIntoShadow).render(
     <QueryClientProvider client={queryClient}>
-        <App />
+        {/* <ShadowHostProvider> */}
+            <App />
+        {/* </ShadowHostProvider> */}
     </QueryClientProvider>
 );
