@@ -4,7 +4,7 @@ import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import injectedStyle from './injected.css?inline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ShadowHostProvider from "@pages/content/ui/ScriptHelpers/ShadowHostProvider/ShadowHostProvider.jsx"
-
+import FishOrchestrationProvider from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx"
 refreshOnUpdate('pages/content');
 
 const root = document.createElement('div');
@@ -34,8 +34,10 @@ const queryClient = new QueryClient();
 
 createRoot(rootIntoShadow).render(
     <QueryClientProvider client={queryClient}>
-        {/* <ShadowHostProvider> */}
-            <App />
-        {/* </ShadowHostProvider> */}
+        <FishOrchestrationProvider>
+            {/* <ShadowHostProvider> */}
+                <App />
+            {/* </ShadowHostProvider> */}
+        </FishOrchestrationProvider>
     </QueryClientProvider>
 );

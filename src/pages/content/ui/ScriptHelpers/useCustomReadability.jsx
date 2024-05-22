@@ -14,7 +14,7 @@ export function useCustomReadability() {
         } else {
             throw new Error("Cannot access document object");
         }
-    }, []); // Empty dependency array to run the effect only once
+    }, []);
 
     return article;
 }

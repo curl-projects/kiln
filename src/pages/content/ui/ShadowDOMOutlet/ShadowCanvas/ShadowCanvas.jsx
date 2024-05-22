@@ -1,13 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { Tldraw, createTLStore, defaultShapeUtils, useEditor } from 'tldraw';
 
+
+function createShape(element, position){
+    switch(element.props.name){
+        case 'div':
+            return {
+                type: 'geo',
+                x: position.x,
+                y: position.y,
+                props: {
+                    geo: 'rectangle',
+                }
+
+            }
+        case 'p': 
+            return {
+
+            }
+        default: 
+            
+            console.warn("Unsupported Element Type", element)
+
+            return {
+                type: 'geo',
+                x: position.x,
+                y: position.y,
+                props: {
+                    geo: 'rectangle',
+                }
+            }
+        
+    }
+}
+
 function traverseReactElements(element, shapes = [], position = { x: 0, y: 0 }) {
     if (!element || typeof element !== 'object') return shapes;
 
     const { type, key, props } = element;
     const { children, ...otherProps } = props || {};
 
-    // Create a shape for the current element
 
     shapes.push({
         id: key || `${type}-${shapes.length}`,
@@ -26,9 +58,13 @@ function traverseReactElements(element, shapes = [], position = { x: 0, y: 0 }) 
         children.forEach((child) => {
             traverseReactElements(child, shapes, nextPosition);
         });
-    } else if (typeof children === 'object') {
+    } 
+    
+    else if (typeof children === 'object') {
         traverseReactElements(children, shapes, nextPosition);
-    } else if (children) {
+    } 
+    
+    else if (children) {
         shapes.push({
             id: `${type}-${shapes.length}-child`,
             type: 'text',

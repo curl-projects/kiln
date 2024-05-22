@@ -1,15 +1,22 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import parse, { domToReact } from 'html-react-parser';
 import { useCustomReadability } from '../ScriptHelpers/useCustomReadability';
-import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowCanvas/ShadowCanvas"
+// import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowCanvas/ShadowCanvas"
+import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ShadowFishCanvas.jsx"
+import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
+import Ripple from './Ripple/Ripple.jsx';
 
 const ShadowDOMOutlet = () => {
     const article = useCustomReadability();
     const [parsedContent, setParsedContent] = useState({})
+    const [textContent, setTextContent] = useState({})
+    const { fishOrchestrator } = useFish();
+    const [ripples, setRipples] = useState([]);
 
-    useEffect(() => {
-        console.log("PARSED CONTENT OUTER:", parsedContent);
-    }, [parsedContent]);
+
+    useEffect(() => { 
+        console.log("ARTICLE:", article);
+    }, [article]);
 
     useEffect(() => {
         const shadowHost = document.getElementById('goals-extension-content-view-root');
@@ -20,7 +27,7 @@ const ShadowDOMOutlet = () => {
             );
 
             siblings.forEach((sibling) => {
-                sibling.style.filter = 'blur(30px)';
+                sibling.style.filter = 'blur(20px)';
             });
 
             return () => {
@@ -31,46 +38,63 @@ const ShadowDOMOutlet = () => {
         }
     }, []);
 
-    const CustomDiv = ({ children, ...props }) => <div {...props}>{children}</div>;
-    const CustomSpan = ({ children, ...props }) => <span {...props}>{children}</span>;
-    const CustomP = ({ children, ...props }) => <p style={styles.shadowDOMParagraph} {...props}>{children}</p>;
-    const CustomA = ({ children, ...props }) => <p style={styles.shadowDOMLink} {...props}>{children}</p>;
+    // const CustomDiv = ({ children, ...props }) => <div {...props}>{children}</div>;
+    // const CustomSpan = ({ children, ...props }) => <span {...props}>{children}</span>;
+    // const CustomP = ({ children, ...props }) => <p style={styles.shadowDOMParagraph} {...props}>{children}</p>;
+    // const CustomA = ({ children, ...props }) => <p style={styles.shadowDOMLink} {...props}>{children}</p>;
 
-    const tagToComponentMap = {
-        div: CustomDiv,
-        span: CustomSpan,
-        p: CustomP,
-        a: CustomA,
-    };
+    // const tagToComponentMap = {
+    //     div: CustomDiv,
+    //     span: CustomSpan,
+    //     p: CustomP,
+    //     a: CustomA,
+    // };
 
-    const processNode = (node, index) => {
-        if (node.type === 'tag' && tagToComponentMap[node.name]) {
-            const CustomComponent = tagToComponentMap[node.name];
+    // const processNode = (node) => {
+    //     if (node.type === 'tag' && tagToComponentMap[node.name]) {
+    //         const CustomComponent = tagToComponentMap[node.name];
 
-            console.log("NODE:", node)
-            return (
-                <CustomComponent type={node.type} name={node.name} data={node.data} nodeAttrs={{...node.attribs}}>
-                    {domToReact(node.children, { replace: processNode })}
-                </CustomComponent>
-            );
-        }
-        return node;
-    };
+    //         console.log("NODE:", node)
+
+    //         return (
+    //             <CustomComponent type={node.type} name={node.name} data={node.data} nodeAttrs={{...node.attribs}}>
+    //                 {domToReact(node.children, { replace: processNode, trim: true })}
+    //             </CustomComponent>
+    //         );
+    //     }
+    //     return node;
+    // };
     
-    useEffect(() => {
-        if(article?.sanitizedContent){
-            const parsed = parse(article.sanitizedContent, { replace: processNode });
-            console.log("PARSED:", parsed)
-            setParsedContent(parsed)
-        }
-    }, [article]);
+    // useEffect(() => {
+    //     if(article?.sanitizedContent){
+    //         const parsed = parse(article.sanitizedContent, { trim: true, replace: processNode  });
+    //         console.log("PARSED:", parsed)
+    //         setParsedContent(parsed)
+    //     }
+    // }, [article]);
+
+
+    const handleClick = (e) => {
+        console.log("X/Y", e.clientX, e.clientY)
+        const newRipple = { x: e.clientX, y: e.clientY };
+        setRipples((prevRipples) => [...prevRipples, newRipple]);
+        fishOrchestrator.emit('shadowDOMClick', { x: e.clientX, y: e.clientY });
+
+        setTimeout(() => {
+            setRipples((prevRipples) => prevRipples.slice(1));
+        }, 500); // duration of the ripple effect
+    };
 
 
     return (
-        <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
+        <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper} onClick={handleClick}>
             <h1 style={{ fontSize: '40px', margin: 0 }}>{article?.title ? article.title : "Untitled"}</h1>
             <p style={{ fontSize: '20px', margin: 0 }}>{article?.siteName ? article.siteName : "No site"}</p>
-           <ShadowCanvas parsedContent={parsedContent}/>
+            {/* {parsedContent} */}
+           <ShadowCanvas />
+           {ripples.map((ripple, index) => (
+                <Ripple key={index} x={ripple.x} y={ripple.y} />
+            ))}
         </div>
     );
 };

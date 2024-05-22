@@ -6,11 +6,13 @@ import TaskLog from "./GlobalComponents/TaskLog/TaskLog.jsx";
 import { useState, useEffect } from 'react';
 import Sidepanel from "@pages/content/ui/GlobalComponents/Sidepanel/Sidepanel.jsx";
 import ControlPanel from "@pages/content/ui/LocalComponents/ControlPanel/ControlPanel.jsx";
-
+import FishAgent from "@pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
+import FishSwarm from "@pages/content/ui/LocalComponents/FishSwarm/FishSwarm.jsx";
 import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.jsx"
 
 export default function App() {
   const [shadowOpen, setShadowOpen] = useState(false);
+  const [fishMoved, setFishMoved] = useState(false);
 
   return (
       <div>
@@ -32,8 +34,33 @@ export default function App() {
           <ControlPanel 
             shadowOpen={shadowOpen} 
             setShadowOpen={setShadowOpen}
+            setFishMoved={setFishMoved}
           />
         </BasePanel>
+          <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
+            <div className="centered-text" style={styles.centeredText}>Hello Text</div>
+          </div>
+        <FishSwarm fishConfig={['helper', 'devil', 'idiot', 'savant']}/>
       </div>
   );
 }
+
+
+const styles = {
+  centeredTextWrapper: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    textAlign: 'center',
+  },
+  centeredText: {
+    fontSize: '5rem', // Large text size
+    fontWeight: 'bold', // Bold text
+    color: '#7F847D',
+    filter: "opacity(0.8)",
+    zIndex: 10000001,
+    letterSpacing: '-0.06em',
+
+  },
+};
