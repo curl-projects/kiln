@@ -1,22 +1,27 @@
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import { useEffect, useState, useRef } from "react";
-import FishAgent from "@pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
+import FishAgentPersistent from "@pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
 
 export default function FishSwarm({ fishConfig }) {
     const { fishOrchestrator } = useFish();
-    const [fishPositions, setFishPositions] = useState(() => generateNonOverlappingPositions(fishConfig.length));
+    const [fishTransforms, setFishTransforms] = useState(() => generateNonOverlappingPositions(fishConfig.length));
     const fishRefs = fishConfig.map(() => useRef(null));
+
+
+    useEffect(() => {
+        console.log("FISH POSITIONS;", fishTransforms)
+    }, [fishTransforms]);
 
     function handleMoveFish() {
         console.log("Moving Fish!");
         const newPositions = generateNonOverlappingPositions(fishConfig.length);
-        setFishPositions(newPositions);
+        setFishTransforms(newPositions);
     }
 
     function handleShadowDOMClick({ x, y }) {
         console.log("Moving Fish!");
         const newPositions = distributeInCircle(fishConfig.length, x, y, 200);
-        setFishPositions(newPositions);
+        setFishTransforms(newPositions);
     }
 
     useEffect(() => {
@@ -25,91 +30,102 @@ export default function FishSwarm({ fishConfig }) {
 
         return () => {
             fishOrchestrator.off("moveFish", handleMoveFish);
+            fishOrchestrator.off("shadowDOMClick", handleShadowDOMClick);
         };
     }, [fishOrchestrator]);
 
     function generateNonOverlappingPositions(numFish) {
-        console.log("Generating Non Overlapping Fish Positions")
+        console.log("Generating Non Overlapping Fish Positions");
         const fishWidth = 300; // Adjust this value according to your fish width
         const fishHeight = 200; // Adjust this value according to your fish height
         const positions = [];
-
+    
+        // Initial position is assumed at left: 0, top: 0
+        // Generate initial random positions within the viewport limits
         for (let i = 0; i < numFish; i++) {
             positions.push({
-                x: Math.random() * (window.innerWidth - fishWidth),
-                y: Math.random() * (window.innerHeight - fishHeight)
+                transformX: Math.random() * (window.innerWidth - fishWidth),
+                transformY: Math.random() * (window.innerHeight - fishHeight)
             });
         }
-
+    
         let hasOverlaps;
         do {
             hasOverlaps = false;
             for (let i = 0; i < positions.length; i++) {
                 // Adjust position if out of bounds
-                if (positions[i].x < 0) positions[i].x = 0;
-                if (positions[i].y < 0) positions[i].y = 0;
-                if (positions[i].x + fishWidth > window.innerWidth) positions[i].x = window.innerWidth - fishWidth;
-                if (positions[i].y + fishHeight > window.innerHeight) positions[i].y = window.innerHeight - fishHeight;
-
+                if (positions[i].transformX < 0) positions[i].transformX = 0;
+                if (positions[i].transformY < 0) positions[i].transformY = 0;
+                if (positions[i].transformX + fishWidth > window.innerWidth) positions[i].transformX = window.innerWidth - fishWidth;
+                if (positions[i].transformY + fishHeight > window.innerHeight) positions[i].transformY = window.innerHeight - fishHeight;
+    
                 for (let j = i + 1; j < positions.length; j++) {
-                    const dx = Math.abs(positions[i].x - positions[j].x);
-                    const dy = Math.abs(positions[i].y - positions[j].y);
+                    const dx = Math.abs(positions[i].transformX - positions[j].transformX);
+                    const dy = Math.abs(positions[i].transformY - positions[j].transformY);
                     if (dx < fishWidth && dy < fishHeight) {
                         hasOverlaps = true;
                         // Adjust positions to remove overlap
-                        positions[j].x = (positions[j].x + fishWidth) % (window.innerWidth - fishWidth);
-                        positions[j].y = (positions[j].y + fishHeight) % (window.innerHeight - fishHeight);
+                        positions[j].transformX = (positions[j].transformX + fishWidth) % (window.innerWidth - fishWidth);
+                        positions[j].transformY = (positions[j].transformY + fishHeight) % (window.innerHeight - fishHeight);
                     }
                 }
             }
         } while (hasOverlaps);
-
+    
         return positions;
     }
-
+    
     function distributeInCircle(numFish, centerX, centerY, radius) {
-        console.log("Generating Circular Fish Positions")
+        console.log("Generating Circular Fish Positions");
         const angleStep = (2 * Math.PI) / numFish;
         const positions = [];
         const fishWidth = 300;
         const fishHeight = 200;
       
         for (let i = 0; i < numFish; i++) {
-          const angle = i * angleStep;
-          const fishCenterX = centerX + radius * Math.cos(angle);
-          const fishCenterY = centerY + radius * Math.sin(angle);
-      
-          const x = fishCenterX - fishWidth / 2;
-          const y = fishCenterY - fishHeight / 2;
-      
-          positions.push({ x, y });
+            const angle = i * angleStep;
+            const fishCenterX = centerX + radius * Math.cos(angle);
+            const fishCenterY = centerY + radius * Math.sin(angle);
+        
+            // Calculate the transform from the initial position (left: 0, top: 0)
+            let transformX = fishCenterX - fishWidth / 2;
+            let transformY = fishCenterY - fishHeight / 2;
+        
+            // Ensure that positions are adjusted to be within the viewport
+            if (transformX < 0) transformX = 0;
+            if (transformY < 0) transformY = 0;
+            if (transformX + fishWidth > window.innerWidth) transformX = window.innerWidth - fishWidth;
+            if (transformY + fishHeight > window.innerHeight) transformY = window.innerHeight - fishHeight;
+    
+            positions.push({ transformX, transformY });
         }
       
         return positions;
-      }
+    }
 
-      function handlePositionChange(index, newX, newY, fishPositions) {
-        fishPositions && setFishPositions(currentPositions => {
+      function handlePositionChange(index, transformX, transformY) {
+        setFishTransforms(currentPositions => {
             const updatedPositions = [...currentPositions];
-            updatedPositions[index] = { x: newX, y: newY };
+            updatedPositions[index] = { transformX: transformX, transformY: transformY };
             return updatedPositions;
         });
-      }
+    }
 
 
 
     return (
         <>
             {fishConfig.map((fishType, index) => {
-                const { x, y } = fishPositions[index];
+                console.log("FISH TRANSFORMS:", fishTransforms)
+                const { transformX, transformY } = fishTransforms[index];
 
-                return <FishAgent 
+                return <FishAgentPersistent 
                             key={index} 
                             ref={fishRefs[index]} 
-                            x={x} 
-                            y={y} 
+                            transformX={transformX} 
+                            transformY={transformY} 
                             fishType={fishType}
-                            onPositionChange={(newX, newY) => handlePositionChange(index, newX, newY, fishPositions)}
+                            onPositionChange={(transformX, transformY) => handlePositionChange(index, transformX, transformY)}
                             />;
             })}
         </>

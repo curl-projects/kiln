@@ -6,9 +6,10 @@ import TaskLog from "./GlobalComponents/TaskLog/TaskLog.jsx";
 import { useState, useEffect } from 'react';
 import Sidepanel from "@pages/content/ui/GlobalComponents/Sidepanel/Sidepanel.jsx";
 import ControlPanel from "@pages/content/ui/LocalComponents/ControlPanel/ControlPanel.jsx";
-import FishAgent from "@pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
+import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
 import FishSwarm from "@pages/content/ui/LocalComponents/FishSwarm/FishSwarm.jsx";
 import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.jsx"
+import CaptureHighlight from "@pages/content/ui/LocalComponents/CaptureHighlight/CaptureHighlight.jsx"
 
 export default function App() {
   const [shadowOpen, setShadowOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function App() {
         {shadowOpen && <ShadowDOMOutlet />}
         {/* <BasePanel type="globalAI" config={{keys: ['goals', "globalAIStream"]}}>
          <GlobalAIText streamName="globalAIStream"/>
-        </BasePanel> */}
+      </BasePanel> */}
         {/* <BasePanel type="localAI" config={{keys: ['goals', "globalAIStream"]}}>
          <LocalAIText />
         </BasePanel> */}
@@ -36,11 +37,13 @@ export default function App() {
             setShadowOpen={setShadowOpen}
             setFishMoved={setFishMoved}
           />
+        
         </BasePanel>
-          <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
+          {/* <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
             <div className="centered-text" style={styles.centeredText}>Hello Text</div>
-          </div>
-        <FishSwarm fishConfig={['helper', 'devil', 'idiot', 'savant']}/>
+          </div> */}
+        <FishSwarm fishConfig={['helper']}/>
+        <CaptureHighlight />
       </div>
   );
 }

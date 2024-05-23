@@ -4,7 +4,6 @@ import { useCustomReadability } from '../ScriptHelpers/useCustomReadability';
 // import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowCanvas/ShadowCanvas"
 import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ShadowFishCanvas.jsx"
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
-import Ripple from './Ripple/Ripple.jsx';
 
 const ShadowDOMOutlet = () => {
     const article = useCustomReadability();
@@ -88,13 +87,7 @@ const ShadowDOMOutlet = () => {
 
     return (
         <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper} onClick={handleClick}>
-            <h1 style={{ fontSize: '40px', margin: 0 }}>{article?.title ? article.title : "Untitled"}</h1>
-            <p style={{ fontSize: '20px', margin: 0 }}>{article?.siteName ? article.siteName : "No site"}</p>
-            {/* {parsedContent} */}
-           <ShadowCanvas />
-           {ripples.map((ripple, index) => (
-                <Ripple key={index} x={ripple.x} y={ripple.y} />
-            ))}
+           <ShadowCanvas article={article}/>
         </div>
     );
 };
@@ -116,7 +109,7 @@ const styles = {
     gap: "20px",
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    padding: '80px',
+    // padding: '80px',
     overflow: 'scroll',
     fontFamily: 'Helvetica Neue, sans-serif',
   },
