@@ -6,8 +6,14 @@ export default function FishSwarm({ fishConfig }) {
     const { fishOrchestrator } = useFish();
     const [fishTransforms, setFishTransforms] = useState(() => generateNonOverlappingPositions(fishConfig.length));
     const fishRefs = fishConfig.map(() => useRef(null));
-    const fishHeadOffset = { x: -31, y: -32 }; // Adjust these values based on the dimensions of the fish's head
+    const fishHeadOffset = { x: -31, y: -31 }; // Adjust these values based on the dimensions of the fish's head
+    const [finalOrientationTarget, setFinalOrientationTarget] = useState(null);
+    const [selectedPoint, setSelectedPoint] = useState(null)
 
+
+    useEffect(()=>{
+        console.log("FINAL ORIENTATION TARGET:", finalOrientationTarget)
+    }, [])
 
     useEffect(() => {
         console.log("FISH TRANSFORMS;", fishTransforms)
@@ -16,14 +22,18 @@ export default function FishSwarm({ fishConfig }) {
     function handleMoveFish() {
         const newTransforms = generateNonOverlappingPositions(fishConfig.length);
         setFishTransforms(newTransforms);
+        setFinalOrientationTarget(null); // Reset the final orientation target
     }
 
     function handleShadowDOMClick({ x, y }) {
         console.log("Moving Fish!", x, y);
         console.log("FISH HEAD OFFSET:", fishHeadOffset)
+        setSelectedPoint({x, y})
 
-        const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+24, y-fishHeadOffset.y, 100);
+        const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+22, y-fishHeadOffset.y, 100);
         setFishTransforms(newTransforms);
+        setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y });
+
     }
     
 
@@ -114,22 +124,38 @@ export default function FishSwarm({ fishConfig }) {
         });
     }
 
+    useEffect(() => {
+        console.log("FINAL ORIENTATION TARGET:", finalOrientationTarget)
+    }, [finalOrientationTarget]);
+
 
 
     return (
         <>
             {fishConfig.map((fishType, index) => {
-                const { transformX, transformY } = fishTransforms[index];
 
                 return <FishAgentPersistent 
                             key={index} 
+                            index={index}
                             ref={fishRefs[index]} 
                             fishHeadOffset={fishHeadOffset}
-                            transform={{ transformX, transformY }}
+                            transform={fishTransforms[index]}
                             fishType={fishType}
                             onPositionChange={(transformX, transformY) => handlePositionChange(index, transformX, transformY)}
+                            finalOrientationTarget={finalOrientationTarget}
                             />;
             })}
+            {selectedPoint && 
+                <div 
+                style={{
+                    position: 'fixed', 
+                    left: selectedPoint.x, 
+                    top: selectedPoint.y, 
+                    width: 10, 
+                    height: 10,
+                    zIndex: '2147483647',
+                    backgroundColor: 'orange'}}>
+                </div>}
         </>
     );
 }

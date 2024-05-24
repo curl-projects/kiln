@@ -3,7 +3,7 @@ import { useStreamAI } from '@pages/content/ui/ScriptHelpers/useStreamAI.jsx';
 import Firefly from '@pages/content/ui/ScriptHelpers/Firefly.jsx';
 import Draggable from 'react-draggable';
 
-const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset }, ref) => {
+const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget }, ref) => {
     const { transformX, transformY } = transform;
 
     const [aiState, setAIState] = useState("");
@@ -16,6 +16,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
     const [pathPoints, setPathPoints] = useState([]);
     const [currentAngle, setCurrentAngle] = useState(Math.atan2(transformY, transformX) * 180 / Math.PI);
     const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 }); // Store the last position to calculate the distance
+    const [finalAngle, setFinalAngle] = useState(currentAngle);
 
 
     useEffect(()=>{
@@ -44,6 +45,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         let animationFrameId;
         let startTime;
         let startAngle = currentAngle;
+
         const moveFish = (timestamp) => {
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
@@ -60,6 +62,24 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
                     startAngle = interpolatedAngle;
                     animationFrameId = requestAnimationFrame(moveFish);
                 } else {
+                    console.log("TRANSFORM X:", transformX, transformY)
+                    const orientationTarget = finalOrientationTarget || { x: transformX, y: transformY };
+                    const finalOrientationAngle = Math.atan2(orientationTarget.y - transformY, orientationTarget.x - transformX) * 180 / Math.PI;
+                    console.log(`FINAL ORIENTATION ANGLE: (FISH) ${index}`, finalOrientationAngle);
+
+                    // Apply the transition effect
+                    if (fireflyRef.current) {
+                        fireflyRef.current.style.transition = 'transform 0.5s ease-in-out';
+                        setCurrentAngle(finalOrientationAngle); // Set the final angle
+                    }
+
+                    // Remove the transition effect after it completes
+                    setTimeout(() => {
+                        if (fireflyRef.current) {
+                            fireflyRef.current.style.transition = '';
+                        }
+                    }, 500);
+
                     cancelAnimationFrame(animationFrameId);
                 }
             } else {
@@ -121,7 +141,6 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
         return start + shortestAngle * t;
     };
-
 
 
     useEffect(()=>{
