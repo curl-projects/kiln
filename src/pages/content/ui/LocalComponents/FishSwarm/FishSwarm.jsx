@@ -6,6 +6,7 @@ export default function FishSwarm({ fishConfig }) {
     const { fishOrchestrator } = useFish();
     const [fishTransforms, setFishTransforms] = useState(() => generateNonOverlappingPositions(fishConfig.length));
     const fishRefs = fishConfig.map(() => useRef(null));
+    const fishHeadOffset = { x: -31, y: -32 }; // Adjust these values based on the dimensions of the fish's head
 
 
     useEffect(() => {
@@ -18,8 +19,10 @@ export default function FishSwarm({ fishConfig }) {
     }
 
     function handleShadowDOMClick({ x, y }) {
-        console.log("Moving Fish!");
-        const newTransforms = distributeInCircle(fishConfig.length, x, y, 100);
+        console.log("Moving Fish!", x, y);
+        console.log("FISH HEAD OFFSET:", fishHeadOffset)
+
+        const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+24, y-fishHeadOffset.y, 100);
         setFishTransforms(newTransforms);
     }
     
@@ -121,6 +124,7 @@ export default function FishSwarm({ fishConfig }) {
                 return <FishAgentPersistent 
                             key={index} 
                             ref={fishRefs[index]} 
+                            fishHeadOffset={fishHeadOffset}
                             transform={{ transformX, transformY }}
                             fishType={fishType}
                             onPositionChange={(transformX, transformY) => handlePositionChange(index, transformX, transformY)}

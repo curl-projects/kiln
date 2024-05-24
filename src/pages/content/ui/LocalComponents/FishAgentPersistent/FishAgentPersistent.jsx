@@ -3,7 +3,7 @@ import { useStreamAI } from '@pages/content/ui/ScriptHelpers/useStreamAI.jsx';
 import Firefly from '@pages/content/ui/ScriptHelpers/Firefly.jsx';
 import Draggable from 'react-draggable';
 
-const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPositionChange }, ref) => {
+const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset }, ref) => {
     const { transformX, transformY } = transform;
 
     const [aiState, setAIState] = useState("");
@@ -11,7 +11,6 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
     const fishRef = useRef(null);
     const fireflyRef = useRef(null);
 
-    const fishHeadOffset = { x: "-31px", y: "-32px" }; // Adjust these values based on the dimensions of the fish's head
 
     const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
     const [pathPoints, setPathPoints] = useState([]);
@@ -27,10 +26,11 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         console.log("LAST POSITION", lastPosition)
     }, [lastPosition])
 
-    const amplitude = 50; // Amplitude of the sinusoidal motion
-    const baseWavelength = 100; // Base wavelength of the sinusoidal motion
+    const amplitude = 100; // Amplitude of the sinusoidal motion
+    const baseWavelength = 400; // Base wavelength of the sinusoidal motion
     const totalDuration = 2000; // Total duration of the animation in milliseconds
-    const amplitudeFactor = 0.5; // Factor to control the amplitude of the last wave
+    const amplitudeFactor = 0.1; // Factor to control the amplitude of the last wave
+    const speedFactor = 1; // Factor to control the speed of the animation
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y) {
@@ -42,13 +42,26 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
 
     useEffect(() => {
         let animationFrameId;
-        const moveFish = () => {
+        let startTime;
+        let startAngle = currentAngle;
+        const moveFish = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
             if (pathPoints.length > 0) {
-                const nextPoint = pathPoints.shift();
-                setCurrentPosition(nextPoint);
-                setCurrentAngle(nextPoint.angle);
-                setPathPoints([...pathPoints]);
-                animationFrameId = requestAnimationFrame(moveFish);
+                const progress = elapsed / (totalDuration / speedFactor);
+                const currentPointIndex = Math.floor(progress * pathPoints.length);
+                if (currentPointIndex < pathPoints.length) {
+                    const nextPoint = pathPoints[currentPointIndex];
+                    setCurrentPosition(nextPoint);
+                    const nextAngle = nextPoint.angle;
+                    const interpolatedAngle = lerp(startAngle, nextAngle, 0.1);
+                    setCurrentAngle(interpolatedAngle);
+                    startAngle = interpolatedAngle;
+                    animationFrameId = requestAnimationFrame(moveFish);
+                } else {
+                    cancelAnimationFrame(animationFrameId);
+                }
             } else {
                 cancelAnimationFrame(animationFrameId);
             }
@@ -104,6 +117,13 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         return newPathPoints;
     };
 
+    const lerp = (start, end, t) => {
+        const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
+        return start + shortestAngle * t;
+    };
+
+
+
     useEffect(()=>{
         console.log("CURRENT ANGLE::", currentAngle)
     }, [aiState])
@@ -113,7 +133,6 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
     useEffect(() => {   
         // when movement starts, make sure that the fish is transitioning
         if (fishRef.current) {
-            // fishRef.current.style.transition = "transform 1s";            
         }
     }, [transform]);
 
@@ -129,13 +148,12 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
             onStop={(e, data) => {
                 console.log("DATA:", data)
                 onPositionChange(data.x, data.y)
-                // fishRef.current.style.transition = "transform 1s";
             }}
         >
             <div ref={fishRef} className='fish' style={{...AIWrapperStyle, left: 0, top: 0}}>
                 <Firefly 
                     fireflyRef={fireflyRef} 
-                    // angle={currentAngle} 
+                    angle={currentAngle} 
                 />
                 {/* <div style={AITextWrapperStyle}>
                     <p style={AITextStyle}>
@@ -154,6 +172,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
                     height: '5px',
                     backgroundColor: 'red',
                     borderRadius: '50%',
+                    opacity: 0.1,
                     left: 0,
                     top: 0,
                     transform: `translate(${point.x}px, ${point.y}px)`,
@@ -167,6 +186,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
                 height: '10px',
                 backgroundColor: 'green',
                 borderRadius: '50%',
+                opacity: 0.1,
                 left: 0,
                 top: 0,
                 transform: `translate(${transformX}px, ${transformY}px)`,
