@@ -9,20 +9,21 @@ export default function FishSwarm({ fishConfig }) {
 
 
     useEffect(() => {
-        console.log("FISH POSITIONS;", fishTransforms)
+        console.log("FISH TRANSFORMS;", fishTransforms)
     }, [fishTransforms]);
 
     function handleMoveFish() {
         console.log("Moving Fish!");
-        const newPositions = generateNonOverlappingPositions(fishConfig.length);
-        setFishTransforms(newPositions);
+        const newTransforms = generateNonOverlappingPositions(fishConfig.length);
+        setFishTransforms(newTransforms);
     }
 
     function handleShadowDOMClick({ x, y }) {
         console.log("Moving Fish!");
-        const newPositions = distributeInCircle(fishConfig.length, x, y, 200);
-        setFishTransforms(newPositions);
+        const newTransforms = distributeInCircle(fishConfig.length, x, y, 100);
+        setFishTransforms(newTransforms);
     }
+    
 
     useEffect(() => {
         fishOrchestrator.on("moveFish", handleMoveFish);
@@ -79,8 +80,8 @@ export default function FishSwarm({ fishConfig }) {
         console.log("Generating Circular Fish Positions");
         const angleStep = (2 * Math.PI) / numFish;
         const positions = [];
-        const fishWidth = 300;
-        const fishHeight = 200;
+        const fishWidth = 120;
+        const fishHeight = 45;
       
         for (let i = 0; i < numFish; i++) {
             const angle = i * angleStep;
@@ -104,6 +105,7 @@ export default function FishSwarm({ fishConfig }) {
     }
 
       function handlePositionChange(index, transformX, transformY) {
+        console.log("POSITION CHANGING!")
         setFishTransforms(currentPositions => {
             const updatedPositions = [...currentPositions];
             updatedPositions[index] = { transformX: transformX, transformY: transformY };
@@ -116,7 +118,6 @@ export default function FishSwarm({ fishConfig }) {
     return (
         <>
             {fishConfig.map((fishType, index) => {
-                console.log("FISH TRANSFORMS:", fishTransforms)
                 const { transformX, transformY } = fishTransforms[index];
 
                 return <FishAgentPersistent 
@@ -131,3 +132,6 @@ export default function FishSwarm({ fishConfig }) {
         </>
     );
 }
+
+
+

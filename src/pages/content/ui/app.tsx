@@ -16,7 +16,7 @@ export default function App() {
   const [fishMoved, setFishMoved] = useState(false);
 
   return (
-      <div>
+      <div style={styles.app}>
         {shadowOpen && <ShadowDOMOutlet />}
         {/* <BasePanel type="globalAI" config={{keys: ['goals', "globalAIStream"]}}>
          <GlobalAIText streamName="globalAIStream"/>
@@ -42,7 +42,7 @@ export default function App() {
           {/* <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
             <div className="centered-text" style={styles.centeredText}>Hello Text</div>
           </div> */}
-        <FishSwarm fishConfig={['helper']}/>
+        <FishSwarm fishConfig={['helper', 'devil', 'alien', 'skeptic']}/>
         <CaptureHighlight />
       </div>
   );
@@ -50,6 +50,9 @@ export default function App() {
 
 
 const styles = {
+  app: {
+    fontFamily: "Helvetica Neue, sans-serif",
+  },
   centeredTextWrapper: {
     position: 'absolute',
     top: '50%',

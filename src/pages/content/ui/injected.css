@@ -38,3 +38,14 @@
      opacity: 0.01;
   }
 }
+
+@keyframes move-fish {
+  from {
+      offset-path: path('M 0 0 C 50 -30, 150 30, 200 0');
+      offset-distance: 0%;
+  }
+  to {
+      offset-path: path('M 0 0 C 50 -30, 150 30, 200 0');
+      offset-distance: 100%;
+  }
+}
