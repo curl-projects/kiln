@@ -29,36 +29,39 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
 
     const amplitude = 50; // Amplitude of the sinusoidal motion
     const baseWavelength = 100; // Base wavelength of the sinusoidal motion
-    const totalDuration = 2000; // Total duration of the animation in 
+    const totalDuration = 2000; // Total duration of the animation in milliseconds
+    const amplitudeFactor = 0.5; // Factor to control the amplitude of the last wave
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y) {
-            const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY);
+            const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY, amplitudeFactor);
             setPathPoints(newPathPoints);
             setLastPosition({ x: transformX, y: transformY });
         }
     }, [transform]);
 
     useEffect(() => {
-        if (pathPoints.length > 0) {
-            const intervalDuration = totalDuration / pathPoints.length;
-            let interval = setInterval(() => {
-                if (pathPoints.length > 0) {
-                    const nextPoint = pathPoints.shift();
-                    setCurrentPosition(nextPoint);
-                    setCurrentAngle(nextPoint.angle);
-                    setPathPoints(pathPoints);
-                } else {
-                    clearInterval(interval);
-                }
-            }, intervalDuration);
+        let animationFrameId;
+        const moveFish = () => {
+            if (pathPoints.length > 0) {
+                const nextPoint = pathPoints.shift();
+                setCurrentPosition(nextPoint);
+                setCurrentAngle(nextPoint.angle);
+                setPathPoints([...pathPoints]);
+                animationFrameId = requestAnimationFrame(moveFish);
+            } else {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
 
-            return () => clearInterval(interval);
+        if (pathPoints.length > 0) {
+            animationFrameId = requestAnimationFrame(moveFish);
         }
+
+        return () => cancelAnimationFrame(animationFrameId);
     }, [pathPoints]);
 
-
-    const calculatePathPoints = (startX, startY, endX, endY) => {
+    const calculatePathPoints = (startX, startY, endX, endY, amplitudeFactor) => {
         const deltaX = endX - startX;
         const deltaY = endY - startY;
         const totalDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
@@ -68,8 +71,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         const remainingDistance = totalDistance - numPeriods * baseWavelength;
         const finalWavelength = remainingDistance;
 
-        const numPoints = Math.max(1000, Math.floor(totalDistance)); // Proportional to distance
-        // const numPoints = 1000;
+        const numPoints = Math.max(100, Math.floor(totalDistance / 10)); // Proportional to distance
         const newPathPoints = [];
         let angle = Math.atan2(deltaY, deltaX);
 
@@ -78,8 +80,9 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
             const distanceTraveled = progress * totalDistance;
             const isLastPeriod = distanceTraveled > numPeriods * baseWavelength;
             const currentWavelength = isLastPeriod ? finalWavelength : baseWavelength;
+            const currentAmplitude = isLastPeriod ? amplitude * amplitudeFactor : amplitude;
             const wavePosition = distanceTraveled % baseWavelength;
-            const sinusoidalOffset = amplitude * Math.sin((2 * Math.PI / currentWavelength) * wavePosition);
+            const sinusoidalOffset = currentAmplitude * Math.sin((2 * Math.PI / currentWavelength) * wavePosition);
 
             const mainX = startX + progress * deltaX;
             const mainY = startY + progress * deltaY;
@@ -101,7 +104,6 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
         return newPathPoints;
     };
 
-
     useEffect(()=>{
         console.log("CURRENT ANGLE::", currentAngle)
     }, [aiState])
@@ -111,7 +113,7 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
     useEffect(() => {   
         // when movement starts, make sure that the fish is transitioning
         if (fishRef.current) {
-            fishRef.current.style.transition = "transform 1s";            
+            // fishRef.current.style.transition = "transform 1s";            
         }
     }, [transform]);
 
@@ -127,11 +129,14 @@ const FishAgent = forwardRef(({ aiData, promptType, transform, fishType, onPosit
             onStop={(e, data) => {
                 console.log("DATA:", data)
                 onPositionChange(data.x, data.y)
-                fishRef.current.style.transition = "transform 1s";
+                // fishRef.current.style.transition = "transform 1s";
             }}
         >
             <div ref={fishRef} className='fish' style={{...AIWrapperStyle, left: 0, top: 0}}>
-                <Firefly fireflyRef={fireflyRef} angle={currentAngle} />
+                <Firefly 
+                    fireflyRef={fireflyRef} 
+                    // angle={currentAngle} 
+                />
                 {/* <div style={AITextWrapperStyle}>
                     <p style={AITextStyle}>
                         {aiState}
