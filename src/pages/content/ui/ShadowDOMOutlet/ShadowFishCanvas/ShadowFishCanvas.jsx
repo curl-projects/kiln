@@ -92,7 +92,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
         case 'pointer_up':
             // ripple effect
             fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
-            console.log("Pointer Up!")
             break;
         default:
             break;

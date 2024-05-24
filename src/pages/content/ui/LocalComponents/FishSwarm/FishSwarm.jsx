@@ -13,7 +13,6 @@ export default function FishSwarm({ fishConfig }) {
     }, [fishTransforms]);
 
     function handleMoveFish() {
-        console.log("Moving Fish!");
         const newTransforms = generateNonOverlappingPositions(fishConfig.length);
         setFishTransforms(newTransforms);
     }
@@ -36,7 +35,6 @@ export default function FishSwarm({ fishConfig }) {
     }, [fishOrchestrator]);
 
     function generateNonOverlappingPositions(numFish) {
-        console.log("Generating Non Overlapping Fish Positions");
         const fishWidth = 300; // Adjust this value according to your fish width
         const fishHeight = 200; // Adjust this value according to your fish height
         const positions = [];
@@ -123,8 +121,7 @@ export default function FishSwarm({ fishConfig }) {
                 return <FishAgentPersistent 
                             key={index} 
                             ref={fishRefs[index]} 
-                            transformX={transformX} 
-                            transformY={transformY} 
+                            transform={{ transformX, transformY }}
                             fishType={fishType}
                             onPositionChange={(transformX, transformY) => handlePositionChange(index, transformX, transformY)}
                             />;

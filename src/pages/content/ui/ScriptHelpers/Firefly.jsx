@@ -1,12 +1,12 @@
 import { useEffect } from "react"
 export default function Firefly({ angle, fireflyRef }) {
     
-    useEffect(()=>{
-        console.log("FIREFLY ANGLE", angle)
-    }, [angle])
+    // useEffect(()=>{
+    //     console.log("FIREFLY ANGLE", angle)
+    // }, [angle])
 
     return (
-        <div ref={fireflyRef} style={{ transform: `rotate(${angle}deg)`, transition: "all 0.1s ease-in-out"}}>
+        <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: "1px solid green", transform: `rotate(${angle}deg)`, transition: "all 0.5s linear"}}>
             <svg width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />
