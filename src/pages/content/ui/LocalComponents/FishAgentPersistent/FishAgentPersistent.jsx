@@ -16,25 +16,15 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const [pathPoints, setPathPoints] = useState([]);
     const [currentAngle, setCurrentAngle] = useState(Math.atan2(transformY, transformX) * 180 / Math.PI);
     const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 }); // Store the last position to calculate the distance
-    const [finalAngle, setFinalAngle] = useState(currentAngle);
-
-
-    useEffect(()=>{
-        console.log("TRANSFORM", transform)
-    }, [transform])
-
-    useEffect(()=>{
-        console.log("LAST POSITION", lastPosition)
-    }, [lastPosition])
 
     const amplitude = 100; // Amplitude of the sinusoidal motion
     const baseWavelength = 400; // Base wavelength of the sinusoidal motion
-    const totalDuration = 2000; // Total duration of the animation in milliseconds
     const amplitudeFactor = 0.1; // Factor to control the amplitude of the last wave
     const speedFactor = 1; // Factor to control the speed of the animation
+    const distanceFactor = 0.5; // Factor to control the impact of distance on animation speed
 
     useEffect(() => {
-        if (transformX !== lastPosition.x || transformY !== lastPosition.y) {
+        if (transformX !== lastPosition.x || transformY !== lastPosition.y){
             const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY, amplitudeFactor);
             setPathPoints(newPathPoints);
             setLastPosition({ x: transformX, y: transformY });
@@ -51,26 +41,28 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
             const elapsed = timestamp - startTime;
 
             if (pathPoints.length > 0) {
-                const progress = elapsed / (totalDuration / speedFactor);
+                const totalDistance = calculateTotalDistance(pathPoints);
+                const dynamicDuration = totalDistance / distanceFactor; // Adjust this factor to control speed
+                const progress = elapsed / (dynamicDuration / speedFactor);
                 const currentPointIndex = Math.floor(progress * pathPoints.length);
                 if (currentPointIndex < pathPoints.length) {
                     const nextPoint = pathPoints[currentPointIndex];
                     setCurrentPosition(nextPoint);
                     const nextAngle = nextPoint.angle;
-                    const interpolatedAngle = lerp(startAngle, nextAngle, 0.1);
+                    const interpolatedAngle = lerpAngle(startAngle, nextAngle, 0.1);
                     setCurrentAngle(interpolatedAngle);
                     startAngle = interpolatedAngle;
                     animationFrameId = requestAnimationFrame(moveFish);
                 } else {
-                    console.log("TRANSFORM X:", transformX, transformY)
                     const orientationTarget = finalOrientationTarget || { x: transformX, y: transformY };
                     const finalOrientationAngle = Math.atan2(orientationTarget.y - transformY, orientationTarget.x - transformX) * 180 / Math.PI;
-                    console.log(`FINAL ORIENTATION ANGLE: (FISH) ${index}`, finalOrientationAngle);
 
-                    // Apply the transition effect
+                    // Apply the transition effect with the shortest rotation path
+                    const shortestFinalAngle = findShortestRotationPath(currentAngle, finalOrientationAngle);
+
                     if (fireflyRef.current) {
                         fireflyRef.current.style.transition = 'transform 0.5s ease-in-out';
-                        setCurrentAngle(finalOrientationAngle); // Set the final angle
+                        setCurrentAngle(shortestFinalAngle); // Set the final angle with the shortest rotation path
                     }
 
                     // Remove the transition effect after it completes
@@ -137,17 +129,26 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
         return newPathPoints;
     };
 
-    const lerp = (start, end, t) => {
+    const lerpAngle = (start, end, t) => {
         const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
         return start + shortestAngle * t;
     };
 
+    const findShortestRotationPath = (start, end) => {
+        const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
+        return start + shortestAngle;
+    };
 
-    useEffect(()=>{
-        console.log("CURRENT ANGLE::", currentAngle)
-    }, [aiState])
+    const calculateTotalDistance = (points) => {
+        let totalDistance = 0;
+        for (let i = 1; i < points.length; i++) {
+            const deltaX = points[i].x - points[i - 1].x;
+            const deltaY = points[i].y - points[i - 1].y;
+            totalDistance += Math.sqrt(deltaX ** 2 + deltaY ** 2);
+        }
+        return totalDistance;
+    };
 
-    
     
     useEffect(() => {   
         // when movement starts, make sure that the fish is transitioning
@@ -165,8 +166,7 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
                 fishRef.current.style.transition = "none";
             }}
             onStop={(e, data) => {
-                console.log("DATA:", data)
-                onPositionChange(data.x, data.y)
+                setCurrentPosition({ x: data.x, y: data.y });
             }}
         >
             <div ref={fishRef} className='fish' style={{...AIWrapperStyle, left: 0, top: 0}}>

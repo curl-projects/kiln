@@ -9,15 +9,9 @@ export default function FishSwarm({ fishConfig }) {
     const fishHeadOffset = { x: -31, y: -31 }; // Adjust these values based on the dimensions of the fish's head
     const [finalOrientationTarget, setFinalOrientationTarget] = useState(null);
     const [selectedPoint, setSelectedPoint] = useState(null)
+    const [isMoving, setIsMoving] = useState(false)
 
 
-    useEffect(()=>{
-        console.log("FINAL ORIENTATION TARGET:", finalOrientationTarget)
-    }, [])
-
-    useEffect(() => {
-        console.log("FISH TRANSFORMS;", fishTransforms)
-    }, [fishTransforms]);
 
     function handleMoveFish() {
         const newTransforms = generateNonOverlappingPositions(fishConfig.length);
@@ -26,13 +20,11 @@ export default function FishSwarm({ fishConfig }) {
     }
 
     function handleShadowDOMClick({ x, y }) {
-        console.log("Moving Fish!", x, y);
-        console.log("FISH HEAD OFFSET:", fishHeadOffset)
         setSelectedPoint({x, y})
 
         const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+22, y-fishHeadOffset.y, 100);
         setFishTransforms(newTransforms);
-        setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y });
+        setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y-24 });
 
     }
     
@@ -115,19 +107,14 @@ export default function FishSwarm({ fishConfig }) {
         return positions;
     }
 
-      function handlePositionChange(index, transformX, transformY) {
-        console.log("POSITION CHANGING!")
-        setFishTransforms(currentPositions => {
-            const updatedPositions = [...currentPositions];
-            updatedPositions[index] = { transformX: transformX, transformY: transformY };
-            return updatedPositions;
-        });
-    }
-
-    useEffect(() => {
-        console.log("FINAL ORIENTATION TARGET:", finalOrientationTarget)
-    }, [finalOrientationTarget]);
-
+    //   function handlePositionChange(index, transformX, transformY) {
+    //     console.log("POSITION CHANGING!")
+    //     setFishTransforms(currentPositions => {
+    //         const updatedPositions = [...currentPositions];
+    //         updatedPositions[index] = { transformX: transformX, transformY: transformY };
+    //         return updatedPositions;
+    //     });
+    // }
 
 
     return (

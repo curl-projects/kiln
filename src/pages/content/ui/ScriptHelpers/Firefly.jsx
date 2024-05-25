@@ -1,13 +1,40 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from 'react';
+
 export default function Firefly({ angle, fireflyRef }) {
+    const svgRef = useRef(null);
+
     
-    // useEffect(()=>{
-    //     console.log("FIREFLY ANGLE", angle)
-    // }, [angle])
+    useEffect(() => {
+        const svgElement = svgRef.current;
+        if (!svgElement) return;
+
+        let animationFrameId;
+        let startTime;
+
+        const frequency = 0.02; // Frequency of the sine wave
+        const amplitude = 10; // Amplitude of the skew
+
+        const animate = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
+            // Calculate the skew value based on the sine wave
+            const skewX = amplitude * Math.sin(frequency * elapsed);
+            svgElement.style.transform = `skewX(${skewX}deg)`;
+
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
+
+        return () => cancelAnimationFrame(animationFrameId);
+    }, []);
+
 
     return (
         <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: "1px solid green", transform: `rotate(${angle}deg)`}}>
-            <svg width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg ref={svgRef} width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" stroke-width="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />
                 </g>
