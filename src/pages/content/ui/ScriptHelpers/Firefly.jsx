@@ -1,38 +1,110 @@
 import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Firefly({ angle, fireflyRef }) {
+const AIIconWrapperStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0
+};
+
+const outerAITextWrapperStyle = {
+    position: 'absolute',
+    // top: '50%', // Aligns middle of the div vertically
+    left: 'calc(100% + 5px)', // Positions it to the right of the fish
+    transform: 'translateY(-50%)', // Centers it vertically
+}
+
+const AITextWrapperStyle = {
+    // Add styles here if needed
+    background: 'white',
+    padding: '10px',
+    borderRadius: '10px',
+    height: '100%',
+    width: '100%',
+    
+
+};
+
+const AITextStyle = {
+    color: '#7F847D',
+    fontSize: '18px',
+    letterSpacing: '-0.03em',
+    fontWeight: 550,
+    lineHeight: '24px',
+    margin: '0'
+};
+
+const variants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { delay: 0.5 }},
+    exit: { opacity: 0, scale: 0.8 }
+};
+
+
+export default function Firefly({ angle, fireflyRef, isMoving, aiState }) {
+    useEffect(() => {
+        console.log("IS MOVING:", isMoving);
+    }, [isMoving]);
+
     const svgRef = useRef(null);
 
-    
     useEffect(() => {
         const svgElement = svgRef.current;
+        svgElement.style.transition = 'transform 0.02s ease-in-out'
         if (!svgElement) return;
 
         let animationFrameId;
         let startTime;
 
         const frequency = 0.02; // Frequency of the sine wave
-        const amplitude = 10; // Amplitude of the skew
 
         const animate = (timestamp) => {
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
 
-            // Calculate the skew value based on the sine wave
+            const amplitude = isMoving ? 15 : 4; // Adjust amplitude based on movement state
             const skewX = amplitude * Math.sin(frequency * elapsed);
             svgElement.style.transform = `skewX(${skewX}deg)`;
 
             animationFrameId = requestAnimationFrame(animate);
         };
 
+        startTime = null;
         animationFrameId = requestAnimationFrame(animate);
 
         return () => cancelAnimationFrame(animationFrameId);
-    }, []);
+    }, [isMoving]);
+
 
 
     return (
         <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: "1px solid green", transform: `rotate(${angle}deg)`}}>
+            <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg)` }}>
+                <AnimatePresence>
+                    {!isMoving && (
+                        <motion.div
+                            style={{ ...AITextWrapperStyle}}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={variants}
+                            transition={{
+                                hidden: { duration: 0.3 },
+                                visible: { duration: 0.3 },
+                                exit: { duration: 0.3 }
+                            }}
+    
+                        >
+                            <p style={AITextStyle}>
+                                {aiState}
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
             <svg ref={svgRef} width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" stroke-width="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">

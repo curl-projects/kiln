@@ -22,7 +22,7 @@ export default function FishSwarm({ fishConfig }) {
     function handleShadowDOMClick({ x, y }) {
         setSelectedPoint({x, y})
 
-        const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+22, y-fishHeadOffset.y, 100);
+        const newTransforms = distributeInCircle(fishConfig.length, x-fishHeadOffset.x+22, y-fishHeadOffset.y, 250);
         setFishTransforms(newTransforms);
         setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y-24 });
 

@@ -6,7 +6,7 @@ import Draggable from 'react-draggable';
 const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget }, ref) => {
     const { transformX, transformY } = transform;
 
-    const [aiState, setAIState] = useState("");
+    const [aiState, setAIState] = useState("Welcome");
     const AIMutation = useStreamAI();
     const fishRef = useRef(null);
     const fireflyRef = useRef(null);
@@ -16,18 +16,20 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const [pathPoints, setPathPoints] = useState([]);
     const [currentAngle, setCurrentAngle] = useState(Math.atan2(transformY, transformX) * 180 / Math.PI);
     const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 }); // Store the last position to calculate the distance
+    const [isMoving, setIsMoving] = useState(false);
 
-    const amplitude = 100; // Amplitude of the sinusoidal motion
-    const baseWavelength = 400; // Base wavelength of the sinusoidal motion
-    const amplitudeFactor = 0.1; // Factor to control the amplitude of the last wave
-    const speedFactor = 1; // Factor to control the speed of the animation
-    const distanceFactor = 0.5; // Factor to control the impact of distance on animation speed
+    const amplitude = 100;
+    const baseWavelength = 400;
+    const amplitudeFactor = 0.1;
+    const speedFactor = 1;
+    const distanceFactor = 0.3;
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y){
             const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY, amplitudeFactor);
             setPathPoints(newPathPoints);
             setLastPosition({ x: transformX, y: transformY });
+            setIsMoving(true);  // Set moving to true when new path points are calculated
         }
     }, [transform]);
 
@@ -42,7 +44,7 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
 
             if (pathPoints.length > 0) {
                 const totalDistance = calculateTotalDistance(pathPoints);
-                const dynamicDuration = totalDistance / distanceFactor; // Adjust this factor to control speed
+                const dynamicDuration = totalDistance / distanceFactor;
                 const progress = elapsed / (dynamicDuration / speedFactor);
                 const currentPointIndex = Math.floor(progress * pathPoints.length);
                 if (currentPointIndex < pathPoints.length) {
@@ -57,24 +59,24 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
                     const orientationTarget = finalOrientationTarget || { x: transformX, y: transformY };
                     const finalOrientationAngle = Math.atan2(orientationTarget.y - transformY, orientationTarget.x - transformX) * 180 / Math.PI;
 
-                    // Apply the transition effect with the shortest rotation path
                     const shortestFinalAngle = findShortestRotationPath(currentAngle, finalOrientationAngle);
 
                     if (fireflyRef.current) {
                         fireflyRef.current.style.transition = 'transform 0.5s ease-in-out';
-                        setCurrentAngle(shortestFinalAngle); // Set the final angle with the shortest rotation path
+                        setCurrentAngle(shortestFinalAngle);
                     }
 
-                    // Remove the transition effect after it completes
                     setTimeout(() => {
                         if (fireflyRef.current) {
                             fireflyRef.current.style.transition = '';
                         }
                     }, 500);
 
+                    setIsMoving(false); // Set moving to false when animation ends
                     cancelAnimationFrame(animationFrameId);
                 }
             } else {
+                setIsMoving(false); // Set moving to false if there are no path points
                 cancelAnimationFrame(animationFrameId);
             }
         };
@@ -91,12 +93,11 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
         const deltaY = endY - startY;
         const totalDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
-        // Calculate the smallest number of periods before passing the target point
         const numPeriods = Math.floor(totalDistance / baseWavelength);
         const remainingDistance = totalDistance - numPeriods * baseWavelength;
         const finalWavelength = remainingDistance;
 
-        const numPoints = Math.max(100, Math.floor(totalDistance / 10)); // Proportional to distance
+        const numPoints = Math.max(100, Math.floor(totalDistance / 10));
         const newPathPoints = [];
         let angle = Math.atan2(deltaY, deltaX);
 
@@ -149,13 +150,6 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
         return totalDistance;
     };
 
-    
-    useEffect(() => {   
-        // when movement starts, make sure that the fish is transitioning
-        if (fishRef.current) {
-        }
-    }, [transform]);
-
 
     return (
         <>
@@ -170,15 +164,15 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
             }}
         >
             <div ref={fishRef} className='fish' style={{...AIWrapperStyle, left: 0, top: 0}}>
-                <Firefly 
-                    fireflyRef={fireflyRef} 
-                    angle={currentAngle} 
-                />
-                {/* <div style={AITextWrapperStyle}>
-                    <p style={AITextStyle}>
-                        {aiState}
-                    </p>
-                </div> */}
+                <div className='innerFish' style={innerFishStyle}>
+                    <Firefly 
+                        fireflyRef={fireflyRef} 
+                        angle={currentAngle} 
+                        isMoving={isMoving}
+                        aiState={aiState}
+                    />
+                </div>
+
             </div>
         </Draggable>
         {pathPoints.map((point, index) => (
@@ -218,6 +212,12 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
 
 export default FishAgent
 
+const innerFishStyle = {
+    height: '100%',
+    width: '100%',
+    position: 'relative',
+}
+
 const AIWrapperStyle = {
     display: 'flex',
     flexDirection: 'row',
@@ -230,6 +230,7 @@ const AIWrapperStyle = {
     zIndex: 2147483647,
     border: '2px solid pink'
 };
+
 
 const AIIconWrapperStyle = {
     display: 'flex',
@@ -244,7 +245,12 @@ const AITextWrapperStyle = {
     // Add styles here if needed
     background: 'white',
     padding: '10px',
-    borderRadius: '10px'
+    borderRadius: '10px',
+    position: 'absolute',
+    top: '50%', // Aligns middle of the div vertically
+    left: '100%', // Positions it to the right of the fish
+    transform: 'translateY(-50%)', // Centers it vertically
+
 };
 
 const AITextStyle = {
