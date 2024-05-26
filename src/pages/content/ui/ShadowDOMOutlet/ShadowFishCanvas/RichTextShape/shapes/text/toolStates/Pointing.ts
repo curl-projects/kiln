@@ -82,7 +82,7 @@ export class Pointing extends StateNode {
 			.createShapes([
 				{
 					id,
-					type: 'text',
+					type: 'richText',
 					x,
 					y,
 					props: {

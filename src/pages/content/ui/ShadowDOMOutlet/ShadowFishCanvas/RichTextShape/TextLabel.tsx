@@ -106,7 +106,8 @@ export const TextLabel = React.memo(function TextLabel({
 					height: textHeight,
 				}}
 			>
-				<div className={`${cssPrefix} tl-text tl-text-content`} dir="auto">
+				<div className={`${cssPrefix} tl-text tl-text-content`} style={{color: 'pink'}} dir="auto">
+				
 					{finalText.split('\n').map((lineOfText, index) => (
 						<div key={index} dir="auto">
 							{lineOfText}

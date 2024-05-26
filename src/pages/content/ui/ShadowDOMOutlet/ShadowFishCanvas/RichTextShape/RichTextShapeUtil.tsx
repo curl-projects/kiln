@@ -2,6 +2,7 @@
 import {
 	Box,
 	Editor,
+	HTMLContainer,
 	Rectangle2d,
 	ShapeUtil,
 	SvgExportContext,
@@ -40,7 +41,6 @@ export class RichTextShapeUtil extends ShapeUtil<TLTextShape> {
 	
 
 	getDefaultProps(): TLTextShape['props'] {
-		console.log("TEXT SHAPE MIGRATIONS", textShapeMigrations)
 		return {
 			color: 'black',
 			size: 'm',

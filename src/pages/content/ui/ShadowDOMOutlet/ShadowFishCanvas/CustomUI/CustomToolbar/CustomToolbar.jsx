@@ -40,11 +40,6 @@ const CustomToolbar = track(() => {
 					<PiTextTBold />
 				</ToolbarButton>
 				<ToolbarButton 
-					handleClick={() => editor.setCurrentTool('text')} 
-					active={editor.getCurrentToolId() === 'text'}>
-					T
-				</ToolbarButton>
-				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('eraser')} 
 					active={editor.getCurrentToolId() === 'eraser'}>
 					<BiSolidEraser />
