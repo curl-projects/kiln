@@ -54,33 +54,57 @@ export default function ShadowCanvas({ parsedContent, article }) {
   
   const [textCreated, setTextCreated] = useState(null)
 
-  useEffect(()=>{
-    console.debug("SELECTED SHAPES:", selectedShapes)
-  }, [selectedShapes])
+  // useEffect(()=>{
+  //   console.debug("SELECTED SHAPES:", selectedShapes)
+  // }, [selectedShapes])
+
+
+  // useEffect(()=>{
+  //   console.log("HOVERED SHAPE:", hoveredShape)
+  // }, [hoveredShape])
 
   useEffect(()=>{
-    if(textCreated && selectedShapes && selectedShapes.length === 0){
+    if(textCreated && (selectedShapes && selectedShapes.length === 0)){
         console.log("TRIGGERED!", textCreated)
-        // fishOrchestrator.emit('textCreated', { 
-        //     x: textCreated.x, 
-        //     y: textCreated.y , 
-        //     //bounding box size
+        if(reactEditor){
+          const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
+          console.log("CORRECT SHAPE:", shapeGeometry)
 
-        // })
+          fishOrchestrator.emit('textCreated', { 
+            x: textCreated.x, 
+            y: textCreated.y , 
+            w: shapeGeometry.w,
+            h: shapeGeometry.h,
+        })
+        }
+
+        
         setTextCreated(null)
     }
   }, [textCreated, selectedShapes])
 
 
-  useEffect(()=>{
-    console.log("HOVERED SHAPE:", hoveredShape)
-  }, [hoveredShape])
 
   function handleCanvasEvent(e){
+    if(reactEditor){
+      const newSelectedShapes = reactEditor.getSelectedShapes();
+      const newHoveredShape = reactEditor.getHoveredShape();
+
+      // Compare and update state only if different
+      if (selectedShapes !== newSelectedShapes) {
+        setSelectedShapes(newSelectedShapes);
+      }
+
+      if (hoveredShape !== newHoveredShape) {
+        setHoveredShape(newHoveredShape);
+      }
+
+    }
+    
     switch(e.name){
         case 'pointer_up':
             // ripple effect
-            // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
+            fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
             break;
         default:
             break;
@@ -93,7 +117,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
             if (record.typeName === 'shape') {
                 console.log(`created shape (${record.type})\n`)
                 console.log("RECORD:", record)
-                if(record.type === 'text'){
+                if(record.type === 'richText'){
                     setTextCreated(record)
                 }
             }
@@ -134,24 +158,24 @@ export default function ShadowCanvas({ parsedContent, article }) {
     }
   }
 
-  function handleChange(e, editor) {
-    if (editor) {
-        // const editorState = editor.getInstanceState()
-        // editorState?.isFocused && console.debug('EDITOR FOCUS STATE::', editorState.isFocused)
-        // TODO: long-term want an event listener specific to this
-      const newSelectedShapes = editor.getSelectedShapes();
-      const newHoveredShape = editor.getHoveredShape();
+  // function handleChange(e, editor) {
+  //   if (editor) {
+  //       // const editorState = editor.getInstanceState()
+  //       // editorState?.isFocused && console.debug('EDITOR FOCUS STATE::', editorState.isFocused)
+  //       // TODO: long-term want an event listener specific to this
+  //     const newSelectedShapes = editor.getSelectedShapes();
+  //     const newHoveredShape = editor.getHoveredShape();
 
-      // Compare and update state only if different
-      if (selectedShapes !== newSelectedShapes) {
-        setSelectedShapes(newSelectedShapes);
-      }
+  //     // Compare and update state only if different
+  //     if (selectedShapes !== newSelectedShapes) {
+  //       setSelectedShapes(newSelectedShapes);
+  //     }
 
-      if (hoveredShape !== newHoveredShape) {
-        setHoveredShape(newHoveredShape);
-      }
-    }
-  }
+  //     if (hoveredShape !== newHoveredShape) {
+  //       setHoveredShape(newHoveredShape);
+  //     }
+  //   }
+  // }
 
   function handleUiEvent(e){
     console.log("UI EVENT", e)
@@ -168,7 +192,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
       onMount={(editor)=>{
         setReactEditor(editor)
         editor.on('event', (event) => handleCanvasEvent(event))
-        editor.on('change', (event) => handleChange(event, editor))
+        // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))
         editor.store.listen(handleStoreEvent)
         editor.createShapes(

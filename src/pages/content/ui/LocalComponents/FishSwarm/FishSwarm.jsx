@@ -19,9 +19,11 @@ export default function FishSwarm({ fishConfig }) {
         setFinalOrientationTarget(null); // Reset the final orientation target
     }
 
-    function handleTextCreated({ x, y, boundingBox}){
-        // build a version of distribute in circle that takes box size into account
-        setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y-24 });
+    function handleTextCreated({ x, y, w, h}){
+        console.log("X:", x, "Y:", y, "W:", w, "H:", h)
+        const newTransforms = distributeAroundBoundingCircle(fishConfig.length, x, y, w, h, 100);
+        setFishTransforms(newTransforms);
+        setFinalOrientationTarget({ x: x - fishHeadOffset.x + 22, y: y - fishHeadOffset.y - 24 });
     }
 
     function handleShadowDOMClick({ x, y }) {
@@ -41,6 +43,7 @@ export default function FishSwarm({ fishConfig }) {
         return () => {
             fishOrchestrator.off("moveFish", handleMoveFish);
             fishOrchestrator.off("shadowDOMClick", handleShadowDOMClick);
+            fishOrchestrator.off('textCreated', handleTextCreated)
         };
     }, [fishOrchestrator]);
 
@@ -111,6 +114,47 @@ export default function FishSwarm({ fishConfig }) {
       
         return positions;
     }
+
+    function distributeAroundBoundingCircle(numFish, x, y, w, h, radiusOffset) {
+        console.log("Generating Fish Positions Around Bounding Circle");
+        const positions = [];
+        const fishWidth = 120;
+        const fishHeight = 45;
+    
+        // Calculate center of the bounding box
+        const centerX = x + w / 2;
+        const centerY = y + h / 2;
+    
+        // Calculate the radius of the circle (half of the diagonal of the bounding box)
+        const boundingBoxRadius = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2) + radiusOffset;
+    
+        const angleStep = (2 * Math.PI) / numFish;
+    
+        for (let i = 0; i < numFish; i++) {
+            const angle = i * angleStep;
+            const fishCenterX = centerX + boundingBoxRadius * Math.cos(angle);
+            const fishCenterY = centerY + boundingBoxRadius * Math.sin(angle);
+    
+            // Calculate the transform from the initial position (left: 0, top: 0)
+            let transformX = fishCenterX - fishWidth / 2;
+            let transformY = fishCenterY - fishHeight / 2;
+    
+            // Ensure that positions are adjusted to be within the viewport
+            if (transformX < 0) transformX = 0;
+            if (transformY < 0) transformY = 0;
+            if (transformX + fishWidth > window.innerWidth) transformX = window.innerWidth - fishWidth;
+            if (transformY + fishHeight > window.innerHeight) transformY = window.innerHeight - fishHeight;
+    
+            positions.push({ transformX, transformY });
+        }
+    
+        return positions;
+    }
+    
+
+
+
+
 
     //   function handlePositionChange(index, transformX, transformY) {
     //     console.log("POSITION CHANGING!")

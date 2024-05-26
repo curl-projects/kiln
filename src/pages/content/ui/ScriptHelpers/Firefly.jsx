@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // const AIIconWrapperStyle = {
@@ -14,9 +14,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const outerAITextWrapperStyle = {
     position: 'absolute',
-    // top: '50%', // Aligns middle of the div vertically
-    left: 'calc(100% + 5px)', // Positions it to the right of the fish
-    transform: 'translateY(-50%)', // Centers it vertically
+    left: '100%', // Positions it to the right of the fish
+    // transform: 'translateY(-50%)', // Centers it vertically
 }
 
 const AITextWrapperStyle = {
@@ -60,7 +59,25 @@ const variants = {
     exit: { opacity: 0, scale: 0.8 }
 };
 
-export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType }) {
+
+const getVerticalTranslation = (angle) => {
+    const radians = angle * (Math.PI / 180);
+    return 50 * Math.sin(radians);
+};
+
+
+export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform }) {
+    const [boxDimensions, setBoxDimensions] = useState({ width: 0, height: 0 });
+    const textBoxRef = useRef(null);
+
+    useEffect(() => {
+        if (textBoxRef.current) {
+            const { offsetWidth, offsetHeight } = textBoxRef.current;
+            setBoxDimensions({ width: offsetWidth, height: offsetHeight });
+        }
+    }, [aiState, isMoving]);
+
+    
     useEffect(() => {
         console.log("IS MOVING:", isMoving);
     }, [isMoving]);
@@ -69,31 +86,15 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
 
     useEffect(() => {
         const svgElement = svgRef.current;
-        svgElement.style.transition = 'transform 0.02s ease-in-out'
         if (!svgElement) return;
-
-        let animationFrameId;
-        let startTime;
-
-        const frequency = 0.02; // Frequency of the sine wave
-
-        const animate = (timestamp) => {
-            if (!startTime) startTime = timestamp;
-            const elapsed = timestamp - startTime;
-
-            const amplitude = isMoving ? 15 : 4; // Adjust amplitude based on movement state
-            const skewX = amplitude * Math.sin(frequency * elapsed);
-            svgElement.style.transform = `skewX(${skewX}deg)`;
-
-            animationFrameId = requestAnimationFrame(animate);
-        };
-
-        startTime = null;
-        animationFrameId = requestAnimationFrame(animate);
-
-        return () => cancelAnimationFrame(animationFrameId);
+    
+        if (isMoving) {
+            svgElement.classList.add('moving');
+        } else {
+            svgElement.classList.remove('moving');
+        }
     }, [isMoving]);
-
+    
 
     const hueMap = {
         'optimist': '90deg', // green
@@ -111,7 +112,7 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
 
     return (
         <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
-            <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg)` }}>
+            <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg) translateY(${-getVerticalTranslation(angle)}px)`}}>
                 <AnimatePresence>
                     {!isMoving && (
                         <motion.div

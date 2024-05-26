@@ -49,3 +49,31 @@
       offset-distance: 100%;
   }
 }
+
+@keyframes skewAnimation {
+  0% { transform: skewX(0deg); }
+  25% { transform: skewX(15deg); }
+  50% { transform: skewX(0deg); }
+  75% { transform: skewX(-15deg); }
+  100% { transform: skewX(0deg); }
+}
+
+@keyframes skewAnimationStopped {
+  0% { transform: skewX(0deg); }
+  25% { transform: skewX(4deg); }
+  50% { transform: skewX(0deg); }
+  75% { transform: skewX(-4deg); }
+  100% { transform: skewX(0deg); }
+}
+
+svg {
+  transition: transform 0.02s ease-in-out;
+}
+
+svg.moving {
+  animation: skewAnimation 0.3s infinite ease-in-out;
+}
+
+svg:not(.moving) {
+  animation: skewAnimationStopped 0.3s infinite ease-in-out;
+}

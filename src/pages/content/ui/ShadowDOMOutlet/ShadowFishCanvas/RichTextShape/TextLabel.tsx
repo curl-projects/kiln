@@ -9,7 +9,7 @@ import {
 } from '@tldraw/editor'
 import React, { useEffect, useState } from 'react'
 
-import { TextArea } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextArea'
+import { TextArea } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextArea'
 import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/TextHelpers'
 import { isLegacyAlign } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/legacyProps'
 import { useEditableText } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/useEditableText'
@@ -101,12 +101,15 @@ export const TextLabel = React.memo(function TextLabel({
 					lineHeight: fontSize * lineHeight + 'px',
 					minHeight: lineHeight + 32,
 					minWidth: textWidth || 0,
-					color: labelColor,
+					// color: labelColor,
 					width: textWidth,
 					height: textHeight,
+					fontFamily: "HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif",
+					color: "#7F847D",
+					fontWeight: '550',
 				}}
 			>
-				<div className={`${cssPrefix} tl-text tl-text-content`} style={{color: 'pink'}} dir="auto">
+				<div className={`${cssPrefix} tl-text tl-text-content`} dir="auto">
 				
 					{finalText.split('\n').map((lineOfText, index) => (
 						<div key={index} dir="auto">

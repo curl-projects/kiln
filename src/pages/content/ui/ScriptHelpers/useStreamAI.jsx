@@ -42,8 +42,6 @@ async function streamAIResponse(setterFunction, data, promptType){
                             return line.split('event: ').join('')
                     })
                     .filter(Boolean);
-
-                    console.log("EVENT LINES:", eventLines)
     
                     if (eventLines[0] === 'close') {
                         // When no more data, exit the function
@@ -68,8 +66,6 @@ async function streamAIResponse(setterFunction, data, promptType){
                     }
                     
                     lines = removeLastUndefined(lines) 
-
-                    console.log("LINES:", lines)
                     
                         lines.forEach((line) => {
                             setterFunction(prevData => prevData + line)
