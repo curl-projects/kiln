@@ -11,10 +11,11 @@ import { ContentTool } from './CustomUI/CustomToolbar/CustomTools/ContentTool.ts
 
 import { FishShapeUtil } from './FishShape/FishShape.tsx'
 import { ContentShapeUtil } from './ContentShape/ContentShape.tsx'
-import { RichTextShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextShapeUtil.tsx"
+import { RichTextShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeUtil.tsx"
 
 // import text tool
-import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextShapeTool"
+
+import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeTool.tsx"
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));

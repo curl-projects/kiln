@@ -1,7 +1,7 @@
 import { TLArrowShape, TLDefaultColorStyle, TLShapeId, VecLike } from '@tldraw/editor'
 import * as React from 'react'
 import { useDefaultColorTheme } from '../../shared/ShapeFill'
-import { TextLabel } from '../../shared/TextLabel'
+import { TextLabel } from '../../../TextLabel'
 import { ARROW_LABEL_FONT_SIZES, TEXT_PROPS } from '../../shared/default-shape-constants'
 
 export const ArrowTextLabel = React.memo(function ArrowTextLabel({

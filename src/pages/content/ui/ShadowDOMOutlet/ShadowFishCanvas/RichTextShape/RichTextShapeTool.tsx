@@ -1,6 +1,6 @@
 import { StateNode } from '@tldraw/editor'
-import { Idle } from './toolStates/Idle'
-import { Pointing } from './toolStates/Pointing'
+import { Idle } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/toolStates/Idle'
+import { Pointing } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/toolStates/Pointing'
 
 /** @public */
 export class RichTextShapeTool extends StateNode {
@@ -9,3 +9,4 @@ export class RichTextShapeTool extends StateNode {
 	static override children = () => [Idle, Pointing]
 	override shapeType = 'richText'
 }
+

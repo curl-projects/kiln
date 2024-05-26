@@ -22,13 +22,13 @@ import {
 import { textShapeMigrations } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/migrations/shapes/TLTextShape";
 
 import { useCallback } from 'react'
-import { useDefaultColorTheme } from '../shared/ShapeFill'
-import { SvgTextLabel } from '../shared/SvgTextLabel'
-import { TextHelpers } from '../shared/TextHelpers'
-import { TextLabel } from '../shared/TextLabel'
-import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '../shared/default-shape-constants'
-import { getFontDefForExport } from '../shared/defaultStyleDefs'
-import { resizeScaled } from '../shared/resizeScaled'
+import { useDefaultColorTheme } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/ShapeFill'
+import { SvgTextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/SvgTextLabel'
+import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/TextHelpers'
+import { TextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextLabel'
+import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/default-shape-constants'
+import { getFontDefForExport } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/defaultStyleDefs'
+import { resizeScaled } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/resizeScaled'
 
 const sizeCache = new WeakMapCache<TLTextShape['props'], { height: number; width: number }>()
 

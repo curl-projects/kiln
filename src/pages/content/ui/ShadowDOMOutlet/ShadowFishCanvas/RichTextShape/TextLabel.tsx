@@ -5,12 +5,14 @@ import {
 	TLDefaultHorizontalAlignStyle,
 	TLDefaultVerticalAlignStyle,
 	TLShapeId,
+
 } from '@tldraw/editor'
 import React, { useEffect, useState } from 'react'
-import { TextArea } from '../text/TextArea'
-import { TextHelpers } from './TextHelpers'
-import { isLegacyAlign } from './legacyProps'
-import { useEditableText } from './useEditableText'
+
+import { TextArea } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextArea'
+import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/TextHelpers'
+import { isLegacyAlign } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/legacyProps'
+import { useEditableText } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/useEditableText'
 
 interface TextLabelProps {
 	id: TLShapeId

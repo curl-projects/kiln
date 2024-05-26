@@ -30,7 +30,7 @@ import {
 import { HyperlinkButton } from '../shared/HyperlinkButton'
 import { useDefaultColorTheme } from '../shared/ShapeFill'
 import { SvgTextLabel } from '../shared/SvgTextLabel'
-import { TextLabel } from '../shared/TextLabel'
+import { TextLabel } from '../../TextLabel'
 import {
 	FONT_FAMILIES,
 	LABEL_FONT_SIZES,
