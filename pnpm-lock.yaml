@@ -41,6 +41,18 @@ dependencies:
   '@tanstack/react-query':
     specifier: ^5.32.1
     version: 5.32.1(react@18.2.0)
+  '@tldraw/editor':
+    specifier: ^2.1.4
+    version: 2.1.4(react-dom@18.2.0)(react@18.2.0)
+  '@tldraw/store':
+    specifier: ^2.1.4
+    version: 2.1.4(react@18.2.0)
+  '@tldraw/utils':
+    specifier: ^2.1.4
+    version: 2.1.4
+  '@tldraw/validate':
+    specifier: ^2.1.4
+    version: 2.1.4
   axios:
     specifier: ^1.6.8
     version: 1.6.8
@@ -68,6 +80,9 @@ dependencies:
   mitt:
     specifier: ^3.0.1
     version: 3.0.1
+  nanoid:
+    specifier: ^5.0.7
+    version: 5.0.7
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -5997,6 +6012,12 @@ packages:
   /nanoid@4.0.2:
     resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
     engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
+
+  /nanoid@5.0.7:
+    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
+    engines: {node: ^18 || >=20}
     hasBin: true
     dev: false
 

@@ -1,97 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import { Tldraw, createTLStore, defaultShapeUtils, react, useEditor,  } from 'tldraw';
 import { HTMLContainer, ShapeUtil } from 'tldraw'
+import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
+import _ from 'lodash';
+
+
+// IMPORTING UI
+import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
+import { ContentTool } from './CustomUI/CustomToolbar/CustomTools/ContentTool.tsx';
+
 import { FishShapeUtil } from './FishShape/FishShape.tsx'
 import { ContentShapeUtil } from './ContentShape/ContentShape.tsx'
-import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
+import { RichTextShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextShapeUtil.tsx"
 
-
-function generateNonOverlappingPositions(numFish) {
-    console.log("Generating Non Overlapping Fish Positions")
-    const fishWidth = 300; // Adjust this value according to your fish width
-    const fishHeight = 200; // Adjust this value according to your fish height
-    const positions = [];
-
-    for (let i = 0; i < numFish; i++) {
-        positions.push({
-            x: Math.random() * (window.innerWidth - fishWidth),
-            y: Math.random() * (window.innerHeight - fishHeight)
-        });
-    }
-
-    let hasOverlaps;
-    do {
-        hasOverlaps = false;
-        for (let i = 0; i < positions.length; i++) {
-            // Adjust position if out of bounds
-            if (positions[i].x < 0) positions[i].x = 0;
-            if (positions[i].y < 0) positions[i].y = 0;
-            if (positions[i].x + fishWidth > window.innerWidth) positions[i].x = window.innerWidth - fishWidth;
-            if (positions[i].y + fishHeight > window.innerHeight) positions[i].y = window.innerHeight - fishHeight;
-
-            for (let j = i + 1; j < positions.length; j++) {
-                const dx = Math.abs(positions[i].x - positions[j].x);
-                const dy = Math.abs(positions[i].y - positions[j].y);
-                if (dx < fishWidth && dy < fishHeight) {
-                    hasOverlaps = true;
-                    // Adjust positions to remove overlap
-                    positions[j].x = (positions[j].x + fishWidth) % (window.innerWidth - fishWidth);
-                    positions[j].y = (positions[j].y + fishHeight) % (window.innerHeight - fishHeight);
-                }
-            }
-        }
-    } while (hasOverlaps);
-
-    return positions;
-}
+// import text tool
+import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/TextShapeTool"
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
-  const customShapeUtils = [FishShapeUtil, ContentShapeUtil]
+  const customShapeUtils = [FishShapeUtil, ContentShapeUtil, RichTextShapeUtil]
+  const customTools = [
+    RichTextShapeTool
+]
+  const customComponents = {
+    Toolbar: null,
+    HelpMenu: null,
+    MainMenu: null,
+
+  }
+
+
+  const uiOverrides = {
+    tools(editor, tools){
+        tools.content = {
+            id: 'richText',
+            icon: 'content-icon',
+            label: "Text",
+            kbd: 't',
+            onSelect: () => {
+                editor.setCurrentTool('richText')
+            }
+        }
+
+        return tools
+    }
+  }
+
   const [reactEditor, setReactEditor] = useState('')
+  const [hoveredShape, setHoveredShape] = useState(undefined)
+  const [selectedShapes, setSelectedShapes] = useState([])
   const { fishOrchestrator } = useFish();
-  const fishConfig = ['helper', 'devil']
-  const initialPositions = generateNonOverlappingPositions(fishConfig.length)
+  
+  const [textCreated, setTextCreated] = useState(null)
 
   useEffect(()=>{
-    console.log("REACT EDITOR:", reactEditor)
-  }, [reactEditor])
+    console.debug("SELECTED SHAPES:", selectedShapes)
+  }, [selectedShapes])
 
+  useEffect(()=>{
+    if(textCreated && selectedShapes && selectedShapes.length === 0){
+        console.log("TRIGGERED!", textCreated)
+        // fishOrchestrator.emit('textCreated', { 
+        //     x: textCreated.x, 
+        //     y: textCreated.y , 
+        //     //bounding box size
 
-  function handleMoveFish(reactEditor) {
-    if(reactEditor){
-        console.log("Moving Fish!");
-        const newPositions = generateNonOverlappingPositions(fishConfig.length);
-        console.log("NEW POSITIONS:", newPositions)
-        console.log("REACT EDITOR:", reactEditor)
-        reactEditor.animateShapes(fishConfig.map((fishType, index) => {
-            return { id:`shape:fish-${fishType}`, x: newPositions[index].x, y: newPositions[index].y}
-        }), {
-            duration: 500,
-            ease: (t) => t * t,
-        })
+        // })
+        setTextCreated(null)
     }
-    else{
-        console.log("REACT EDITOR:", reactEditor)
-        console.error("React Editor not set!")
-    }
-}
+  }, [textCreated, selectedShapes])
 
-  useEffect(() => {
-        fishOrchestrator.on("moveFish", () => handleMoveFish(reactEditor));
 
-        return () => {
-            fishOrchestrator.off("moveFish", () => handleMoveFish(reactEditor));
-        };
-    }, [fishOrchestrator, reactEditor]);
-
- 
+  useEffect(()=>{
+    console.log("HOVERED SHAPE:", hoveredShape)
+  }, [hoveredShape])
 
   function handleCanvasEvent(e){
     switch(e.name){
         case 'pointer_up':
             // ripple effect
-            fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
+            // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
             break;
         default:
             break;
@@ -99,23 +87,98 @@ export default function ShadowCanvas({ parsedContent, article }) {
   }
 
 
+  function handleStoreEvent(change){
+        for (const record of Object.values(change.changes.added)) {
+            if (record.typeName === 'shape') {
+                console.log(`created shape (${record.type})\n`)
+                console.log("RECORD:", record)
+                if(record.type === 'text'){
+                    setTextCreated(record)
+                }
+            }
+
+        for (const [from, to] of Object.values(change.changes.updated)) {
+            if (
+                from.typeName === 'instance' &&
+                to.typeName === 'instance' &&
+                from.currentPageId !== to.currentPageId
+            ) {
+                logChangeEvent(`changed page (${from.currentPageId}, ${to.currentPageId})`)
+            } else if (from.id.startsWith('shape') && to.id.startsWith('shape')) {
+                let diff = _.reduce(
+                    from,
+                    (result, value, key) =>
+                        _.isEqual(value, (to)[key]) ? result : result.concat([key, (to)[key]]),
+                    []
+                )
+                if (diff?.[0] === 'props') {
+                    diff = _.reduce(
+                        (from).props,
+                        (result, value, key) =>
+                            _.isEqual(value, (to).props[key])
+                                ? result
+                                : result.concat([key, (to).props[key]]),
+                        []
+                    )
+                }
+                logChangeEvent(`updated shape (${JSON.stringify(diff)})\n`)
+            }
+        }
+
+        for (const record of Object.values(change.changes.removed)) {
+            if (record.typeName === 'shape') {
+                logChangeEvent(`deleted shape (${record.type})\n`)
+            }
+        }
+    }
+  }
+
+  function handleChange(e, editor) {
+    if (editor) {
+        // const editorState = editor.getInstanceState()
+        // editorState?.isFocused && console.debug('EDITOR FOCUS STATE::', editorState.isFocused)
+        // TODO: long-term want an event listener specific to this
+      const newSelectedShapes = editor.getSelectedShapes();
+      const newHoveredShape = editor.getHoveredShape();
+
+      // Compare and update state only if different
+      if (selectedShapes !== newSelectedShapes) {
+        setSelectedShapes(newSelectedShapes);
+      }
+
+      if (hoveredShape !== newHoveredShape) {
+        setHoveredShape(newHoveredShape);
+      }
+    }
+  }
+
+  function handleUiEvent(e){
+    console.log("UI EVENT", e)
+  }
+
   return (
     <Tldraw
       shapeUtils={customShapeUtils}
-      color='pink'
+      tools={customTools}
+      uiOverrides={uiOverrides}
+      components={customComponents}
+
+      onUiEvent={handleUiEvent}
       onMount={(editor)=>{
-        editor.on('event', (event) => handleCanvasEvent(event))
         setReactEditor(editor)
+        editor.on('event', (event) => handleCanvasEvent(event))
+        editor.on('change', (event) => handleChange(event, editor))
+        // editor.on('', (e) => console.log("SELECTION CHANGE", e))
+        editor.store.listen(handleStoreEvent)
         editor.createShapes(
             [
-            // ...fishConfig.map((fishType, index) => {
-            //     return { type: 'fish', id:`shape:fish-${fishType}`, x: initialPositions[index].x, y: initialPositions[index].y, props: {config: "fish", personality: fishType, w: 300, h: 200}}
-            // }),
-            {type: 'content', props: { content: article?.title ? article.title : "Untitled", contentType: 'header'}},
-            {type: 'content', props: { content: article?.siteName ? article.siteName : "No site", contentType: 'paragraph'}}
+                {type: 'content', props: { content: article?.title ? article.title : "Untitled", contentType: 'header'}},
+                {type: 'content', props: { content: article?.siteName ? article.siteName : "No site", contentType: 'paragraph'}}
             ]   
         )
       }}
-    />
+    >
+        <CustomToolbar />
+    </Tldraw>
   );
 }

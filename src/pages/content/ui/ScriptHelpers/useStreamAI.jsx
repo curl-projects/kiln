@@ -10,7 +10,7 @@ async function streamAIResponse(setterFunction, data, promptType){
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'gpt-4',
+                model: 'gpt-4o',
                 data: data,
                 promptType: promptType
             }),
@@ -33,7 +33,7 @@ async function streamAIResponse(setterFunction, data, promptType){
                     const { done, value } = await reader.read();
             
                     const chunk = new TextDecoder().decode(value);
-    
+
                     const eventLines = chunk.toString()
                     .split("\n")
                     .filter((line) => line.trim() !== "")
@@ -42,6 +42,8 @@ async function streamAIResponse(setterFunction, data, promptType){
                             return line.split('event: ').join('')
                     })
                     .filter(Boolean);
+
+                    console.log("EVENT LINES:", eventLines)
     
                     if (eventLines[0] === 'close') {
                         // When no more data, exit the function
@@ -49,7 +51,7 @@ async function streamAIResponse(setterFunction, data, promptType){
                     }
                     // Decode the stream data and append it to state
     
-                    const lines = chunk.toString()
+                    var lines = chunk.toString()
                     .split("\n")
                     .filter((line) => line.trim() !== "")
                     .map((line) => {
@@ -57,6 +59,17 @@ async function streamAIResponse(setterFunction, data, promptType){
                             return line.split('data: ').join('')
                     })
                     .filter(Boolean);
+
+                    function removeLastUndefined(arr) {
+                        if (arr.length > 0 && arr[arr.length - 1] === "undefined") {
+                            arr.pop();
+                        }
+                        return arr;
+                    }
+                    
+                    lines = removeLastUndefined(lines) 
+
+                    console.log("LINES:", lines)
                     
                         lines.forEach((line) => {
                             setterFunction(prevData => prevData + line)

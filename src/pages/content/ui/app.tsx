@@ -12,7 +12,7 @@ import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.j
 import CaptureHighlight from "@pages/content/ui/LocalComponents/CaptureHighlight/CaptureHighlight.jsx"
 
 export default function App() {
-  const [shadowOpen, setShadowOpen] = useState(false);
+  const [shadowOpen, setShadowOpen] = useState(true);
   const [fishMoved, setFishMoved] = useState(false);
 
   return (
@@ -42,9 +42,7 @@ export default function App() {
           {/* <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
             <div className="centered-text" style={styles.centeredText}>Hello Text</div>
           </div> */}
-        <FishSwarm fishConfig={['helper',
-         'devil', 'angel', 'skeptic'
-         ]}/>
+        <FishSwarm fishConfig={['researcher', 'planner', 'optimist', 'critic']}/>
         <CaptureHighlight />
       </div>
   );

@@ -19,6 +19,11 @@ export default function FishSwarm({ fishConfig }) {
         setFinalOrientationTarget(null); // Reset the final orientation target
     }
 
+    function handleTextCreated({ x, y, boundingBox}){
+        // build a version of distribute in circle that takes box size into account
+        setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y-24 });
+    }
+
     function handleShadowDOMClick({ x, y }) {
         setSelectedPoint({x, y})
 
@@ -27,11 +32,11 @@ export default function FishSwarm({ fishConfig }) {
         setFinalOrientationTarget({ x: x-fishHeadOffset.x+22, y: y-fishHeadOffset.y-24 });
 
     }
-    
 
     useEffect(() => {
         fishOrchestrator.on("moveFish", handleMoveFish);
         fishOrchestrator.on("shadowDOMClick", handleShadowDOMClick);
+        fishOrchestrator.on('textCreated', handleTextCreated)
 
         return () => {
             fishOrchestrator.off("moveFish", handleMoveFish);

@@ -25,6 +25,15 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const distanceFactor = 0.3;
 
     useEffect(() => {
+        setAIState("");
+        AIMutation.mutate({
+            setterFunction: setAIState,
+            data: { ...aiData, fishType: fishType },
+            promptType: promptType || 'sayHello'
+        });
+    }, []);
+
+    useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y){
             const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY, amplitudeFactor);
             setPathPoints(newPathPoints);
@@ -170,6 +179,7 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
                         angle={currentAngle} 
                         isMoving={isMoving}
                         aiState={aiState}
+                        fishType={fishType}
                     />
                 </div>
 
@@ -228,7 +238,6 @@ const AIWrapperStyle = {
     width: 'fit-content',
     cursor: 'grab',
     zIndex: 2147483647,
-    border: '2px solid pink'
 };
 
 

@@ -1,14 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const AIIconWrapperStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    top: 0,
-    left: 0
-};
+// const AIIconWrapperStyle = {
+//     display: 'flex',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     position: 'absolute',
+//     top: 0,
+//     left: 0
+// };
+
+
 
 const outerAITextWrapperStyle = {
     position: 'absolute',
@@ -23,10 +25,24 @@ const AITextWrapperStyle = {
     padding: '10px',
     borderRadius: '10px',
     height: '100%',
-    width: '100%',
-    
-
+    maxHeight: '300px',
+    overflow: 'scroll',
+    width: '160px',
 };
+
+const AITextNameWrapperStyle = {
+    display: 'flex',
+    alignItems: 'flex-start'
+}
+const AITextNameStyle = {
+    fontFamily: "IBM Plex Mono, monospace",
+    fontWeight: 600,
+    fontSize: '12px',
+    letterSpacing: '-0.01em',
+    margin: 0,
+    textTransform: "uppercase",
+}
+
 
 const AITextStyle = {
     color: '#7F847D',
@@ -34,7 +50,8 @@ const AITextStyle = {
     letterSpacing: '-0.03em',
     fontWeight: 550,
     lineHeight: '24px',
-    margin: '0'
+    margin: '0',
+    userSelect: "none",
 };
 
 const variants = {
@@ -43,8 +60,7 @@ const variants = {
     exit: { opacity: 0, scale: 0.8 }
 };
 
-
-export default function Firefly({ angle, fireflyRef, isMoving, aiState }) {
+export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType }) {
     useEffect(() => {
         console.log("IS MOVING:", isMoving);
     }, [isMoving]);
@@ -79,9 +95,22 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState }) {
     }, [isMoving]);
 
 
+    const hueMap = {
+        'optimist': '90deg', // green
+        'critic': '270deg', // pink
+        'researcher': '180deg', // blue
+        'planner': '0deg', // orange
+    }
+
+    const colorMap = {
+        'optimist': '#6BC076', // green
+        'critic': '#E295DE', // pink
+        'researcher': '#6BB8DD', // blue
+        'planner': '#E6A07A', // orange
+    }
 
     return (
-        <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: "1px solid green", transform: `rotate(${angle}deg)`}}>
+        <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
             <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg)` }}>
                 <AnimatePresence>
                     {!isMoving && (
@@ -95,9 +124,19 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState }) {
                                 hidden: { duration: 0.3 },
                                 visible: { duration: 0.3 },
                                 exit: { duration: 0.3 }
-                            }}
-    
-                        >
+                            }}>
+                            <div style={AITextNameWrapperStyle}>
+                                <p style={{...AITextNameStyle, color: colorMap[fishType]}}>
+                                    {
+                                        {
+                                        'optimist': 'The Optimist', // green
+                                        'critic': 'The Critic', // pink
+                                        'researcher': 'The Researcher', // blue
+                                        'planner': 'The Planner', // orange
+                                        }[fishType]
+                                    }
+                                </p> 
+                            </div>
                             <p style={AITextStyle}>
                                 {aiState}
                             </p>
@@ -105,7 +144,7 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState }) {
                     )}
                 </AnimatePresence>
             </div>
-            <svg ref={svgRef} width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}` }} width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" stroke-width="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />

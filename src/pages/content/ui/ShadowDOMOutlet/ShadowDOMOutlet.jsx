@@ -73,20 +73,8 @@ const ShadowDOMOutlet = () => {
     // }, [article]);
 
 
-    const handleClick = (e) => {
-        console.log("X/Y", e.clientX, e.clientY)
-        const newRipple = { x: e.clientX, y: e.clientY };
-        setRipples((prevRipples) => [...prevRipples, newRipple]);
-        fishOrchestrator.emit('shadowDOMClick', { x: e.clientX, y: e.clientY });
-
-        setTimeout(() => {
-            setRipples((prevRipples) => prevRipples.slice(1));
-        }, 500); // duration of the ripple effect
-    };
-
-
     return (
-        <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper} onClick={handleClick}>
+        <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
            <ShadowCanvas article={article}/>
         </div>
     );
