@@ -66,14 +66,12 @@
   100% { transform: skewX(0deg); }
 }
 
-svg {
-  transition: transform 0.02s ease-in-out;
-}
 
 svg.moving {
   animation: skewAnimation 0.3s infinite ease-in-out;
 }
 
-svg:not(.moving) {
+
+svg.slowMoving {
   animation: skewAnimationStopped 0.3s infinite ease-in-out;
 }

@@ -24,14 +24,14 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const speedFactor = 1;
     const distanceFactor = 0.3;
 
-    // useEffect(() => {
-    //     setAIState("");
-    //     AIMutation.mutate({
-    //         setterFunction: setAIState,
-    //         data: { ...aiData, fishType: fishType },
-    //         promptType: promptType || 'sayHello'
-    //     });
-    // }, []);
+    useEffect(() => {
+        setAIState("");
+        AIMutation.mutate({
+            setterFunction: setAIState,
+            data: { ...aiData, fishType: fishType },
+            promptType: promptType || 'sayHello'
+        });
+    }, []);
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y){

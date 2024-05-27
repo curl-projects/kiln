@@ -30,7 +30,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
   }
 
-
   const uiOverrides = {
     tools(editor, tools){
         tools.content = {
@@ -64,6 +63,8 @@ export default function ShadowCanvas({ parsedContent, article }) {
   // }, [hoveredShape])
 
   useEffect(()=>{
+    console.log("TEXT CREATED:", textCreated)
+    console.log("SELECTED SHAPES:", selectedShapes)
     if(textCreated && (selectedShapes && selectedShapes.length === 0)){
         console.log("TRIGGERED!", textCreated)
         if(reactEditor){
@@ -85,29 +86,31 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
 
-  function handleCanvasEvent(e){
-    if(reactEditor){
-      const newSelectedShapes = reactEditor.getSelectedShapes();
-      const newHoveredShape = reactEditor.getHoveredShape();
+  function handleCanvasEvent(e, editor){
+    if(editor){  
+      switch(e.name){
+          case 'pointer_up':
+              // ripple effect
+            
+              const newSelectedShapes = editor.getSelectedShapes();
+              const newHoveredShape = editor.getHoveredShape();
 
-      // Compare and update state only if different
-      if (selectedShapes !== newSelectedShapes) {
-        setSelectedShapes(newSelectedShapes);
+              console.log("POINTER UP:", newSelectedShapes)
+
+                // Compare and update state only if different
+                if (selectedShapes !== newSelectedShapes) {
+                  setSelectedShapes(newSelectedShapes);
+                }
+
+                if (hoveredShape !== newHoveredShape) {
+                  setHoveredShape(newHoveredShape);
+                }
+
+              // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
+              break;
+          default:
+              break;
       }
-
-      if (hoveredShape !== newHoveredShape) {
-        setHoveredShape(newHoveredShape);
-      }
-
-    }
-    
-    switch(e.name){
-        case 'pointer_up':
-            // ripple effect
-            fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
-            break;
-        default:
-            break;
     }
   }
 
@@ -191,7 +194,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
       onUiEvent={handleUiEvent}
       onMount={(editor)=>{
         setReactEditor(editor)
-        editor.on('event', (event) => handleCanvasEvent(event))
+        editor.on('event', (event) => handleCanvasEvent(event, editor))
         // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))
         editor.store.listen(handleStoreEvent)

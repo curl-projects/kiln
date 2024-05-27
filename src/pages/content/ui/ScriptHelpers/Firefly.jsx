@@ -89,9 +89,11 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
         if (!svgElement) return;
     
         if (isMoving) {
+            svgElement.classList.remove('slowMoving');
             svgElement.classList.add('moving');
         } else {
             svgElement.classList.remove('moving');
+            svgElement.classList.add('slowMoving');
         }
     }, [isMoving]);
     
