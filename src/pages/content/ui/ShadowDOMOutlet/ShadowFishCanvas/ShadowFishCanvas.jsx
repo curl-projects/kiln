@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Tldraw, createTLStore, defaultShapeUtils, react, useEditor,  } from 'tldraw';
+import { Tldraw, createTLStore, defaultShapeUtils, react, useEditor, createShapeId  } from 'tldraw';
 import { HTMLContainer, ShapeUtil } from 'tldraw'
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import _ from 'lodash';
 
-
+import { handleDoubleClickOnCanvas } from './RichTextShape/canvasOverride.jsx';
 // IMPORTING UI
 import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
 import { ContentTool } from './CustomUI/CustomToolbar/CustomTools/ContentTool.tsx';
@@ -32,15 +32,21 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
   const uiOverrides = {
     tools(editor, tools){
-        tools.content = {
-            id: 'richText',
-            icon: 'content-icon',
-            label: "Text",
-            kbd: 't',
-            onSelect: () => {
-                editor.setCurrentTool('richText')
-            }
-        }
+       console.log("TOOLS:", tools)
+
+       tools.select = {
+        ...tools.select,
+        
+       }
+        // tools.content = {
+        //     id: 'richText',
+        //     icon: 'content-icon',
+        //     label: "Text",
+        //     kbd: 't',
+        //     onSelect: () => {
+        //         editor.setCurrentTool('richText')
+        //     }
+        // }
 
         return tools
     }
@@ -63,19 +69,24 @@ export default function ShadowCanvas({ parsedContent, article }) {
   // }, [hoveredShape])
 
   useEffect(()=>{
-    console.log("TEXT CREATED:", textCreated)
     console.log("SELECTED SHAPES:", selectedShapes)
     if(textCreated && (selectedShapes && selectedShapes.length === 0)){
         console.log("TRIGGERED!", textCreated)
         if(reactEditor){
           const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
           console.log("CORRECT SHAPE:", shapeGeometry)
+          
+
+          const textShape = reactEditor.getShape(textCreated.id)
+
+          console.log("RICH TEXT SHAPE:", textShape)
 
           fishOrchestrator.emit('textCreated', { 
             x: textCreated.x, 
             y: textCreated.y , 
             w: shapeGeometry.w,
             h: shapeGeometry.h,
+            text: textShape.props.text
         })
         }
 
@@ -108,6 +119,28 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
               // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
               break;
+          // case "double_click":
+          //       const editorSelectedShapes = editor.getSelectedShapes()
+          //       if (editorSelectedShapes.length > 0) break;
+          //       editor.setCurrentTool("richText") // Or any other wanted tool
+          //       const id = createShapeId()
+          //       editor.createShapes([
+          //         {
+          //           id,
+          //           type: 'richText',
+          //           x: e.point.x,
+          //           y: e.point.y,
+          //           props: {
+          //             text: '',
+          //             autoSize: true,
+          //           },
+          //         },
+          //       ]).select(id)
+          //       editor.setEditingShape(id)
+          //       // editor.setCurrentTool('select')
+          //       // editor.root.getCurrent()?.transition('editing_shape')
+          //       break
+            
           default:
               break;
       }
@@ -116,6 +149,8 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
   function handleStoreEvent(change){
+
+
         for (const record of Object.values(change.changes.added)) {
             if (record.typeName === 'shape') {
                 console.log(`created shape (${record.type})\n`)
@@ -149,6 +184,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
                         []
                     )
                 }
+                console.log("UPDATED SHAPE:", diff)
                 logChangeEvent(`updated shape (${JSON.stringify(diff)})\n`)
             }
         }
@@ -188,12 +224,14 @@ export default function ShadowCanvas({ parsedContent, article }) {
     <Tldraw
       shapeUtils={customShapeUtils}
       tools={customTools}
-      uiOverrides={uiOverrides}
+      overrides={uiOverrides}
       components={customComponents}
+  
 
       onUiEvent={handleUiEvent}
       onMount={(editor)=>{
         setReactEditor(editor)
+        editor.root.children.select.children.idle.handleDoubleClickOnCanvas = (parent, info) => handleDoubleClickOnCanvas(editor, info, parent)
         editor.on('event', (event) => handleCanvasEvent(event, editor))
         // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))

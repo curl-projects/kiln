@@ -19,7 +19,7 @@ export default function FishSwarm({ fishConfig }) {
         setFinalOrientationTarget(null); // Reset the final orientation target
     }
 
-    function handleTextCreated({ x, y, w, h }){
+    function handleTextCreated({ x, y, w, h, text}){
         console.log("X:", x, "Y:", y, "W:", w, "H:", h);
         setSelectedPoint({x: x-(w/2)+10, y, w, h})
         const offset = 250;

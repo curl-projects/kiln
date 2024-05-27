@@ -43,7 +43,8 @@ export default function App() {
             <div className="centered-text" style={styles.centeredText}>Hello Text</div>
           </div> */}
         <FishSwarm fishConfig={['researcher', 
-        'planner', 'optimist', 'critic']}
+        // 'planner', 'optimist', 'critic'
+      ]}
         />
         <CaptureHighlight />
       </div>

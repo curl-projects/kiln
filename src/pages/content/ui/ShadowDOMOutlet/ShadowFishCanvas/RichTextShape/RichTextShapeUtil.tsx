@@ -185,6 +185,7 @@ export class RichTextShapeUtil extends ShapeUtil<TLTextShape> {
 	}
 
 	override onEditEnd: TLOnEditEndHandler<TLTextShape> = (shape) => {
+		console.log("EDIT ENDED!")
 		const {
 			id,
 			type,
