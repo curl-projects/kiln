@@ -1,4 +1,5 @@
 import { StateNode, TLEventHandlers, TLTextShape, createShapeId } from '@tldraw/editor'
+
 export class Pointing extends StateNode {
 	static override id = 'pointing'
 
@@ -21,10 +22,10 @@ export class Pointing extends StateNode {
 			this.markId = `creating:${id}`
 			this.editor.mark(this.markId)
 
-			this.editor.createShapes<TLTextShape>([
+			this.editor.createShapes([
 				{
 					id,
-					type: 'text',
+					type: 'richText',
 					x: originPagePoint.x,
 					y: originPagePoint.y,
 					props: {
@@ -48,7 +49,7 @@ export class Pointing extends StateNode {
 				handle: 'right',
 				isCreating: true,
 				creationCursorOffset: { x: 18, y: 1 },
-				onInteractionEnd: 'text',
+				onInteractionEnd: 'rightText',
 				onCreate: () => {
 					this.editor.setEditingShape(shape.id)
 					this.editor.setCurrentTool('select.editing_shape')
@@ -74,7 +75,7 @@ export class Pointing extends StateNode {
 	}
 
 	private complete() {
-		this.editor.mark('creating text shape')
+		this.editor.mark('creating richText shape')
 		const id = createShapeId()
 		const { x, y } = this.editor.inputs.currentPagePoint
 		this.editor

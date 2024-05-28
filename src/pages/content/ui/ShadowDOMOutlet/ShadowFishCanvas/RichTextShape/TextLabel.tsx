@@ -63,6 +63,32 @@ export const TextLabel = React.memo(function TextLabel({
 
 	const [initialText, setInitialText] = useState(text)
 
+	const [dropdownVisible, setDropdownVisible] = useState(false);
+	const [dropdownItems] = useState(['Item1', 'Item2', 'Item3']);
+	const [autoFillText, setAutoFillText] = useState('');
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === '@') {
+			setDropdownVisible(true);
+		} else {
+			setDropdownVisible(false);
+		}
+	
+		if (handleKeyDownCustom) {
+			handleKeyDownCustom(e);
+		}
+	};
+
+	const handleItemClick = (item: string) => {
+		console.log("HI! ITEM CLICK")
+		setAutoFillText(item);
+		setDropdownVisible(false);
+		console.log(`Selected item: ${item}`);
+	};
+	
+	
+
+
 	useEffect(() => {
 		if (!isEditing) setInitialText(text)
 	}, [isEditing, text])
@@ -126,10 +152,26 @@ export const TextLabel = React.memo(function TextLabel({
 						text={text}
 						isEditing={isEditing}
 						{...editableTextRest}
-						handleKeyDown={handleKeyDownCustom ?? editableTextRest.handleKeyDown}
+						handleKeyDown={handleKeyDown}
 					/>
 				)}
 			</div>
+			{isEditingAnything && dropdownVisible && (
+        	<div className="dropdown-menu">
+				{dropdownItems.map((item, index) => (
+					<div key={index} onClick={() => handleItemClick(item)}>
+					{item}
+					</div>
+				))}
+			</div>
+			)}
 		</div>
 	)
 })
+
+
+const styles = {
+	dropdownMenu: {
+		
+	}
+}

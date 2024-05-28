@@ -4,7 +4,7 @@ import { HTMLContainer, ShapeUtil } from 'tldraw'
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import _ from 'lodash';
 
-import { handleDoubleClickOnCanvas } from './RichTextShape/canvasOverride.jsx';
+import { handleDoubleClickOnCanvas } from './RichTextShape/canvasOverride.tsx';
 // IMPORTING UI
 import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
 import { ContentTool } from './CustomUI/CustomToolbar/CustomTools/ContentTool.tsx';
@@ -16,6 +16,7 @@ import { RichTextShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishC
 // import text tool
 
 import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeTool.tsx"
+// import { }
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
@@ -34,10 +35,10 @@ export default function ShadowCanvas({ parsedContent, article }) {
     tools(editor, tools){
        console.log("TOOLS:", tools)
 
-       tools.select = {
-        ...tools.select,
+      //  tools.select = {
+      //   ...tools.select,
         
-       }
+      //  }
         // tools.content = {
         //     id: 'richText',
         //     icon: 'content-icon',
@@ -64,30 +65,34 @@ export default function ShadowCanvas({ parsedContent, article }) {
   // }, [selectedShapes])
 
 
-  // useEffect(()=>{
-  //   console.log("HOVERED SHAPE:", hoveredShape)
-  // }, [hoveredShape])
+  useEffect(()=>{
+    console.log("TEXT CREATED:", textCreated)
+  }, [textCreated])
 
   useEffect(()=>{
     console.log("SELECTED SHAPES:", selectedShapes)
+  }, [selectedShapes])
+
+  useEffect(()=>{
+    // console.log("SELECTED SHAPES:", selectedShapes)
     if(textCreated && (selectedShapes && selectedShapes.length === 0)){
-        console.log("TRIGGERED!", textCreated)
+        // console.log("TRIGGERED!", textCreated)
         if(reactEditor){
           const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
-          console.log("CORRECT SHAPE:", shapeGeometry)
-          
+          // console.log("CORRECT SHAPE:", shapeGeometry)
 
           const textShape = reactEditor.getShape(textCreated.id)
 
-          console.log("RICH TEXT SHAPE:", textShape)
-
-          fishOrchestrator.emit('textCreated', { 
-            x: textCreated.x, 
-            y: textCreated.y , 
-            w: shapeGeometry.w,
-            h: shapeGeometry.h,
-            text: textShape.props.text
-        })
+          // console.log("RICH TEXT SHAPE:", textShape)
+          if(shapeGeometry.w){
+            fishOrchestrator.emit('textCreated', { 
+              x: textCreated.x, 
+              y: textCreated.y , 
+              w: shapeGeometry.w,
+              h: shapeGeometry.h,
+              text: textShape.props.text
+            })
+          }
         }
 
         
@@ -99,23 +104,25 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
   function handleCanvasEvent(e, editor){
     if(editor){  
+                  
+      const newSelectedShapes = editor.getSelectedShapes();
+      const newHoveredShape = editor.getHoveredShape();
+
+      // console.log("POINTER UP:", newSelectedShapes)
+
+        // Compare and update state only if different
+        if (selectedShapes !== newSelectedShapes) {
+          setSelectedShapes(newSelectedShapes);
+        }
+
+        if (hoveredShape !== newHoveredShape) {
+          setHoveredShape(newHoveredShape);
+        }
+        
       switch(e.name){
           case 'pointer_up':
               // ripple effect
-            
-              const newSelectedShapes = editor.getSelectedShapes();
-              const newHoveredShape = editor.getHoveredShape();
 
-              console.log("POINTER UP:", newSelectedShapes)
-
-                // Compare and update state only if different
-                if (selectedShapes !== newSelectedShapes) {
-                  setSelectedShapes(newSelectedShapes);
-                }
-
-                if (hoveredShape !== newHoveredShape) {
-                  setHoveredShape(newHoveredShape);
-                }
 
               // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
               break;
@@ -149,13 +156,13 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
   function handleStoreEvent(change){
-
-
         for (const record of Object.values(change.changes.added)) {
             if (record.typeName === 'shape') {
                 console.log(`created shape (${record.type})\n`)
                 console.log("RECORD:", record)
+                console.log("HI FINN!")
                 if(record.type === 'richText'){
+                  console.log("HI AGAIN FINN!")
                     setTextCreated(record)
                 }
             }
@@ -231,11 +238,16 @@ export default function ShadowCanvas({ parsedContent, article }) {
       onUiEvent={handleUiEvent}
       onMount={(editor)=>{
         setReactEditor(editor)
-        editor.root.children.select.children.idle.handleDoubleClickOnCanvas = (parent, info) => handleDoubleClickOnCanvas(editor, info, parent)
+        editor.root.children.select.children.idle.handleDoubleClickOnCanvas = function(info) {
+          handleDoubleClickOnCanvas.call(this, info);
+        }.bind({ editor, parent: editor.root.children.select.children.idle.parent });
+
+        
         editor.on('event', (event) => handleCanvasEvent(event, editor))
         // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))
         editor.store.listen(handleStoreEvent)
+        // editor.createShape({ type: 'my-custom-shape', x: 100, y: 100 })
         editor.createShapes(
             [
                 {type: 'content', props: { content: article?.title ? article.title : "Untitled", contentType: 'header'}},
