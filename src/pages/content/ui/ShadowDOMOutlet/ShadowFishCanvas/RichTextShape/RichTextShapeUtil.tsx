@@ -25,7 +25,7 @@ import { textShapeMigrations } from "@pages/content/ui/ShadowDOMOutlet/ShadowFis
 import { useCallback } from 'react'
 import { useDefaultColorTheme } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/ShapeFill'
 import { SvgTextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/SvgTextLabel'
-import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/TextHelpers'
+import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextHelpers'
 import { TextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextLabel'
 import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/default-shape-constants'
 import { getFontDefForExport } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/defaultStyleDefs'

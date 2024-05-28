@@ -10,9 +10,9 @@ import {
 import React, { useEffect, useState } from 'react'
 
 import { TextArea } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextArea'
-import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/TextHelpers'
+import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextHelpers'
 import { isLegacyAlign } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/legacyProps'
-import { useEditableText } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/useEditableText'
+import { useEditableText } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/useEditableText'
 
 interface TextLabelProps {
 	id: TLShapeId
@@ -172,6 +172,6 @@ export const TextLabel = React.memo(function TextLabel({
 
 const styles = {
 	dropdownMenu: {
-		
+
 	}
 }

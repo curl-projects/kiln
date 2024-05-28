@@ -7,12 +7,12 @@ import {
 	useValue,
 } from '@tldraw/editor'
 import React, { useCallback, useEffect, useRef } from 'react'
-import { INDENT, TextHelpers } from './TextHelpers'
+import { INDENT, TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextHelpers'
 
 /** @public */
 export function useEditableText(id: TLShapeId, type: string, text: string) {
 	const editor = useEditor()
-	const rInput = useRef<HTMLTextAreaElement>(null)
+	const rInput = useRef<HTMLDivElement>(null)
 	const isEditing = useValue('isEditing', () => editor.getEditingShapeId() === id, [editor])
 	const isEditingAnything = useValue('isEditingAnything', () => !!editor.getEditingShapeId(), [
 		editor,
@@ -21,7 +21,14 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
 	useEffect(() => {
 		function selectAllIfEditing({ shapeId }: { shapeId: TLShapeId }) {
 			if (shapeId === id) {
-				rInput.current?.select()
+				const element = rInput.current;
+				if(element){
+					const range = document.createRange();
+					range.selectNodeContents(element);
+					const selection = window.getSelection();
+					selection.removeAllRanges();
+					selection.addRange(range);
+				}
 			}
 		}
 
@@ -39,7 +46,14 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
 		}
 
 		if (editor.getInstanceState().isCoarsePointer) {
-			rInput.current?.select()
+			const element = rInput.current;
+				if(element){
+					const range = document.createRange();
+					range.selectNodeContents(element);
+					const selection = window.getSelection();
+					selection.removeAllRanges();
+					selection.addRange(range);
+				}
 		}
 
 		// XXX(mime): This fixes iOS not showing the cursor sometimes.
@@ -52,7 +66,7 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
 
 	// When the user presses ctrl / meta enter, complete the editing state.
 	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		(e: React.KeyboardEvent<HTMLDivElement>) => {
 			if (editor.getEditingShapeId() !== id) return
 
 			switch (e.key) {
@@ -69,21 +83,21 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
 
 	// When the text changes, update the text value.
 	const handleChange = useCallback(
-		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		(e: React.ChangeEvent<HTMLDivElement>) => {
 			if (editor.getEditingShapeId() !== id) return
-
-			let text = TextHelpers.normalizeText(e.currentTarget.value)
+			
+			let text = TextHelpers.normalizeText(e.target.value)
 
 			// ------- Bug fix ------------
 			// Replace tabs with spaces when pasting
-			const untabbedText = text.replace(/\t/g, INDENT)
-			if (untabbedText !== text) {
-				const selectionStart = e.currentTarget.selectionStart
-				e.currentTarget.value = untabbedText
-				e.currentTarget.selectionStart = selectionStart + (untabbedText.length - text.length)
-				e.currentTarget.selectionEnd = selectionStart + (untabbedText.length - text.length)
-				text = untabbedText
-			}
+			// const untabbedText = text.replace(/\t/g, INDENT)
+			// if (untabbedText !== text) {
+			// 	const selectionStart = e.target.value.selectionStart
+			// 	e.target.value.value = untabbedText
+			// 	e.target.value.selectionStart = selectionStart + (untabbedText.length - text.length)
+			// 	e.target.value.selectionEnd = selectionStart + (untabbedText.length - text.length)
+			// 	text = untabbedText
+			// }
 			// ----------------------------
 
 			editor.updateShape<TLUnknownShape & { props: { text: string } }>({
