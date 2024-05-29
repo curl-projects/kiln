@@ -35,8 +35,8 @@ const CustomToolbar = track(() => {
 					<PiPencilSimpleFill />
 				</ToolbarButton>
 				<ToolbarButton 
-					handleClick={() => editor.setCurrentTool('richText')} 
-					active={editor.getCurrentToolId() === 'richText'}>
+					handleClick={() => editor.setCurrentTool('tiptap')} 
+					active={editor.getCurrentToolId() === 'tiptapcl'}>
 					<PiTextTBold />
 				</ToolbarButton>
 				<ToolbarButton 

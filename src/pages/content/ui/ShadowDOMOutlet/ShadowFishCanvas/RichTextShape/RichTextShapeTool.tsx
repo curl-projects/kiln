@@ -4,9 +4,9 @@ import { Pointing } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/Ric
 
 /** @public */
 export class RichTextShapeTool extends StateNode {
-	static override id = 'richText'
+	static override id = 'tiptap'
 	static override initial = 'idle'
 	static override children = () => [Idle, Pointing]
-	override shapeType = 'richText'
+	override shapeType = 'tiptap'
 }
 

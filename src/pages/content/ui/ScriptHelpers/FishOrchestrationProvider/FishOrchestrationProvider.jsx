@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 // Create the context
 const FishContext = createContext();
@@ -35,8 +35,10 @@ class EventEmitter {
 const fishOrchestrator = new EventEmitter();
 
 export default function FishOrchestrationProvider({ children }) {
+    const [fishConfig, setFishConfig] = useState(['researcher'])
+     // 'planner', 'optimist', 'critic'
     return (
-        <FishContext.Provider value={{ fishOrchestrator }}>
+        <FishContext.Provider value={{ fishOrchestrator, fishConfig, setFishConfig }}>
             {children}
         </FishContext.Provider>
     );

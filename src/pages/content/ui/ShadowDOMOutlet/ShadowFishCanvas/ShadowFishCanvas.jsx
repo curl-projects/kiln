@@ -13,14 +13,16 @@ import { FishShapeUtil } from './FishShape/FishShape.tsx'
 import { ContentShapeUtil } from './ContentShape/ContentShape.tsx'
 import { RichTextShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeUtil.tsx"
 
+import { TipTapShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/TipTapShape/TipTapShapeUtil.tsx"
+
 // import text tool
 
 import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeTool.tsx"
-// import { }
+import { IFrameShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/IFrameShape/IFrameShape"
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
-  const customShapeUtils = [FishShapeUtil, ContentShapeUtil, RichTextShapeUtil]
+  const customShapeUtils = [FishShapeUtil, ContentShapeUtil, IFrameShapeUtil, TipTapShapeUtil]
   const customTools = [
     RichTextShapeTool
 ]
@@ -33,7 +35,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
   const uiOverrides = {
     tools(editor, tools){
-       console.log("TOOLS:", tools)
 
       //  tools.select = {
       //   ...tools.select,
@@ -65,13 +66,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
   // }, [selectedShapes])
 
 
-  useEffect(()=>{
-    console.log("TEXT CREATED:", textCreated)
-  }, [textCreated])
-
-  useEffect(()=>{
-    console.log("SELECTED SHAPES:", selectedShapes)
-  }, [selectedShapes])
 
   useEffect(()=>{
     // console.log("SELECTED SHAPES:", selectedShapes)
@@ -159,10 +153,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
         for (const record of Object.values(change.changes.added)) {
             if (record.typeName === 'shape') {
                 console.log(`created shape (${record.type})\n`)
-                console.log("RECORD:", record)
-                console.log("HI FINN!")
                 if(record.type === 'richText'){
-                  console.log("HI AGAIN FINN!")
                     setTextCreated(record)
                 }
             }
@@ -191,14 +182,13 @@ export default function ShadowCanvas({ parsedContent, article }) {
                         []
                     )
                 }
-                console.log("UPDATED SHAPE:", diff)
-                logChangeEvent(`updated shape (${JSON.stringify(diff)})\n`)
+                console.log("update shape:", diff)
             }
         }
 
         for (const record of Object.values(change.changes.removed)) {
             if (record.typeName === 'shape') {
-                logChangeEvent(`deleted shape (${record.type})\n`)
+              console.log("deleted shape:", (record.type))
             }
         }
     }
@@ -251,7 +241,8 @@ export default function ShadowCanvas({ parsedContent, article }) {
         editor.createShapes(
             [
                 {type: 'content', props: { content: article?.title ? article.title : "Untitled", contentType: 'header'}},
-                {type: 'content', props: { content: article?.siteName ? article.siteName : "No site", contentType: 'paragraph'}}
+                {type: 'content', props: { content: article?.siteName ? article.siteName : "No site", contentType: 'paragraph'}},
+                // {type: 'iFrame', props: {}}
             ]   
         )
       }}

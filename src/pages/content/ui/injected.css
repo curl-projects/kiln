@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap");
 @import url("tldraw/tldraw.css");
+/* @import url("tiptap-extension-upload-image/dist/upload-image.min.css"); */
 
 .basePanel{
     border: 2px solid #EEEEEC;
@@ -30,6 +31,22 @@
   border: 1px solid #ffffff59;
   border: 10px solid black;
   z-index: 2147483647;
+}
+
+.goals-extension-dropdown-item{
+    padding: 4px 8px;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-radius: 4;
+		cursor: pointer;
+    pointer-events: all;
+    transition: all 0.5s ease-in-out;
+    z-index: 2147483647;
+}
+
+
+.goals-extension-dropdown-item:hover{
+ color: pink;
 }
 
 @keyframes ripple-effect {

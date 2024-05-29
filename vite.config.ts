@@ -18,6 +18,7 @@ export default defineConfig({
       '@src': srcDir,
       '@assets': resolve(srcDir, 'assets'),
       '@pages': pagesDir,
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   plugins: [...getPlugins(isDev), react()],
@@ -30,6 +31,7 @@ export default defineConfig({
     modulePreload: false,
     reportCompressedSize: isProduction,
     emptyOutDir: !isDev,
+    
     rollupOptions: {
       input: {
         devtools: resolve(pagesDir, 'devtools', 'index.html'),

@@ -2,8 +2,8 @@ import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvid
 import { useEffect, useState, useRef } from "react";
 import FishAgentPersistent from "@pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
 
-export default function FishSwarm({ fishConfig }) {
-    const { fishOrchestrator } = useFish();
+export default function FishSwarm() {
+    const { fishOrchestrator, fishConfig } = useFish();
     const [fishTransforms, setFishTransforms] = useState(() => generateNonOverlappingPositions(fishConfig.length));
     const fishRefs = fishConfig.map(() => useRef(null));
     const fishHeadOffset = { x: -32.5, y: -32.5 }; // Adjust these values based on the dimensions of the fish's head

@@ -42,10 +42,7 @@ export default function App() {
           {/* <div className="centered-text-wrapper" style={styles.centeredTextWrapper}>
             <div className="centered-text" style={styles.centeredText}>Hello Text</div>
           </div> */}
-        <FishSwarm fishConfig={['researcher', 
-        // 'planner', 'optimist', 'critic'
-      ]}
-        />
+        <FishSwarm />
         <CaptureHighlight />
       </div>
   );

@@ -25,7 +25,7 @@ export class Pointing extends StateNode {
 			this.editor.createShapes([
 				{
 					id,
-					type: 'richText',
+					type: 'tiptap',
 					x: originPagePoint.x,
 					y: originPagePoint.y,
 					props: {
@@ -75,14 +75,14 @@ export class Pointing extends StateNode {
 	}
 
 	private complete() {
-		this.editor.mark('creating richText shape')
+		this.editor.mark('creating tiptap shape')
 		const id = createShapeId()
 		const { x, y } = this.editor.inputs.currentPagePoint
 		this.editor
 			.createShapes([
 				{
 					id,
-					type: 'richText',
+					type: 'tiptap',
 					x,
 					y,
 					props: {
