@@ -33,10 +33,10 @@ export const useTipTap = (props: useTipTapProps, handleChange: any, size: any) =
         class: `prose prose-sm prose-zinc dark:prose-invert w-full h-full p-4 focus:outline-none !max-w-full ${className}`,
       },
     },
-    // onUpdate: ({ editor }) => {
-    //   // console.log("UPDATE!", size)
-    //   // handleChange(editor.getHTML(), size);
-    // },
+    onUpdate: ({ editor }) => {
+      console.log("UPDATE!",)
+      handleChange(editor.getHTML(), size);
+    },
     ...rest,
   });
 

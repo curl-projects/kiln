@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState, useCallback } from 'react';
+import React, { memo, useEffect, useRef, useState, useCallback } from 'react';
 import { useTipTap } from './useTipTap';
 import { Loading } from "./Loading";
 import { EditorContent, EditorOptions } from '@tiptap/react';
@@ -29,25 +29,24 @@ export const TipTap = memo((props: TipTapProps) => {
 
   const { editor } = useTipTap(props, handleChange, size);
 
-  useEffect(()=>{
-    console.log("SIZE:", size)
-  }, [size])
-  
+  useEffect(() => {
+    if (editor && props.isEditing) {
+      editor.commands.focus();
+    }
+  }, [props.isEditing, editor]);
 
   const resizeEditor = useCallback(() => {
-    if (ref.current) {
-      const { offsetHeight, offsetWidth } = ref.current;
-      console.log("REF CURRENT:", offsetHeight, offsetWidth, ref.current)
-      const newSize = { width: offsetWidth, height: offsetHeight };
+    if (editor) {
+      const dom = editor.view.dom;
+      const newSize = { width: dom.scrollWidth, height: dom.scrollHeight };
       setSize(newSize);
     }
-  }, [ref.current]);
+  }, [editor]);
 
   useEffect(() => {
-    if(editor && size){
+    if (editor && size) {
       handleChange(editor.getHTML(), size);
     }
-    
   }, [size, editor]);
 
   useEffect(() => {
@@ -72,26 +71,6 @@ export const TipTap = memo((props: TipTapProps) => {
   }
 
   return (
-    <div
-      ref={ref}
-      style={{
-        position: 'relative',
-        // display: 'flex',
-        overflow: 'visible',
-        // justifyContent: 'flex-start',
-        boxSizing: "border-box",
-        lineHeight: `${props.fontSize * props.lineHeight}px`,
-        // minHeight: 8,
-        // minHeight: `${props.fontSize * props.lineHeight + 32}px`,
-        // minWidth: props.width || 0,
-        // width: 'fit-content',
-        // height: 'fit-content',
-        border: '2px solid black',
-        // padding: '10px',
-        // padding: '1rem', // Replacing Tailwind with inline style
-      }}
-    >
-      <EditorContent editor={editor} />
-    </div>
+  <EditorContent ref={ref} editor={editor} />
   );
 });

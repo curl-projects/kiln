@@ -52,8 +52,8 @@ import {
   
     getDefaultProps(): TipTapNode['props'] {
       return {
-        w: 300,
-        h: 300,
+        w: 8,
+        h: 8,
         text: '',
         autoSize: true,
         fontSize: 14,
@@ -71,7 +71,8 @@ import {
     getGeometry(shape: TipTapNode) {
       const { scale } = shape.props;
       console.log("GEOMETRY DIMS:", shape.props.w, shape.props.h)
-    //   const { width, height } = this.getMinDimensions(shape)!;
+      const { width, height } = this.getMinDimensions(shape)!;
+      console.log("WIDTH:", width, "HEIGHT:", height)
       return new Rectangle2d({
         width: shape.props.w * scale,
         height: shape.props.h * scale,
@@ -194,7 +195,7 @@ import {
           overflow: 'hidden',
           fontSize: '14px',
           border: '2px solid green',
-          
+          whiteSpace: 'nowrap',          
         }} >
           <TipTap 
             id={shape.id}
