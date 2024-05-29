@@ -66,14 +66,14 @@ import {
   
 		if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
 		  editor.complete();
-		}
+		}e
 	  },
 	  [editor, id]
 	);
   
 	const handleChange = useCallback(
 	  (htmlText: string, size: any) => {
-		console.log("HANDLE CHANGE!")
+		console.log("HANDLE CHANGE!", size, htmlText)
 		if (editor.getEditingShapeId() !== id) return;
   
 		editor.updateShape<TLUnknownShape & { props: { text: string, w: number, h: number } }>({

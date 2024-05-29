@@ -70,6 +70,7 @@ import {
   
     getGeometry(shape: TipTapNode) {
       const { scale } = shape.props;
+      console.log("GEOMETRY DIMS:", shape.props.w, shape.props.h)
     //   const { width, height } = this.getMinDimensions(shape)!;
       return new Rectangle2d({
         width: shape.props.w * scale,
@@ -100,62 +101,62 @@ import {
       }
     }
   
-    override onBeforeUpdate = (prev: TipTapNode, next: TipTapNode) => {
-        console.log("BEFORE UPDATE!")
-    //   if (!next.props.autoSize) return;
+    // override onBeforeUpdate = (prev: TipTapNode, next: TipTapNode) => {
+    //     console.log("BEFORE UPDATE!")
+    // //   if (!next.props.autoSize) return;
   
-      const styleDidChange =
-        prev.props.size !== next.props.size ||
-        prev.props.align !== next.props.align ||
-        prev.props.font !== next.props.font ||
-        (prev.props.scale !== 1 && next.props.scale === 1);
+    //   const styleDidChange =
+    //     prev.props.size !== next.props.size ||
+    //     prev.props.align !== next.props.align ||
+    //     prev.props.font !== next.props.font ||
+    //     (prev.props.scale !== 1 && next.props.scale === 1);
   
-      const textDidChange = prev.props.text !== next.props.text;
+    //   const textDidChange = prev.props.text !== next.props.text;
   
-      if (!styleDidChange && !textDidChange) return;
+    //   if (!styleDidChange && !textDidChange) return;
   
-      const boundsA = this.getMinDimensions(prev);
-      const boundsB = getTextSize(this.editor, next.props);
+    //   const boundsA = this.getMinDimensions(prev);
+    //   const boundsB = getTextSize(this.editor, next.props);
   
-      const wA = boundsA.width * prev.props.scale;
-      const hA = boundsA.height * prev.props.scale;
-      const wB = boundsB.width * next.props.scale;
-      const hB = boundsB.height * next.props.scale;
+    //   const wA = boundsA.width * prev.props.scale;
+    //   const hA = boundsA.height * prev.props.scale;
+    //   const wB = boundsB.width * next.props.scale;
+    //   const hB = boundsB.height * next.props.scale;
   
-      let delta: Vec | undefined;
+    //   let delta: Vec | undefined;
   
-      switch (next.props.align) {
-        case 'middle': {
-          delta = new Vec((wB - wA) / 2, textDidChange ? 0 : (hB - hA) / 2);
-          break;
-        }
-        case 'end': {
-          delta = new Vec(wB - wA, textDidChange ? 0 : (hB - hA) / 2);
-          break;
-        }
-        default: {
-          if (textDidChange) break;
-          delta = new Vec(0, (hB - hA) / 2);
-          break;
-        }
-      }
+    //   switch (next.props.align) {
+    //     case 'middle': {
+    //       delta = new Vec((wB - wA) / 2, textDidChange ? 0 : (hB - hA) / 2);
+    //       break;
+    //     }
+    //     case 'end': {
+    //       delta = new Vec(wB - wA, textDidChange ? 0 : (hB - hA) / 2);
+    //       break;
+    //     }
+    //     default: {
+    //       if (textDidChange) break;
+    //       delta = new Vec(0, (hB - hA) / 2);
+    //       break;
+    //     }
+    //   }
   
-      if (delta) {
-        delta.rot(next.rotation);
-        const { x, y } = next;
-        return {
-          ...next,
-          x: x - delta.x,
-          y: y - delta.y,
-          props: { ...next.props, w: wB, h: hB },
-        };
-      } else {
-        return {
-          ...next,
-          props: { ...next.props, w: wB, h: hB },
-        };
-      }
-    }
+    //   if (delta) {
+    //     delta.rot(next.rotation);
+    //     const { x, y } = next;
+    //     return {
+    //       ...next,
+    //       x: x - delta.x,
+    //       y: y - delta.y,
+    //       props: { ...next.props, w: wB, h: hB },
+    //     };
+    //   } else {
+    //     return {
+    //       ...next,
+    //       props: { ...next.props, w: wB, h: hB },
+    //     };
+    //   }
+    // }
   
     override onDoubleClickEdge = (shape: TipTapNode) => {
       if (!shape.props.autoSize) {
@@ -183,28 +184,17 @@ import {
       const isEditing = useIsEditing(shape.id);
       const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
   
-      const handleSizeChange = (size: { width: number, height: number }) => {
-        this.editor.updateShapes([
-          {
-            id: shape.id,
-            type: shape.type,
-            props: { w: size.width, h: size.height },
-          },
-        ]);
-      };
-  
       return (
         <HTMLContainer id={shape.id} style={{
           position: 'relative',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 'auto',
-          height: 'auto',
+          display: 'grid',
+          height: 'fit-content',
+          width: 'fit-content',
+          boxSizing: 'border-box',
           overflow: 'hidden',
           fontSize: '14px',
-          cursor: 'auto',
           border: '2px solid green',
+          
         }} >
           <TipTap 
             id={shape.id}
@@ -216,21 +206,20 @@ import {
             height={shape.props.h}
             fontSize={shape.props.fontSize}
             lineHeight={TEXT_PROPS.lineHeight}
-            onSizeChange={handleSizeChange}
           />
         </HTMLContainer>
       );
     }
   
     indicator(shape: TipTapNode) {
-        const finnShape = this.editor.getShapeGeometry(shape);
+      console.log("SHAPE DIMS:", shape.props.w, shape.props.h)
 
       const bounds = this.editor.getShapeGeometry(shape).bounds;
 
       console.log("BOUNDS:", bounds)
       const editor = useEditor();
     //   if (shape.props.autoSize && editor.getEditingShapeId() === shape.id) return null;
-      return <rect width={toDomPrecision(shape.props.w)} height={toDomPrecision(shape.props.h)} />;
+      return <rect width={toDomPrecision(bounds.width)} height={toDomPrecision(bounds.height)} />;
     }
   
     override onResize: TLOnResizeHandler<TipTapNode> = (shape, info) => {

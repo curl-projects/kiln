@@ -92,3 +92,8 @@ svg.moving {
 svg.slowMoving {
   animation: skewAnimationStopped 0.3s infinite ease-in-out;
 }
+
+/* EDITOR */
+.tiptap p {
+  margin: 0;
+}
