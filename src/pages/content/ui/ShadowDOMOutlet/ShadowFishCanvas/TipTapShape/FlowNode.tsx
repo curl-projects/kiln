@@ -2,7 +2,7 @@
 
 // import { toPng } from "html-to-image";
 // import * as yup from 'yup';
-import { BaseBoxShapeUtil, SvgExportContext, TLBaseBoxShape } from "tldraw";
+import { BaseBoxShapeUtil, SvgExportContext, TLBaseBoxShape,  } from "tldraw";
 // import { NodeSchemaMappings } from '@/components';
 
 export abstract class FlowNodeUtil<Shape extends TLBaseBoxShape> extends BaseBoxShapeUtil<Shape> {

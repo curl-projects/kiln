@@ -17,14 +17,14 @@ import { TipTapShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCan
 
 // import text tool
 
-import { RichTextShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/RichTextShapeTool.tsx"
+import { TipTapShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/TipTapShape/TipTapShapeTool.tsx"
 import { IFrameShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/IFrameShape/IFrameShape"
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
   const customShapeUtils = [FishShapeUtil, ContentShapeUtil, IFrameShapeUtil, TipTapShapeUtil]
   const customTools = [
-    RichTextShapeTool
+    TipTapShapeTool
 ]
   const customComponents = {
     Toolbar: null,

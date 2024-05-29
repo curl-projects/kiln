@@ -87,7 +87,7 @@ export class RichTextShapeUtil extends ShapeUtil<TLTextShape> {
 			<TextLabel
 				id={id}
 				classNamePrefix="tl-richText-shape"
-				type="text"
+				type="richText"
 				font={font}
 				fontSize={FONT_SIZES[size]}
 				lineHeight={TEXT_PROPS.lineHeight}

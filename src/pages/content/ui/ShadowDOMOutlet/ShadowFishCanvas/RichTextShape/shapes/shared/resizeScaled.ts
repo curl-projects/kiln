@@ -1,7 +1,8 @@
 import { Box, TLShape, Vec, VecModel } from '@tldraw/editor'
+import { TipTapNode  } from '../../../TipTapShape/TipTapShapeUtil'
 
 export function resizeScaled(
-	shape: Extract<TLShape, { props: { scale: number } }>,
+	shape: Extract<TipTapNode, { props: { scale: number } }>,
 	{
 		initialBounds,
 		scaleX,
