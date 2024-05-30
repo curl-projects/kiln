@@ -5,35 +5,34 @@ const FishHighlight = Extension.create({
   name: 'fishHighlight',
 
   addNodeView() {
-    console.log("addNodeView called");
+    console.log('addNodeView called');
     return ReactNodeViewRenderer(FishNode);
-},
+  },
 
-addGlobalAttributes() {
-    console.log("addGlobalAttributes called");
+  addGlobalAttributes() {
+    console.log('addGlobalAttributes called');
     return [
-        {
-            types: ['paragraph'], // Simplify to very common types
-            attributes: {
-                dataFish: {
-                    default: null,
-                    parseHTML: element => element.getAttribute('data-fish'),
-                    renderHTML: attributes => {
-                        if (!attributes.dataFish) {
-                            return {};
-                        }
-                        return { 'data-fish': attributes.dataFish };
-                    },
-                },
+      {
+        types: ['paragraph'], // Simplify to very common types
+        attributes: {
+          dataFish: {
+            default: null,
+            parseHTML: element => element.getAttribute('data-fish'),
+            renderHTML: attributes => {
+              if (!attributes.dataFish) {
+                return {};
+              }
+              return { 'data-fish': attributes.dataFish };
             },
+          },
         },
+      },
     ];
-},
+  },
 });
 
-
 const FishNode = ({ node }) => {
-  console.log("FISH NODE RENDERED");
+  console.log('FISH NODE RENDERED');
   return <div>Static Test Content</div>;
 };
 

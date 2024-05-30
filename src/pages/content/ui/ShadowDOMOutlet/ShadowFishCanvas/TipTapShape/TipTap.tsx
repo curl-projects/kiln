@@ -1,11 +1,11 @@
 import React, { memo, useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useTipTap } from './useTipTap';
-import { Loading } from "./Loading";
+import { Loading } from './Loading';
 import { EditorContent, EditorOptions } from '@tiptap/react';
 import { useEditableText } from './useEditableText';
-import { TLShapeId } from "tldraw";
+import { TLShapeId } from 'tldraw';
 import { ResizableBox } from 'react-resizable';
-import { stopEventPropagation } from '@tldraw/editor'; 
+import { stopEventPropagation } from '@tldraw/editor';
 import { useEditor } from '@tiptap/react';
 import { Document } from '@tiptap/extension-document';
 import { Paragraph } from '@tiptap/extension-paragraph';
@@ -38,9 +38,8 @@ export const TipTap = memo((props: TipTapProps) => {
   //   if(editor){
   //     handleChange(editor.getHTML(), size);
   //   }
-    
-  // }, [size])
 
+  // }, [size])
 
   const editor = useEditor({
     extensions: [
@@ -51,7 +50,7 @@ export const TipTap = memo((props: TipTapProps) => {
       // Placeholder.configure({
       //   placeholder: 'Start typing...',
       // }),
-        // Add your custom extension here
+      // Add your custom extension here
       // ...extensions,
     ],
     content: props.content,
@@ -62,11 +61,11 @@ export const TipTap = memo((props: TipTapProps) => {
     //   },
     // },
     onUpdate: ({ editor }) => {
-      console.log("handling change!")
-      const dom = editor.view.dom;
-      const newSize = { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 };
-      console.log("handling change! New size:", newSize)
-      handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+      // console.log('handling change!');
+      // const dom = editor.view.dom;
+      // const newSize = { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 };
+      // console.log('handling change! New size:', newSize);
+      // handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
     },
 
     // ...rest,
@@ -74,9 +73,34 @@ export const TipTap = memo((props: TipTapProps) => {
 
   // const { editor } = useTipTap(props, handleChange, size);
 
+  // useEffect(()=>{
+  //   if(editor){
+  //     const dom = editor.view.dom;
+  //     handleChange(editor.getHTML(), { width: dom.scrollWidth + 14, height: dom.scrollHeight + 14 });
+  //   }
+  // }, [props.isEditing])
+
+  const resizeEditor = useCallback(() => {
+    if(editor){
+      const dom = editor.view.dom;
+      handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+    }
+  }, [editor])
+
+  useLayoutEffect(() => {
+    if(editor){
+      editor.on('update', resizeEditor);
+    }
+
+    if(!props.isSelected){
+      resizeEditor();
+    }
+  }, [editor, props.isSelected]);
+
   useEffect(() => {
     // stopEventPropagation;
     if (editor && props.isEditing) {
+      console.log("CHANGED",)
       const dom = editor.view.dom;
       // handleChange(editor.getHTML(), { width: dom.scrollWidth + 14, height: dom.scrollHeight + 14 });
       editor.commands.focus();
@@ -120,9 +144,10 @@ export const TipTap = memo((props: TipTapProps) => {
     return <Loading />;
   }
 
-  function handleResize(){
-    console.log("RESIZING!")
+  function handlePointerDown() {
+    console.log('Pointer Down!');
   }
+
 
   return (
     // <ResizableBox onResize={handleResize}
@@ -130,23 +155,24 @@ export const TipTap = memo((props: TipTapProps) => {
     //     border: '2px solid pink',
     //     // textWrap: props.isEditing ? "unset" : 'wrap',
     // }}>
-      <EditorContent 
-        ref={ref} 
-        editor={editor} 
-        onPointerDown={props.isEditing ? stopEventPropagation : undefined}
-        className='tiptapParent' 
-        style={{
-          border: "2px solid red", 
-          // height: `${props.height}px`,
-          // width: `${props.width}px`,
-          minWidth: 0, 
-          minHeight: 0, 
-          boxSizing: 'border-box',
-          // whiteSpace: 'pre-wrap'
-          whiteSpace: props.justCreated ? "unset" : 'pre-line',
-
-        }}/>
+    <EditorContent
+      ref={ref}
+      onPointerDown={handlePointerDown}
+      editor={editor}
+      // onPointerDown={props.isEditing ? stopEventPropagation : undefined}
+      className="tiptapParent"
+      style={{
+        border: '2px solid red',
+        // height: `${props.height}px`,
+        // width: `${props.width}px`,
+        minWidth: 0,
+        minHeight: 0,
+        boxSizing: 'border-box',
+        // overflowY: 'visible',
+        // whiteSpace: 'pre-wrap'
+        whiteSpace: props.justCreated ? 'unset' : 'pre-wrap',
+      }}
+    />
     // </ResizableBox>
   );
 });
-

@@ -5,18 +5,12 @@ import { Text } from '@tiptap/extension-text';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { TipTapProps } from './TipTap';
 import { useCallback } from 'react';
-import FishHighlight from './customExtensions/FishColorExtension';  // Import your custom extension
+import FishHighlight from './customExtensions/FishColorExtension'; // Import your custom extension
 
 export interface useTipTapProps extends Partial<TipTapProps> {}
 
 export const useTipTap = (props: useTipTapProps, handleChange: any, size: any) => {
-  const {
-    children,
-    content = '',
-    className,
-    extensions = [],
-    ...rest
-  } = props;
+  const { children, content = '', className, extensions = [], ...rest } = props;
 
   const editor = useEditor({
     extensions: [
@@ -27,7 +21,7 @@ export const useTipTap = (props: useTipTapProps, handleChange: any, size: any) =
       // Placeholder.configure({
       //   placeholder: 'Start typing...',
       // }),
-        // Add your custom extension here
+      // Add your custom extension here
       // ...extensions,
     ],
     content: content,
@@ -65,8 +59,6 @@ export const useTipTap = (props: useTipTapProps, handleChange: any, size: any) =
   //   const words = editor?.storage?.characterCount?.words();
   //   return { characters, words };
   // }, [editor]);
-
-
 
   // const getLinkAttributes = useCallback(() => editor?.getAttributes('link').href, [editor]);
 
