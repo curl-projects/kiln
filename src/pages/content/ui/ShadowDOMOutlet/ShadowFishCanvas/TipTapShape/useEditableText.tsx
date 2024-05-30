@@ -73,16 +73,15 @@ import {
   
 	const handleChange = useCallback(
 	  (htmlText: string, size: any) => {
-		// console.log("HANDLE CHANGE ID!", id)
-        // console.log("HANDLE CHANGE TYPE!", type)
-		if (editor.getEditingShapeId() !== id) return;
+		console.log("HANDLE CHANGE!", id)
+		// if (editor.getEditingShapeId() !== id) return;
   
 		editor.updateShape<TLUnknownShape & { props: { text: string, w: number, h: number } }>({
 		  id,
 		  type,
 		  props: { text: htmlText, w: size.width, h: size.height},
 		});
-		// console.log("UPDATED SHAPE:", size)
+		console.log("UPDATED SHAPE:", size)
 	  },
 	  [editor, id, type]
 	);

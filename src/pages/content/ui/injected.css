@@ -101,9 +101,20 @@ svg.slowMoving {
   /* width: fit-content; */
   box-sizing: border-box;
   border: 2px solid black;
-  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+/* white-space: pre-wrap; */
+  /* overflow-wrap: break-word;
+  word-wrap: break-word; */
+  
 }
 /* EDITOR */
 .tiptap p {
   margin: 0;
+}
+
+.fish-highlight {
+  background-color: pink;
 }

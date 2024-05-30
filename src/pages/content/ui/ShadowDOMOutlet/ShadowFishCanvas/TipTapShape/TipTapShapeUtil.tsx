@@ -17,7 +17,7 @@ import {
     TLOnResizeHandler,
   } from "@tldraw/editor";
   import { TipTap } from "./TipTap";
-  import { useCallback, useState } from 'react';
+  import { useCallback, useState, useEffect } from 'react';
   import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/default-shape-constants'
   import { resizeScaled } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/resizeScaled'
 
@@ -43,19 +43,19 @@ import {
     return {size, setSize}
   }
   
-  const sizeCache = new WeakMapCache<TipTapNode['props'], { width: number, height: number }>();
+  // const sizeCache = new WeakMapCache<TipTapNode['props'], { width: number, height: number }>();
   
   export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     static override type = 'tiptap' as const;
-    override canScroll = () => true;
+    // override canScroll = () => true;
     override canEdit = () => true;
 
     // override isAspectRatioLocked: TLShapeUtilFlag<TipTapNode> = () => true;
   
     getDefaultProps(): TipTapNode['props'] {
       return {
-        w: 8,
-        h: 8,
+        w: 14,
+        h: 14,
         text: '',
         autoSize: true,
         fontSize: 14,
@@ -68,14 +68,14 @@ import {
       };
     }
   
-    getMinDimensions(shape: TipTapNode) {
-      return sizeCache.get(shape.props, (props) => getTextSize(this.editor, props));
-    }
+    // getMinDimensions(shape: TipTapNode) {
+    //   return sizeCache.get(shape.props, (props) => getTextSize(this.editor, props));
+    // }
   
     getGeometry(shape: TipTapNode) {
       const { scale } = shape.props;
       // console.log("GEOMETRY DIMS:", s`hape.props.w, shape.props.h)
-      const { width, height } = this.getMinDimensions(shape)!;
+      // const { width, height } = this.getMinDimensions(shape)!;
       // console.log("WIDTH:", width, "HEIGHT:", height)
       return new Rectangle2d({
         width: shape.props.w * scale,
@@ -86,6 +86,7 @@ import {
     }
   
     override onEditEnd: TLOnEditEndHandler<TipTapNode> = (shape) => {
+      console.log("EDIT END!")
       const { id, type, props: { text } } = shape;
       const trimmedText = text.trimEnd();
   
@@ -186,20 +187,54 @@ import {
     }
   
     component(shape: TipTapNode) {
-      const isEditing = useIsEditing(shape.id);
+      const [justCreated, setJustCreated] = useState(true);
+      // const isEditing = useIsEditing(shape.id);
+      const isEditing = this.editor.getEditingShapeId() === shape.id
       const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
+
+      // this.editor.store.listen((change) => {
+      //   console.log("CHANGE")
+      //   for (const record of Object.values(change.changes.added)) {
+      //     if (record.typeName === 'shape') {
+      //         console.log(`inner created shape (${record.type})\n`)
+      //         if(record.id === shape.id){
+      //             setJustCreated(true)
+      //         }
+      //     }
+      //    }
+      // })
+
+      useEffect(() => {
+        if(!isEditing){
+          console.log("NO LONGER EDITING")
+          setJustCreated(false)
+        }
+      }, [isEditing, setJustCreated])
+
+      useEffect(()=>{
+        console.log("JUST CREATED!", justCreated)
+      }, [justCreated])
+      // const isEditing = isSelected
+
+      console.log("IS EDITING:", isEditing)
+      console.log("SHAPE HEIGHT:", shape.props.h, "SHAPE WIDTH:", shape.props.w)
   
       return (
-        <HTMLContainer id={shape.id} style={{
+        <div id={shape.id} style={{
           position: 'relative',
           display: 'grid',
-          height: 'fit-content',
-          width: 'fit-content',
+          height: `${shape.props.h}px`,
+          width: `${shape.props.w}px`,
           boxSizing: 'border-box',
           overflow: 'hidden',
           fontSize: '14px',
           border: '2px solid green',
-          whiteSpace: 'nowrap',          
+          whiteSpace: 'nowrap',
+          // whiteSpace: isEditing ? 'nowrap' : 'pre-wrap',
+          
+          // wordWrap: 'normal',
+          // overflowWrap: 'anywhere',
+          // whiteSpace: (isEditing ) ? "nowrap" : 'pre-wrap', 
         }} >
           <TipTap 
             id={shape.id}
@@ -211,8 +246,9 @@ import {
             height={shape.props.h}
             fontSize={shape.props.fontSize}
             lineHeight={TEXT_PROPS.lineHeight}
+            justCreated={justCreated}
           />
-        </HTMLContainer>
+        </div>
       );
     }
   

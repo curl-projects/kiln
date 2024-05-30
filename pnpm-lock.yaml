@@ -254,6 +254,9 @@ dependencies:
   prosemirror-state:
     specifier: ^1.4.3
     version: 1.4.3
+  prosemirror-view:
+    specifier: ^1.33.6
+    version: 1.33.6
   react:
     specifier: 18.2.0
     version: 18.2.0
