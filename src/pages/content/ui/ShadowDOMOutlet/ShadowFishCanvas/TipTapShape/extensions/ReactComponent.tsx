@@ -1,5 +1,3 @@
-'use client'
-
 import { mergeAttributes, Node } from '@tiptap/core'
 import { ReactNodeViewRenderer, NodeViewContent, NodeViewWrapper } from '@tiptap/react'
 

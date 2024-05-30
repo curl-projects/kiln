@@ -64,7 +64,7 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
 
   const handleChange = useCallback(
     (htmlText: string, size: any) => {
-      console.log('HANDLE CHANGE!', id);
+    //   console.log('HANDLE CHANGE!', id);
       // if (editor.getEditingShapeId() !== id) return;
 
       editor.updateShape<TLUnknownShape & { props: { text: string; w: number; h: number } }>({
@@ -72,13 +72,14 @@ export function useEditableText(id: TLShapeId, type: string, text: string) {
         type,
         props: { text: htmlText, w: size.width, h: size.height },
       });
-      console.log('UPDATED SHAPE:', size);
+    //   console.log('UPDATED SHAPE:', size);
     },
     [editor, id, type],
-  );
+);
 
   const handleInputPointerDown = useCallback(
     (e: React.PointerEvent) => {
+		console.log("HELLO!")
       editor.dispatch({
         ...getPointerInfo(e),
         type: 'pointer',

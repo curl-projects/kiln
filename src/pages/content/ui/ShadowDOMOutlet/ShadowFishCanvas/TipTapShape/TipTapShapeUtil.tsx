@@ -9,7 +9,10 @@ import {
   ShapeUtil,
   TLShapeUtilFlag,
   TLOnResizeHandler,
+  stopEventPropagation,
 } from '@tldraw/editor';
+import { useEditableText } from './useEditableText';
+
 import { TipTap } from './TipTap';
 import { useCallback, useState, useEffect } from 'react';
 import {
@@ -84,7 +87,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
   }
 
   override onEditEnd: TLOnEditEndHandler<TipTapNode> = shape => {
-    console.log('EDIT END!');
+    // console.log('EDIT END!');
     const {
       id,
       type,
@@ -190,6 +193,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
 
   component(shape: TipTapNode) {
     const [justCreated, setJustCreated] = useState(true);
+    const { handleChange, handleInputPointerDown } = useEditableText(shape.id, 'tiptap', shape.props.text);
     // const isEditing = useIsEditing(shape.id);
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
@@ -208,22 +212,23 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
 
     useEffect(() => {
       if (!isEditing) {
-        console.log('NO LONGER EDITING');
+        // console.log('NO LONGER EDITING');
         setJustCreated(false);
       }
     }, [isEditing, setJustCreated]);
 
-    useEffect(() => {
-      console.log('JUST CREATED!', justCreated);
-    }, [justCreated]);
-    // const isEditing = isSelected
+    // useEffect(() => {
+    //   console.log('JUST CREATED!', justCreated);
+    // }, [justCreated]);
 
-    console.log('IS EDITING:', isEditing);
-    console.log('SHAPE HEIGHT:', shape.props.h, 'SHAPE WIDTH:', shape.props.w);
+    // console.log('IS EDITING:', isEditing);
+    // console.log('IS SELECTED:', isSelected);
+    // console.log('SHAPE HEIGHT:', shape.props.h, 'SHAPE WIDTH:', shape.props.w);
 
     return (
       <div
         id={shape.id}
+        onKeyDown={stopEventPropagation}
         style={{
           position: 'relative',
           display: 'grid',
@@ -236,6 +241,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
           whiteSpace: 'nowrap',
           fontFamily: "HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif",
           fontWeight: 550,
+          pointerEvents: 'none'
 
           // whiteSpace: isEditing ? 'nowrap' : 'pre-wrap',
 
@@ -247,6 +253,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
           id={shape.id}
           type="tiptap"
           content={shape.props.text}
+          handleChange={handleChange}
           isEditing={isEditing}
           isSelected={isSelected}
           width={shape.props.w}
@@ -271,8 +278,8 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
   }
 
   override onResize: TLOnResizeHandler<TipTapNode> = (shape, info) => {
-    console.log('\n');
-    console.log('RESIZING HAPPENING!', info);
+    // console.log('\n');
+    // console.log('RESIZING HAPPENING!', info);
 
     const { newPoint, initialBounds, initialShape, scaleX, scaleY, handle } = info;
 
@@ -286,7 +293,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     const nextWidth = Math.max(1, Math.abs(initialBounds.width * scaleX));
     const nextHeight = Math.max(1, Math.abs(initialBounds.height * scaleY));
 
-    console.log('NEXT WIDTH:', nextWidth, 'NEXT HEIGHT:', nextHeight);
+    // console.log('NEXT WIDTH:', nextWidth, 'NEXT HEIGHT:', nextHeight);
     const { x, y } = scaleX < 0 ? Vec.Sub(newPoint, Vec.FromAngle(shape.rotation).mul(nextWidth)) : newPoint;
 
     return {

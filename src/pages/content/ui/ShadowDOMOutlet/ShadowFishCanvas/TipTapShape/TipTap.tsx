@@ -10,6 +10,8 @@ import { useEditor } from '@tiptap/react';
 import { Document } from '@tiptap/extension-document';
 import { Paragraph } from '@tiptap/extension-paragraph';
 import { Text } from '@tiptap/extension-text';
+// import Mention from '@tiptap/extension-mention'
+import suggestion, { CustomMention } from './customExtensions/suggestion'
 
 export interface TipTapProps extends Partial<EditorOptions> {
   children?: any;
@@ -26,11 +28,11 @@ export interface TipTapProps extends Partial<EditorOptions> {
   type: string;
   isSelected?: any;
   justCreated: any;
+  handleChange: any;
 }
 
 export const TipTap = memo((props: TipTapProps) => {
   const { toolbar = false } = props;
-  const { handleChange } = useEditableText(props.id, props.type, props.content);
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: props.width, height: props.height });
 
@@ -46,7 +48,32 @@ export const TipTap = memo((props: TipTapProps) => {
       Document,
       Paragraph,
       Text,
-      // FishHighlight,
+      CustomMention.configure({
+        HTMLAttributes: {
+          class: 'mention',
+          style: {
+            border: '1px solid pink',
+          }
+        },
+        suggestion: {
+          ...suggestion,
+          items: ({ query }) => {
+            return [
+              'finn',
+              'josh',
+              'tess'
+            ]
+              .filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
+              .slice(0, 5)
+          } 
+        },
+      
+      }),
+
+      // .configure({
+      //   keywords: ['finn'],  // Customize your keywords
+      //   color: 'yellow'  // Customize the highlight color
+      // }),
       // Placeholder.configure({
       //   placeholder: 'Start typing...',
       // }),
@@ -57,18 +84,14 @@ export const TipTap = memo((props: TipTapProps) => {
 
     // editorProps: {
     //   attributes: {
-    //     // class: `prose prose-sm prose-zinc dark:prose-invert w-full h-full p-4 focus:outline-none !max-w-full ${className}`,
+    //     class: `goals-extension-editor`,
     //   },
     // },
     onUpdate: ({ editor }) => {
-      // console.log('handling change!');
-      // const dom = editor.view.dom;
-      // const newSize = { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 };
-      // console.log('handling change! New size:', newSize);
-      // handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+      stopEventPropagation;
     },
-
-    // ...rest,
+    onSelectionUpdate: ({ editor }) => {
+    }
   });
 
   // const { editor } = useTipTap(props, handleChange, size);
@@ -80,10 +103,14 @@ export const TipTap = memo((props: TipTapProps) => {
   //   }
   // }, [props.isEditing])
 
+  useEffect(()=>{
+    console.log("JUST CREATED!", props.justCreated)
+  }, [props.justCreated])
+
   const resizeEditor = useCallback(() => {
     if(editor){
       const dom = editor.view.dom;
-      handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+      props.handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
     }
   }, [editor])
 
@@ -95,74 +122,31 @@ export const TipTap = memo((props: TipTapProps) => {
     if(!props.isSelected){
       resizeEditor();
     }
-  }, [editor, props.isSelected]);
+  }, [editor, props.isSelected, resizeEditor]);
 
   useEffect(() => {
-    // stopEventPropagation;
     if (editor && props.isEditing) {
-      console.log("CHANGED",)
+      // console.log("CHANGED",)
+      stopEventPropagation;
       const dom = editor.view.dom;
-      // handleChange(editor.getHTML(), { width: dom.scrollWidth + 14, height: dom.scrollHeight + 14 });
       editor.commands.focus();
-      // stopEventPropagation;
+      
     }
   }, [props.isEditing, editor]);
-
-  // const resizeEditor = useCallback(() => {
-  //   if (editor) {
-  //     const dom = editor.view.dom;
-  //     console.log("DOM:", dom)
-  //     const newSize = { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 };
-  //     setSize(newSize);
-  //   }
-  // }, [editor]);
-
-  // useLayoutEffect(() => {
-  //   if (editor && size) {
-  //     handleChange(editor.getHTML(), size);
-  //   }
-  // }, [size, editor]);
-
-  // useLayoutEffect(() => {
-  //   if (editor) {
-  //     editor.on('update', resizeEditor);
-  //     editor.commands.focus();
-  //   }
-
-  //   return () => {
-  //     if (editor) {
-  //       editor.off('update', resizeEditor);
-  //     }
-  //   };
-  // }, [editor, resizeEditor]);
-
-  // useLayoutEffect(() => {
-  //   resizeEditor();
-  // }, [props.content, resizeEditor]);
 
   if (!editor) {
     return <Loading />;
   }
 
-  function handlePointerDown() {
-    console.log('Pointer Down!');
-  }
-
 
   return (
-    // <ResizableBox onResize={handleResize}
-    //   style={{
-    //     border: '2px solid pink',
-    //     // textWrap: props.isEditing ? "unset" : 'wrap',
-    // }}>
     <EditorContent
       ref={ref}
-      onPointerDown={handlePointerDown}
       editor={editor}
-      // onPointerDown={props.isEditing ? stopEventPropagation : undefined}
       className="tiptapParent"
       style={{
         border: '2px solid red',
+        pointerEvents: 'all',
         // height: `${props.height}px`,
         // width: `${props.width}px`,
         minWidth: 0,
@@ -170,9 +154,87 @@ export const TipTap = memo((props: TipTapProps) => {
         boxSizing: 'border-box',
         // overflowY: 'visible',
         // whiteSpace: 'pre-wrap'
-        whiteSpace: props.justCreated ? 'unset' : 'pre-wrap',
+        whiteSpace: props.justCreated ? 'pre' : 'pre-line',
       }}
     />
-    // </ResizableBox>
   );
 });
+
+
+// export default HighlightExtension;
+
+// import { Mark, mergeAttributes } from '@tiptap/core'
+
+// export const Highlight = Mark.create({
+//   name: 'highlight',
+
+//   addOptions() {
+//     return {
+//       multicolor: false,
+//       HTMLAttributes: {},
+//     }
+//   },
+
+//   addAttributes() {
+//     return {
+//       color: {
+//         default: 'pink',
+//         renderHTML: attributes => {
+//           return { style: `background-color: ${attributes.color}` }
+//         },
+//         parseHTML: element => ({
+//           color: element.style.backgroundColor,
+//         }),
+//       },
+//     }
+//   },
+
+//   parseHTML() {
+//     return [
+//       {
+//         tag: 'span[style*="background-color"]',
+//         getAttrs: node => node.style.backgroundColor === this.options.HTMLAttributes.style.backgroundColor,
+//       },
+//     ]
+//   },
+
+//   renderHTML({ HTMLAttributes }) {
+//     return ['span', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
+//   },
+// })
+
+// // Function to apply highlight to 'finn'
+// export function applyHighlight(editor) {
+//   const transaction = editor.state.tr;
+//   let hasChange = false;
+
+//   editor.state.doc.descendants((node, pos) => {
+//     if (node.isText) {
+//       const regex = /\b(finn)(\s|\b|,|\.|!|\?)/gi; // Adjusted to match spaces or punctuation after "finn"
+//       let match;
+//       let lastIndex = 0;
+
+//       while ((match = regex.exec(node.text)) !== null) {
+//         const start = pos + match.index;
+//         const end = start + match[1].length; // Adjust to apply only to "finn"
+
+//         if (!editor.state.doc.rangeHasMark(start, end, editor.schema.marks.highlight)) {
+//           if (lastIndex !== match.index) {
+//             transaction.addMark(start, end, editor.schema.marks.highlight.create({ color: 'pink' }));
+//             hasChange = true;
+//           }
+//         }
+//         lastIndex = match.index + match[0].length;
+//       }
+//     }
+//   });
+
+//   if (hasChange) {
+//     editor.view.dispatch(transaction);
+//   }
+// }
+
+// // Example usage
+// // Create your Tiptap editor instance and register the Highlight extension
+// // editor.registerExtension(Highlight)
+// // Then you can use applyHighlight(editor) whenever you want to color 'finn'
