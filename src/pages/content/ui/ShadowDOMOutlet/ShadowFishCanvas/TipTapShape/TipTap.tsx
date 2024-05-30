@@ -29,6 +29,7 @@ export interface TipTapProps extends Partial<EditorOptions> {
   isSelected?: any;
   justCreated: any;
   handleChange: any;
+  fishConfig: any;
 }
 
 export const TipTap = memo((props: TipTapProps) => {
@@ -59,9 +60,8 @@ export const TipTap = memo((props: TipTapProps) => {
           ...suggestion,
           items: ({ query }) => {
             return [
-              'finn',
-              'josh',
-              'tess'
+              ...props.fishConfig.map(e => e.name),
+              'everyone'
             ]
               .filter(item => item.toLowerCase().startsWith(query.toLowerCase()))
               .slice(0, 5)
@@ -78,7 +78,7 @@ export const TipTap = memo((props: TipTapProps) => {
     //   },
     // },
     onUpdate: ({ editor }) => {
-      console.log("UPDATE:")
+      // console.log("UPDATE:")
       stopEventPropagation;
     },
     onSelectionUpdate: ({ editor }) => {
@@ -95,15 +95,11 @@ export const TipTap = memo((props: TipTapProps) => {
   //   }
   // }, [props.isEditing])
 
-  useEffect(()=>{
-    console.log("JUST CREATED!", props.justCreated)
-  }, [props.justCreated])
-
   const resizeEditor = useCallback(() => {
     if(editor){
       const dom = editor.view.dom;
-      console.log("RESIZE:", dom.scrollWidth, dom.scrollHeight)
-      props.handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+      // console.log("RESIZE:", dom.scrollWidth, dom.scrollHeight)
+      props.handleChange(editor.getHTML(), editor.getText(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
     }
   }, [editor])
 

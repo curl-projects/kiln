@@ -35,7 +35,7 @@ class EventEmitter {
 const fishOrchestrator = new EventEmitter();
 
 export default function FishOrchestrationProvider({ children }) {
-    const [fishConfig, setFishConfig] = useState(['researcher'])
+    const [fishConfig, setFishConfig] = useState([{name: 'researcher'}])
      // 'planner', 'optimist', 'critic'
     return (
         <FishContext.Provider value={{ fishOrchestrator, fishConfig, setFishConfig }}>

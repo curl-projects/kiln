@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
+// import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
 
 import {
     EnumStyleProp,

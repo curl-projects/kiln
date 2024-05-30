@@ -12,6 +12,7 @@ import {
   stopEventPropagation,
 } from '@tldraw/editor';
 import { useEditableText } from './useEditableText';
+import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 
 import { TipTap } from './TipTap';
 import { useCallback, useState, useEffect } from 'react';
@@ -34,8 +35,7 @@ export type TipTapNode = TLBaseShape<
     align: string;
     size: string;
     font: string;
-    resizeW: number;
-    resizeH: number;
+    plainText: string;
   }
 >;
 
@@ -64,8 +64,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
       align: 'start',
       size: 'm',
       font: 'draw',
-      resizeH: 8,
-      resizeW: 8,
+      plainText: "",
     };
   }
 
@@ -194,6 +193,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
   component(shape: TipTapNode) {
     const [justCreated, setJustCreated] = useState(true);
     const { handleChange, handleInputPointerDown } = useEditableText(shape.id, 'tiptap', shape.props.text);
+    const { fishOrchestrator, fishConfig } = useFish();
     // const isEditing = useIsEditing(shape.id);
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
@@ -211,8 +211,50 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     // })
 
     useEffect(() => {
-      if (!isEditing) {
-        // console.log('NO LONGER EDITING');
+      if (!isEditing && justCreated) {
+
+        console.log("JUST CREATED SIDE EFFECTS")
+        // execute "stopped editing for the first time side" effects here
+
+        const shapeGeometry: any = this.editor.getShapeGeometry(shape.id)
+
+        function getMentionComponentDataIds(htmlString: string) {
+          // Create a new DOM parser
+          const parser = new DOMParser();
+          // Parse the HTML string into a document
+          const doc = parser.parseFromString(htmlString, 'text/html');
+          // Select all mention-component elements
+          const mentionComponents = doc.querySelectorAll('mention-component');
+          // Extract the data-id attributes
+          const dataIds = Array.from(mentionComponents).map(component => component.getAttribute('data-id'));
+          return dataIds;
+        }
+
+        const mentions = getMentionComponentDataIds(shape.props.text);
+
+        console.log("MENTIONS", mentions)
+
+        if(shapeGeometry.w){
+          console.log("SHAPE", shape)
+          console.log("SHAPE GEOMETRY:", shapeGeometry)
+          if(mentions && mentions.length > 0){
+            console.log("MENTIONS SET:", [...new Set(mentions)])
+            fishOrchestrator.emit('textCreated', { 
+              x: shape.x, 
+              y: shape.y , 
+              w: shapeGeometry.w,
+              h: shapeGeometry.h,
+              text: shape.props.plainText,
+              fishNames: [...new Set(mentions)]
+            })
+          }
+      
+
+        }
+
+
+
+
         setJustCreated(false);
       }
     }, [isEditing, setJustCreated]);
@@ -260,6 +302,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
           fontSize={shape.props.fontSize}
           lineHeight={TEXT_PROPS.lineHeight}
           justCreated={justCreated}
+          fishConfig={fishConfig}
         />
       </div>
     );
