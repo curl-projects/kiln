@@ -33,6 +33,8 @@ import {
       align: string;
       size: string;
       font: string;
+      resizeW: number;
+      resizeH: number;
     }
   >;
 
@@ -61,6 +63,8 @@ import {
         align: 'start',
         size: 'm',
         font: 'draw',
+        resizeH: 8,
+        resizeW: 8,
       };
     }
   
@@ -70,9 +74,9 @@ import {
   
     getGeometry(shape: TipTapNode) {
       const { scale } = shape.props;
-      console.log("GEOMETRY DIMS:", shape.props.w, shape.props.h)
+      // console.log("GEOMETRY DIMS:", s`hape.props.w, shape.props.h)
       const { width, height } = this.getMinDimensions(shape)!;
-      console.log("WIDTH:", width, "HEIGHT:", height)
+      // console.log("WIDTH:", width, "HEIGHT:", height)
       return new Rectangle2d({
         width: shape.props.w * scale,
         height: shape.props.h * scale,
@@ -213,27 +217,34 @@ import {
     }
   
     indicator(shape: TipTapNode) {
-      console.log("SHAPE DIMS:", shape.props.w, shape.props.h)
+      // console.log("SHAPE DIMS:", shape.props.w, shape.props.h)
 
       const bounds = this.editor.getShapeGeometry(shape).bounds;
 
-      console.log("BOUNDS:", bounds)
+      // console.log("BOUNDS:", bounds)
       const editor = useEditor();
     //   if (shape.props.autoSize && editor.getEditingShapeId() === shape.id) return null;
       return <rect width={toDomPrecision(bounds.width)} height={toDomPrecision(bounds.height)} />;
     }
   
     override onResize: TLOnResizeHandler<TipTapNode> = (shape, info) => {
-      const { newPoint, initialBounds, initialShape, scaleX, handle } = info;
+      console.log("\n")
+      console.log("RESIZING HAPPENING!", info)
+
+      const { newPoint, initialBounds, initialShape, scaleX, scaleY, handle } = info;
+
   
-      if (info.mode === 'scale_shape' || (handle !== 'right' && handle !== 'left')) {
-        return {
-          id: shape.id,
-          type: shape.type,
-          ...resizeScaled(shape, info),
-        };
-      } else {
+      // if (info.mode === 'scale_shape' || (handle !== 'right' && handle !== 'left')) {
+      //   return {
+      //     id: shape.id,
+      //     type: shape.type,
+      //     ...resizeScaled(shape, info),
+      //   };
+      // } else {
         const nextWidth = Math.max(1, Math.abs(initialBounds.width * scaleX));
+        const nextHeight = Math.max(1, Math.abs(initialBounds.height * scaleY));
+
+        console.log("NEXT WIDTH:", nextWidth, "NEXT HEIGHT:", nextHeight)
         const { x, y } =
           scaleX < 0 ? Vec.Sub(newPoint, Vec.FromAngle(shape.rotation).mul(nextWidth)) : newPoint;
   
@@ -244,10 +255,10 @@ import {
           y,
           props: {
             w: nextWidth / initialShape.props.scale,
-            autoSize: false,
+            h: nextHeight / initialShape.props.scale,
           },
         };
-      }
+      // }
     }
   }
   

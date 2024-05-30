@@ -99,6 +99,9 @@ svg.slowMoving {
   /* padding: 10px; */
   /* box-sizing: border-box; */
   /* width: fit-content; */
+  box-sizing: border-box;
+  border: 2px solid black;
+  height: 100% !important;
 }
 /* EDITOR */
 .tiptap p {

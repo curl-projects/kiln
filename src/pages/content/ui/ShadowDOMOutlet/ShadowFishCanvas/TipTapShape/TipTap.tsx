@@ -1,9 +1,10 @@
-import React, { memo, useEffect, useRef, useState, useCallback } from 'react';
+import React, { memo, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useTipTap } from './useTipTap';
 import { Loading } from "./Loading";
 import { EditorContent, EditorOptions } from '@tiptap/react';
 import { useEditableText } from './useEditableText';
 import { TLShapeId } from "tldraw";
+import { ResizableBox } from 'react-resizable';
 
 export interface TipTapProps extends Partial<EditorOptions> {
   children?: any;
@@ -26,10 +27,15 @@ export const TipTap = memo((props: TipTapProps) => {
   const { handleChange } = useEditableText(props.id, props.type, props.content);
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: props.width, height: props.height });
+  const [resizableSize, setResizableSize] = useState({ width: props.width, height: props.height });
+
+  useLayoutEffect(() => {
+    setResizableSize({ width: props.width, height: props.height });
+  }, [props.width, props.height]);
 
   const { editor } = useTipTap(props, handleChange, size);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (editor && props.isEditing) {
       editor.commands.focus();
     }
@@ -38,18 +44,18 @@ export const TipTap = memo((props: TipTapProps) => {
   const resizeEditor = useCallback(() => {
     if (editor) {
       const dom = editor.view.dom;
-      const newSize = { width: dom.scrollWidth, height: dom.scrollHeight };
+      const newSize = { width: dom.scrollWidth + 8, height: dom.scrollHeight + 8 };
       setSize(newSize);
     }
   }, [editor]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (editor && size) {
       handleChange(editor.getHTML(), size);
     }
   }, [size, editor]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (editor) {
       editor.on('update', resizeEditor);
       editor.commands.focus();
@@ -62,7 +68,7 @@ export const TipTap = memo((props: TipTapProps) => {
     };
   }, [editor, resizeEditor]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     resizeEditor();
   }, [props.content, resizeEditor]);
 
@@ -71,6 +77,12 @@ export const TipTap = memo((props: TipTapProps) => {
   }
 
   return (
-  <EditorContent ref={ref} editor={editor} />
+    <ResizableBox height={resizableSize.height} width={resizableSize.width} 
+      style={{
+        border: '2px solid red',
+        textWrap: props.isEditing ? "unset" : 'wrap',
+    }}>
+      <EditorContent ref={ref} editor={editor} />
+    </ResizableBox>
   );
 });

@@ -34,7 +34,7 @@ export const useTipTap = (props: useTipTapProps, handleChange: any, size: any) =
       },
     },
     onUpdate: ({ editor }) => {
-      console.log("UPDATE!",)
+      // console.l og("UPDATE!",)
       handleChange(editor.getHTML(), size);
     },
     ...rest,
