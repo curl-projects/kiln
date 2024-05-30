@@ -5,6 +5,7 @@ import { EditorContent, EditorOptions } from '@tiptap/react';
 import { useEditableText } from './useEditableText';
 import { TLShapeId } from "tldraw";
 import { ResizableBox } from 'react-resizable';
+import { stopEventPropagation } from '@tldraw/editor'; 
 
 export interface TipTapProps extends Partial<EditorOptions> {
   children?: any;
@@ -36,10 +37,11 @@ export const TipTap = memo((props: TipTapProps) => {
   const { editor } = useTipTap(props, handleChange, size);
 
   useLayoutEffect(() => {
-    if (editor && props.isEditing) {
+    if (editor && props.isSelected) {
       editor.commands.focus();
+      stopEventPropagation;
     }
-  }, [props.isEditing, editor]);
+  }, [props.isSelected, editor]);
 
   const resizeEditor = useCallback(() => {
     if (editor) {
@@ -80,9 +82,9 @@ export const TipTap = memo((props: TipTapProps) => {
     <ResizableBox height={resizableSize.height} width={resizableSize.width} 
       style={{
         border: '2px solid red',
-        textWrap: props.isEditing ? "unset" : 'wrap',
+        // textWrap: props.isEditing ? "unset" : 'wrap',
     }}>
-      <EditorContent ref={ref} editor={editor} />
+      <EditorContent ref={ref} editor={editor}/>
     </ResizableBox>
   );
 });
