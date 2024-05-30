@@ -228,14 +228,13 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     return (
       <div
         id={shape.id}
-        onKeyDown={stopEventPropagation}
         style={{
           position: 'relative',
           display: 'grid',
           height: `${shape.props.h}px`,
           width: `${shape.props.w}px`,
           boxSizing: 'border-box',
-          overflow: 'hidden',
+          overflow: 'visible',
           fontSize: '20px',
           border: '2px solid green',
           whiteSpace: 'nowrap',

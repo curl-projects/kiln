@@ -69,16 +69,6 @@ export const TipTap = memo((props: TipTapProps) => {
         },
       
       }),
-
-      // .configure({
-      //   keywords: ['finn'],  // Customize your keywords
-      //   color: 'yellow'  // Customize the highlight color
-      // }),
-      // Placeholder.configure({
-      //   placeholder: 'Start typing...',
-      // }),
-      // Add your custom extension here
-      // ...extensions,
     ],
     content: props.content,
 
@@ -88,9 +78,11 @@ export const TipTap = memo((props: TipTapProps) => {
     //   },
     // },
     onUpdate: ({ editor }) => {
+      console.log("UPDATE:")
       stopEventPropagation;
     },
     onSelectionUpdate: ({ editor }) => {
+      stopEventPropagation;
     }
   });
 
@@ -110,6 +102,7 @@ export const TipTap = memo((props: TipTapProps) => {
   const resizeEditor = useCallback(() => {
     if(editor){
       const dom = editor.view.dom;
+      console.log("RESIZE:", dom.scrollWidth, dom.scrollHeight)
       props.handleChange(editor.getHTML(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
     }
   }, [editor])
@@ -132,7 +125,11 @@ export const TipTap = memo((props: TipTapProps) => {
       editor.commands.focus();
       
     }
-  }, [props.isEditing, editor]);
+
+    if(editor && props.isSelected && !props.isEditing){
+      editor.commands.blur();
+    }
+  }, [props.isEditing, editor, props.isSelected]);
 
   if (!editor) {
     return <Loading />;
@@ -151,10 +148,13 @@ export const TipTap = memo((props: TipTapProps) => {
         // width: `${props.width}px`,
         minWidth: 0,
         minHeight: 0,
+        height: props.justCreated ? 'fit-content' : 'unset',
+        width: props.justCreated ? 'fit-content' : 'unset',
         boxSizing: 'border-box',
+        overflow: 'visible',
         // overflowY: 'visible',
         // whiteSpace: 'pre-wrap'
-        whiteSpace: props.justCreated ? 'pre' : 'pre-line',
+        whiteSpace: props.justCreated ? 'unset' : 'pre-line',
       }}
     />
   );
