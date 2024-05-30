@@ -15,7 +15,7 @@ const manifest = {
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'identity', 'identity.email'],
+  permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'identity', 'identity.email'],
   side_panel: {
     default_path: 'src/pages/sidepanel/index.html',
   },
@@ -36,24 +36,32 @@ permissions: ['storage', 'sidePanel', 'activeTab', 'tabs', 'scripting', 'identit
   icons: {
     128: 'icon-128.png',
   },
-  // content_scripts: [
-  //   {
-      // matches: ['http://*/*', 'https://*/*'],
-  //     // js: ['src/pages/contentInjected/index.js'],
-  //     // all_frames: false,
-  //     // KEY for cache invalidation
-  //     // css: ['assets/css/contentStyle<KEY>.chunk.css'],
-  //   },
-  //   // {
-  //   //   matches: ['http://*/*', 'https://*/*'],
-  //   //   js: ['src/pages/contentUI/index.js'],
-  //   // },
-  // ],
+  content_scripts: [
+    {
+      matches: ['http://*/*', 'https://*/*'],
+      js: ['src/pages/contentInjected/index.js'],
+      all_frames: false,
+      // KEY for cache invalidation
+      css: [
+        'assets/css/contentStyle<KEY>.chunk.css',
+    ],
+    },
+    {
+      matches: ['http://*/*', 'https://*/*'],
+      js: ['src/pages/contentUI/index.js'],
+    },
+  ],
   devtools_page: 'src/pages/devtools/index.html',
   web_accessible_resources: [
     {
-      resources: ['assets/js/*.js', 'assets/css/*.css', 'icon-128.png', 'icon-34.png'],
-      matches: ['*://*/*'],
+      resources: [
+        'assets/js/*.js',
+        'assets/css/*.css',
+        'icon-128.png',
+        'icon-34.png',
+        'pages/ContentScriptControls/SpecificContentScripts/specificContentScripts.js',
+      ],
+      matches: ['<all_urls>'],
     },
   ],
 };

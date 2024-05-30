@@ -18,6 +18,7 @@ export default defineConfig({
       '@src': srcDir,
       '@assets': resolve(srcDir, 'assets'),
       '@pages': pagesDir,
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   plugins: [...getPlugins(isDev), react()],
@@ -30,13 +31,14 @@ export default defineConfig({
     modulePreload: false,
     reportCompressedSize: isProduction,
     emptyOutDir: !isDev,
+    
     rollupOptions: {
       input: {
         devtools: resolve(pagesDir, 'devtools', 'index.html'),
         panel: resolve(pagesDir, 'panel', 'index.html'),
         contentInjected: resolve(pagesDir, 'content', 'injected', 'index.ts'),
         contentUI: resolve(pagesDir, 'content', 'ui', 'index.ts'),
-        background: resolve(pagesDir, 'background', 'index.ts'),
+        background: resolve(pagesDir, 'background', 'index.jsx'),
         contentStyle: resolve(pagesDir, 'content', 'style.scss'),
         popup: resolve(pagesDir, 'popup', 'index.html'),
         newtab: resolve(pagesDir, 'newtab', 'index.html'),

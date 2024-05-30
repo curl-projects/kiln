@@ -2,11 +2,13 @@ import { createRoot } from 'react-dom/client';
 import App from '@pages/content/ui/app';
 import refreshOnUpdate from 'virtual:reload-on-update-in-view';
 import injectedStyle from './injected.css?inline';
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ShadowHostProvider from "@pages/content/ui/ScriptHelpers/ShadowHostProvider/ShadowHostProvider.jsx"
+import FishOrchestrationProvider from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx"
 refreshOnUpdate('pages/content');
 
 const root = document.createElement('div');
-root.id = 'chrome-extension-boilerplate-react-vite-content-view-root';
+root.id = 'goals-extension-content-view-root';
 
 document.body.append(root);
 
@@ -21,6 +23,8 @@ const styleElement = document.createElement('style');
 styleElement.innerHTML = injectedStyle;
 shadowRoot.appendChild(styleElement);
 
+const queryClient = new QueryClient();
+
 /**
  * https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/pull/174
  *
@@ -28,4 +32,12 @@ shadowRoot.appendChild(styleElement);
  * Please refer to the PR link above and go back to the contentStyle.css implementation, or raise a PR if you have a better way to improve it.
  */
 
-createRoot(rootIntoShadow).render(<App />);
+createRoot(rootIntoShadow).render(
+    <QueryClientProvider client={queryClient}>
+        <FishOrchestrationProvider>
+            {/* <ShadowHostProvider> */}
+                <App />
+            {/* </ShadowHostProvider> */}
+        </FishOrchestrationProvider>
+    </QueryClientProvider>
+);

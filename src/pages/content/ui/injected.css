@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap");
+@import url("tldraw/tldraw.css");
+/* @import url("tiptap-extension-upload-image/dist/upload-image.min.css"); */
+
+.basePanel{
+    border: 2px solid #EEEEEC;
+    background-color: #FCFDFC;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.25);
+    min-height: 200px;
+    min-width: 200px;
+    z-index: 10000000000;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    cursor: grab;
+    color: black;
+
+  }
+
+  .tl-background {
+    background-color: transparent;
+  }
+
+
+.ripple {
+  width: 10px;
+  height: 10px;
+  /* background-color: transparent; */
+  position: fixed;
+  border-radius: 50%;
+  border: 1px solid #ffffff59;
+  border: 10px solid black;
+  z-index: 2147483647;
+}
+
+.goals-extension-dropdown-item{
+    padding: 4px 8px;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-radius: 4;
+		cursor: pointer;
+    pointer-events: all;
+    transition: all 0.5s ease-in-out;
+    z-index: 2147483647;
+}
+
+
+.goals-extension-dropdown-item:hover{
+ color: pink;
+}
+
+@keyframes ripple-effect {
+  to {
+     transform:scale(15);
+     opacity: 0.01;
+  }
+}
+
+@keyframes move-fish {
+  from {
+      offset-path: path('M 0 0 C 50 -30, 150 30, 200 0');
+      offset-distance: 0%;
+  }
+  to {
+      offset-path: path('M 0 0 C 50 -30, 150 30, 200 0');
+      offset-distance: 100%;
+  }
+}
+
+@keyframes skewAnimation {
+  0% { transform: skewX(0deg); }
+  25% { transform: skewX(15deg); }
+  50% { transform: skewX(0deg); }
+  75% { transform: skewX(-15deg); }
+  100% { transform: skewX(0deg); }
+}
+
+@keyframes skewAnimationStopped {
+  0% { transform: skewX(0deg); }
+  25% { transform: skewX(4deg); }
+  50% { transform: skewX(0deg); }
+  75% { transform: skewX(-4deg); }
+  100% { transform: skewX(0deg); }
+}
+
+
+svg.moving {
+  animation: skewAnimation 0.3s infinite ease-in-out;
+}
+
+
+svg.slowMoving {
+  animation: skewAnimationStopped 0.3s infinite ease-in-out;
+}
+
+
+.tiptap { 
+  /* margin: 10px; */
+  /* padding: 10px; */
+  /* box-sizing: border-box; */
+  /* width: fit-content; */
+  box-sizing: border-box;
+  border: 2px solid black;
+  height: 100% !important;
+}
+/* EDITOR */
+.tiptap p {
+  margin: 0;
+}

@@ -44,6 +44,23 @@
 - https://dev.to/franciscomendes10866/building-real-time-applications-with-remixjs-server-sent-events-and-job-queues-315f 
 
 - https://github.com/openai/openai-node/issues/18
+
+- https://stackoverflow.com/questions/62340697/react-query-how-to-usequery-when-button-is-clicked
+
+- https://stackoverflow.com/questions/77992304/import-a-node-module-in-a-content-script-of-a-chrome-extension-vite-and-react
+
+- https://stackoverflow.com/questions/36599147/proper-way-to-inject-react-component-onto-page-in-chrome-extension
+
+- https://dev.to/anobjectisa/build-a-chrome-extension-using-reactjs-38o7
+
+- https://medium.com/code-monkey/react-aquarium-3b61ce79abae
+
+- https://github.com/kaizhelam/Koi-Fish
+
+- https://github.com/tshaddix/webext-redux
+
+- https://medium.com/@byeduardoac/optimising-chrome-extensions-part-1-beyond-redux-post-manifest-v3-c4e04d509264
+
 **Done**
 - Read page context
     - Find action associated with page changing
@@ -62,12 +79,10 @@ not a search page)
                 - Fetch goals for user
 - Authentication on the chrome extension
     - Fetch google information and load into state
-    
-
 
 **To Do**
 - Implement some type of storage 
-    - Local storage for dealing with state and browser processing
+    - Local storage for dealing with state and browser processing and other things
         - Integrate with session db for:
             - Storing authentication details, etc. that persist across tab loads
             - Caching generated text and processing, probably organized using tab ids
@@ -93,9 +108,61 @@ not a search page)
     - Loading Hooks
     - Caching
 
+- Do this
+    - Do this first   
+
 
 **Bugs**
 - Handle error case when the extension isn't allowed to access URL contents
 
 - Want to classify relevance first, and then use that to figure out which goals to show. Only generate the AI response for each goal when it's opened.
 - Add system message
+
+
+- Avoid nested component waterfalls for the goals view
+
+- TODO: add the queryCaching feature thingy to make everything much faster
+
+   
+    - 
+
+- Add a timer and use it to coordinate activity 
+- Add suggested tasks
+
+- Maybe suggested functionality like bubbles below the box?
+
+
+- THINGS TO DO:
+    - AI MEMORY: SHORT-TERM & LONG-TERM
+    - SUGGESTED TASKS
+    - INJECTING CONTENT DIRECTLY INTO THE PAGE
+    - IDENTIFYING DIVS TO HIGHLIGHT
+
+
+    - SUBDOMAINS!!
+
+- MARKDOWN FOR CHATBOT RESPONSE
+
+- Architecture
+    - Decoupled relevance pipeline and hook
+    - Pipeline for uploading tasks as they're created, and deleting them when they're destroyed.
+    - Use metadata filtering for goals, tasks, etc.
+        - Descriptions should be included.
+        - Build some replicable system for including pinecone set up/tear down in the CRUD queries for objects in the database
+
+- Flow
+1. Split up every sentence in the 
+
+
+1. malia gets to GG park around 7pm
+2. 17 minutes home, 11 minutes walk, 10 minutes waiting, 10 minutes walgreens, 25 minutes cycle = 73 minutes 
+
+[] Fix new page functionality
+
+**When you open a new page**
+1. Identify relevant tasks, and reorganize task list
+    1. Make the "ADD PAGE" button very rivisble 
+2. Provide three things to think about
+
+*TODO*
+- Stop stream if they spam enter

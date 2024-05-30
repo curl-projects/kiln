@@ -1,0 +1,10 @@
+.taskContainer {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    padding-top: 40px;
+    border: 1px solid #ccc; /* Optional, just for visual */
+    max-height: 40vh;
+    overflow-y: scroll;
+  }
+  
