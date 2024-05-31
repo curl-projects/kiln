@@ -67,32 +67,38 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
 
-  useEffect(()=>{
-    // console.log("SELECTED SHAPES:", selectedShapes)
-    if(textCreated && (selectedShapes && selectedShapes.length === 0)){
-        // console.log("TRIGGERED!", textCreated)
-        if(reactEditor){
-          const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
-          // console.log("CORRECT SHAPE:", shapeGeometry)
+  // useEffect(()=>{
+  //   // console.log("SELECTED SHAPES:", selectedShapes)
+  //   if(textCreated && (selectedShapes && selectedShapes.length === 0)){
+  //       // console.log("TRIGGERED!", textCreated)
+  //       if(reactEditor){
+  //         const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
+  //         // console.log("CORRECT SHAPE:", shapeGeometry)
 
-          const textShape = reactEditor.getShape(textCreated.id)
+  //         const textShape = reactEditor.getShape(textCreated.id)
 
-          // console.log("RICH TEXT SHAPE:", textShape)
-          if(shapeGeometry.w){
-            fishOrchestrator.emit('textCreated', { 
-              x: textCreated.x, 
-              y: textCreated.y , 
-              w: shapeGeometry.w,
-              h: shapeGeometry.h,
-              text: textShape.props.text
-            })
-          }
-        }
+  //         // console.log("RICH TEXT SHAPE:", textShape)
+  //         if(shapeGeometry.w){
+  //           fishOrchestrator.emit('textCreated', { 
+  //             x: textCreated.x, 
+  //             y: textCreated.y , 
+  //             w: shapeGeometry.w,
+  //             h: shapeGeometry.h,
+  //             prompt: {
+  //               type: "respondToCreatedText",
+  //               aiData: {
+  //                 text: textShape.props.text
+  //               }
+  //             },
+              
+  //           })
+  //         }
+  //       }
 
         
-        setTextCreated(null)
-    }
-  }, [textCreated, selectedShapes])
+  //       setTextCreated(null)
+  //   }
+  // }, [textCreated, selectedShapes])
 
 
 

@@ -1,14 +1,20 @@
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import { useEffect, useState, useRef } from "react";
 import FishAgentPersistent from "@pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
+import Ripple from "@pages/content/ui/LocalComponents/FishRipple/FishRipple.jsx";
 
 export default function FishSwarm() {
     const { fishOrchestrator, fishConfig } = useFish();
     const [fishTransforms, setFishTransforms] = useState(() => generateInitialPositions(fishConfig));
+    const [prompt, setPrompt] = useState({
+        type: "sayHello",
+        aiData: {}
+    })
     const [fishOrientationTargets, setFishOrientationTargets] = useState({});
     const fishRefs = fishConfig.map(() => useRef(null));
     const fishHeadOffset = { x: -32.5, y: -32.5 };
     const [selectedPoint, setSelectedPoint] = useState(null);
+    const rippleRef = useRef(null);
 
     function handleMoveFish({ fishNames }) {
         const newTransforms = generateNonOverlappingPositions(fishNames.length);
@@ -28,7 +34,9 @@ export default function FishSwarm() {
         });
     }
 
-    function handleTextCreated({ x, y, w, h, text, fishNames }) {
+    function handleTextCreated({ x, y, w, h, prompt, fishNames }) {
+        console.log("TEXT CREATED")
+        setPrompt(prompt);
         setSelectedPoint({ x: x, y, w, h });
         const offset = 250;
         const newTransforms = distributeInEllipse(fishNames, x - fishHeadOffset.x, y - fishHeadOffset.y, w + offset, h + offset, fishConfig);
@@ -42,8 +50,8 @@ export default function FishSwarm() {
             });
             return updatedTargets;
         });
+        rippleRef.current.triggerRipple(x, y, w, h);
     }
-    
     
 
     function handleShadowDOMClick({ x, y, fishNames }) {
@@ -60,7 +68,6 @@ export default function FishSwarm() {
             return updatedTargets;
         });
     }
-    
     
 
     useEffect(() => {
@@ -167,9 +174,11 @@ export default function FishSwarm() {
                             transform={transform}
                             fishType={fish.name}
                             finalOrientationTarget={finalOrientationTarget}
+                            prompt={prompt}
                         />;
             })}
             {selectedPoint && 
+             
                 <div 
                 style={{
                     position: 'fixed', 
@@ -182,7 +191,10 @@ export default function FishSwarm() {
                     backgroundColor: selectedPoint?.w ? "none" : 'orange',
                     border: selectedPoint?.w ? "1px solid orange" : "none", 
                 }}>
-                </div>}
+                </div>
+                
+                }
+           <Ripple ref={rippleRef} initialWidth={100} initialHeight={100} />
         </>
     );
 }

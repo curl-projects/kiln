@@ -244,8 +244,14 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
               y: shape.y , 
               w: shapeGeometry.w,
               h: shapeGeometry.h,
-              text: shape.props.plainText,
+              prompt: {
+                promptType: "respondToCreatedText",
+                aiData: {
+                  text: shape.props.plainText
+                }
+              },
               fishNames: [...new Set(mentions)]
+              
             })
           }
       

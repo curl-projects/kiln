@@ -3,7 +3,7 @@ import { useStreamAI } from '@pages/content/ui/ScriptHelpers/useStreamAI.jsx';
 import Firefly from '@pages/content/ui/ScriptHelpers/Firefly.jsx';
 import Draggable from 'react-draggable';
 
-const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget }, ref) => {
+const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget, prompt, ...props }, ref) => {
     const { transformX, transformY } = transform;
 
     const [aiState, setAIState] = useState("Welcome");
@@ -21,17 +21,19 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const amplitude = 100;
     const baseWavelength = 400;
     const amplitudeFactor = 0.1;
-    const speedFactor = 1;
+    const speedFactor = 2;
     const distanceFactor = 0.3;
 
-    // useEffect(() => {
-    //     setAIState("");
-    //     AIMutation.mutate({
-    //         setterFunction: setAIState,
-    //         data: { ...aiData, fishType: fishType },
-    //         promptType: promptType || 'sayHello'
-    //     });
-    // }, []);
+    useEffect(() => {
+        console.log("PROMPT:", prompt)
+        setAIState("");
+        AIMutation.mutate({
+            setterFunction: setAIState,
+            data: { ...prompt.aiData, fishType: fishType },
+            promptType: prompt.promptType
+        });
+    }, [prompt]);
+
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y){

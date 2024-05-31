@@ -8,7 +8,7 @@ import React, {
 
 import { default as MentionExtension } from "@tiptap/extension-mention";
 import { ReactNodeViewRenderer, mergeAttributes } from "@tiptap/react";
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewWrapper } from "@tiptap/react";
 
 export const MentionList = forwardRef((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
