@@ -55,8 +55,8 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
 
   getDefaultProps(): TipTapNode['props'] {
     return {
-      w: 14,
-      h: 14,
+      w: 34,
+      h: 34,
       text: '',
       autoSize: true,
       fontSize: 14,
@@ -250,16 +250,13 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
                   text: shape.props.plainText
                 }
               },
-              fishNames: [...new Set(mentions)]
+              fishNames: mentions.includes('everyone') ? fishConfig.map(e => e.name) : [...new Set(mentions)]
               
             })
           }
       
 
         }
-
-
-
 
         setJustCreated(false);
       }
@@ -286,6 +283,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
           fontSize: '20px',
           border: '2px solid green',
           whiteSpace: 'nowrap',
+          letterSpacing: '-0.03em',
           fontFamily: "HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif",
           fontWeight: 550,
           pointerEvents: 'none'

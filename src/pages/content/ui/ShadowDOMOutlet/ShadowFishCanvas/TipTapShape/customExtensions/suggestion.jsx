@@ -200,15 +200,26 @@ export function Mention(props) {
     };
   }, []);
 
+  const colorMap = {
+    'optimist': '#6BC076', // green
+    'critic': '#E295DE', // pink
+    'researcher': '#6BB8DD', // blue
+    'planner': '#E6A07A', // orange
+    'everyone': 'black',
+}
+
   return (
     <NodeViewWrapper style={{ display: 'inline', width: 'fit-content' }}>
       <span
         style={{
           borderRadius: '0.25rem',
-          backgroundColor: 'rgba(0, 123, 255, 0.2)', // Assuming custom-primary-100 is equivalent to a color like #007BFF
-          padding: '0.125rem 0.25rem',
+          // backgroundColor: 'rgba(0, 123, 255, 0.2)', // Assuming custom-primary-100 is equivalent to a color like #007BFF
+          // padding: '0.125rem 0.25rem',
           fontWeight: '500',
-          color: '#007BFF' // Replace with the actual hex value for custom-primary-100
+          fontSize: '20px',
+          letterSpacing: "-0.03em",
+          fontFamily: "IBM Plex Mono, monospace",
+          color: colorMap[props.node.attrs.id] || 'red' // Replace with the actual hex value for custom-primary-100
         }}
       >
         @{props.node.attrs.id}

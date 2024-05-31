@@ -35,14 +35,6 @@ export interface TipTapProps extends Partial<EditorOptions> {
 export const TipTap = memo((props: TipTapProps) => {
   const { toolbar = false } = props;
   const ref = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: props.width, height: props.height });
-
-  // useLayoutEffect(()=>{
-  //   if(editor){
-  //     handleChange(editor.getHTML(), size);
-  //   }
-
-  // }, [size])
 
   const editor = useEditor({
     extensions: [
@@ -88,18 +80,12 @@ export const TipTap = memo((props: TipTapProps) => {
 
   // const { editor } = useTipTap(props, handleChange, size);
 
-  // useEffect(()=>{
-  //   if(editor){
-  //     const dom = editor.view.dom;
-  //     handleChange(editor.getHTML(), { width: dom.scrollWidth + 14, height: dom.scrollHeight + 14 });
-  //   }
-  // }, [props.isEditing])
-
+ 
   const resizeEditor = useCallback(() => {
     if(editor){
       const dom = editor.view.dom;
       // console.log("RESIZE:", dom.scrollWidth, dom.scrollHeight)
-      props.handleChange(editor.getHTML(), editor.getText(), { width: dom.scrollWidth + 12, height: dom.scrollHeight + 12 });
+      props.handleChange(editor.getHTML(), editor.getText(), { width: dom.scrollWidth + 13, height: dom.scrollHeight + 12 });
     }
   }, [editor])
 
