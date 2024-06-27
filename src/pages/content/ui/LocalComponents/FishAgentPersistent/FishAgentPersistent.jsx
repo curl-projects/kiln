@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useStreamAI } from '@pages/content/ui/ScriptHelpers/useStreamAI.jsx';
 import Firefly from '@pages/content/ui/ScriptHelpers/Firefly.jsx';
 import Draggable from 'react-draggable';
-
-const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget }, ref) => {
+import { useMutation } from '@tanstack/react-query'
+import { streamAIResponse } from '../../ScriptHelpers/useStreamAI';
+const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, onPositionChange, fishHeadOffset, finalOrientationTarget, prompt, ...props }, ref) => {
     const { transformX, transformY } = transform;
 
     const [aiState, setAIState] = useState("Welcome");
@@ -21,17 +22,31 @@ const FishAgent = forwardRef(({ index, aiData, promptType, transform, fishType, 
     const amplitude = 100;
     const baseWavelength = 400;
     const amplitudeFactor = 0.1;
-    const speedFactor = 1;
+    const speedFactor = 2;
     const distanceFactor = 0.3;
 
-    // useEffect(() => {
-    //     setAIState("");
-    //     AIMutation.mutate({
-    //         setterFunction: setAIState,
-    //         data: { ...aiData, fishType: fishType },
-    //         promptType: promptType || 'sayHello'
-    //     });
-    // }, []);
+    // useEffect(()=>{
+    //     console.log("AI STATE:", aiState)
+    // }, [aiState])
+
+    const { mutate, error } = useMutation(streamAIResponse);
+
+    useEffect(() => {
+        console.log("Mutation Error:", error);
+    }, [error]);
+
+    useEffect(() => {
+        console.log("PROMPT:", prompt);
+        console.log("FISH TYPE:", fishType);
+        setAIState("");
+        mutate({
+            setterFunction: setAIState,
+            data: { ...prompt.aiData, fishType: fishType },
+            promptType: prompt.promptType
+        });
+    }, [prompt, fishType, mutate]);
+
+
 
     useEffect(() => {
         if (transformX !== lastPosition.x || transformY !== lastPosition.y){

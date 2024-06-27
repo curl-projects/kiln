@@ -119,6 +119,9 @@ dependencies:
   '@tiptap/extension-list-keymap':
     specifier: ^2.4.0
     version: 2.4.0(@tiptap/core@2.4.0)
+  '@tiptap/extension-mention':
+    specifier: ^2.4.0
+    version: 2.4.0(@tiptap/core@2.4.0)(@tiptap/pm@2.4.0)(@tiptap/suggestion@2.4.0)
   '@tiptap/extension-ordered-list':
     specifier: ^2.4.0
     version: 2.4.0(@tiptap/core@2.4.0)
@@ -182,6 +185,9 @@ dependencies:
   '@tiptap/starter-kit':
     specifier: ^2.4.0
     version: 2.4.0(@tiptap/pm@2.4.0)
+  '@tiptap/suggestion':
+    specifier: ^2.4.0
+    version: 2.4.0(@tiptap/core@2.4.0)(@tiptap/pm@2.4.0)
   '@tldraw/editor':
     specifier: ^2.1.4
     version: 2.1.4(react-dom@18.2.0)(react@18.2.0)
@@ -254,6 +260,12 @@ dependencies:
   prosemirror-state:
     specifier: ^1.4.3
     version: 1.4.3
+  prosemirror-transform:
+    specifier: ^1.9.0
+    version: 1.9.0
+  prosemirror-view:
+    specifier: ^1.33.6
+    version: 1.33.6
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -299,6 +311,9 @@ dependencies:
   tailwind-merge:
     specifier: ^2.3.0
     version: 2.3.0
+  tippy.js:
+    specifier: ^6.3.7
+    version: 6.3.7
   tiptap-extensions:
     specifier: ^1.35.2
     version: 1.35.2(vue-template-compiler@2.7.16)(vue@2.7.16)
@@ -3136,6 +3151,18 @@ packages:
       '@tiptap/core': 2.4.0(@tiptap/pm@2.4.0)
     dev: false
 
+  /@tiptap/extension-mention@2.4.0(@tiptap/core@2.4.0)(@tiptap/pm@2.4.0)(@tiptap/suggestion@2.4.0):
+    resolution: {integrity: sha512-7BqCNfqF1Mv9IrtdlHADwXMFo968UNmthf/TepVXC7EX2Ke6/Y4vvxmpYVNZc55FdswFwpVyZ2VeXBj3AC2JcA==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+      '@tiptap/suggestion': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.4.0(@tiptap/pm@2.4.0)
+      '@tiptap/pm': 2.4.0
+      '@tiptap/suggestion': 2.4.0(@tiptap/core@2.4.0)(@tiptap/pm@2.4.0)
+    dev: false
+
   /@tiptap/extension-ordered-list@2.4.0(@tiptap/core@2.4.0):
     resolution: {integrity: sha512-Zo0c9M0aowv+2+jExZiAvhCB83GZMjZsxywmuOrdUbq5EGYKb7q8hDyN3hkrktVHr9UPXdPAYTmLAHztTOHYRA==}
     peerDependencies:
@@ -3349,6 +3376,16 @@ packages:
       '@tiptap/extension-text': 2.4.0(@tiptap/core@2.4.0)
     transitivePeerDependencies:
       - '@tiptap/pm'
+    dev: false
+
+  /@tiptap/suggestion@2.4.0(@tiptap/core@2.4.0)(@tiptap/pm@2.4.0):
+    resolution: {integrity: sha512-6dCkjbL8vIzcLWtS6RCBx0jlYPKf2Beuyq5nNLrDDZZuyJow5qJAY0eGu6Xomp9z0WDK/BYOxT4hHNoGMDkoAg==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.4.0(@tiptap/pm@2.4.0)
+      '@tiptap/pm': 2.4.0
     dev: false
 
   /@tldraw/editor@2.1.4(react-dom@18.2.0)(react@18.2.0):

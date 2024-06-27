@@ -6,7 +6,7 @@ import TaskLog from "./GlobalComponents/TaskLog/TaskLog.jsx";
 import { useState, useEffect } from 'react';
 import Sidepanel from "@pages/content/ui/GlobalComponents/Sidepanel/Sidepanel.jsx";
 import ControlPanel from "@pages/content/ui/LocalComponents/ControlPanel/ControlPanel.jsx";
-import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
+// import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgentPersistent/FishAgentPersistent.jsx";
 import FishSwarm from "@pages/content/ui/LocalComponents/FishSwarm/FishSwarm.jsx";
 import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.jsx"
 import CaptureHighlight from "@pages/content/ui/LocalComponents/CaptureHighlight/CaptureHighlight.jsx"

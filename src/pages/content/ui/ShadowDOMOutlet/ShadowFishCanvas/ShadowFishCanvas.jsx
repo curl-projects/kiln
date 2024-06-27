@@ -40,15 +40,15 @@ export default function ShadowCanvas({ parsedContent, article }) {
       //   ...tools.select,
         
       //  }
-        // tools.content = {
-        //     id: 'richText',
-        //     icon: 'content-icon',
-        //     label: "Text",
-        //     kbd: 't',
-        //     onSelect: () => {
-        //         editor.setCurrentTool('richText')
-        //     }
-        // }
+        tools.tiptap = {
+            id: 'tiptap',
+            icon: 'content-icon',
+            label: "Tiptap",
+            kbd: 't',
+            onSelect: () => {
+                editor.setCurrentTool('tiptap')
+            }
+        }
 
         return tools
     }
@@ -67,32 +67,38 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
 
-  useEffect(()=>{
-    // console.log("SELECTED SHAPES:", selectedShapes)
-    if(textCreated && (selectedShapes && selectedShapes.length === 0)){
-        // console.log("TRIGGERED!", textCreated)
-        if(reactEditor){
-          const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
-          // console.log("CORRECT SHAPE:", shapeGeometry)
+  // useEffect(()=>{
+  //   // console.log("SELECTED SHAPES:", selectedShapes)
+  //   if(textCreated && (selectedShapes && selectedShapes.length === 0)){
+  //       // console.log("TRIGGERED!", textCreated)
+  //       if(reactEditor){
+  //         const shapeGeometry = reactEditor.getShapeGeometry(textCreated.id)
+  //         // console.log("CORRECT SHAPE:", shapeGeometry)
 
-          const textShape = reactEditor.getShape(textCreated.id)
+  //         const textShape = reactEditor.getShape(textCreated.id)
 
-          // console.log("RICH TEXT SHAPE:", textShape)
-          if(shapeGeometry.w){
-            fishOrchestrator.emit('textCreated', { 
-              x: textCreated.x, 
-              y: textCreated.y , 
-              w: shapeGeometry.w,
-              h: shapeGeometry.h,
-              text: textShape.props.text
-            })
-          }
-        }
+  //         // console.log("RICH TEXT SHAPE:", textShape)
+  //         if(shapeGeometry.w){
+  //           fishOrchestrator.emit('textCreated', { 
+  //             x: textCreated.x, 
+  //             y: textCreated.y , 
+  //             w: shapeGeometry.w,
+  //             h: shapeGeometry.h,
+  //             prompt: {
+  //               type: "respondToCreatedText",
+  //               aiData: {
+  //                 text: textShape.props.text
+  //               }
+  //             },
+              
+  //           })
+  //         }
+  //       }
 
         
-        setTextCreated(null)
-    }
-  }, [textCreated, selectedShapes])
+  //       setTextCreated(null)
+  //   }
+  // }, [textCreated, selectedShapes])
 
 
 
@@ -193,25 +199,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
         }
     }
   }
-
-  // function handleChange(e, editor) {
-  //   if (editor) {
-  //       // const editorState = editor.getInstanceState()
-  //       // editorState?.isFocused && console.debug('EDITOR FOCUS STATE::', editorState.isFocused)
-  //       // TODO: long-term want an event listener specific to this
-  //     const newSelectedShapes = editor.getSelectedShapes();
-  //     const newHoveredShape = editor.getHoveredShape();
-
-  //     // Compare and update state only if different
-  //     if (selectedShapes !== newSelectedShapes) {
-  //       setSelectedShapes(newSelectedShapes);
-  //     }
-
-  //     if (hoveredShape !== newHoveredShape) {
-  //       setHoveredShape(newHoveredShape);
-  //     }
-  //   }
-  // }
 
   function handleUiEvent(e){
     console.log("UI EVENT", e)

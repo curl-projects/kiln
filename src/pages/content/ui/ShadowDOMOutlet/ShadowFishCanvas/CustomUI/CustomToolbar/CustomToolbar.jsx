@@ -36,7 +36,7 @@ const CustomToolbar = track(() => {
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('tiptap')} 
-					active={editor.getCurrentToolId() === 'tiptapcl'}>
+					active={editor.getCurrentToolId() === 'tiptap'}>
 					<PiTextTBold />
 				</ToolbarButton>
 				<ToolbarButton 

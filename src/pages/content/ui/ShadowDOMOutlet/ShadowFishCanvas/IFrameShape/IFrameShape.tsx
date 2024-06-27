@@ -36,8 +36,8 @@ export class IFrameShapeUtil extends ShapeUtil<IFrameShape> {
 	// [b]
 	getDefaultProps(): IFrameShape['props'] {
 		return {
-			w: 800,
-			h: 800,
+			w: 400,
+			h: 400,
             url: 'https://github.com/tldraw/tldraw',
 		}
 	}
@@ -65,14 +65,20 @@ export class IFrameShapeUtil extends ShapeUtil<IFrameShape> {
 
 	// [f]
 	component(shape: IFrameShape) {
+		console.log("DOCUMENT ELEMENT", document.documentElement.outerHTML)
+
+		const domHTML = document.documentElement.outerHTML
+
 		return (
-		<div>
+		<HTMLContainer className='iframeWrapper'>
 			<Iframe 
-				src={shape.props.url}
+				srcDoc={domHTML}
 				height={`${shape.props.h}px`}
 				width={`${shape.props.w}px`}
+				x={200}
+				y={200}
 		/>
-		</div>
+		</HTMLContainer>
 		)
 	}
 

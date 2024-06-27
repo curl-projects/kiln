@@ -22,16 +22,6 @@
   }
 
 
-.ripple {
-  width: 10px;
-  height: 10px;
-  /* background-color: transparent; */
-  position: fixed;
-  border-radius: 50%;
-  border: 1px solid #ffffff59;
-  border: 10px solid black;
-  z-index: 2147483647;
-}
 
 .goals-extension-dropdown-item{
     padding: 4px 8px;
@@ -49,10 +39,14 @@
  color: pink;
 }
 
-@keyframes ripple-effect {
+@keyframes fish-ripple {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
   to {
-     transform:scale(15);
-     opacity: 0.01;
+    transform: scale(3);
+    opacity: 0;
   }
 }
 
@@ -101,9 +95,29 @@ svg.slowMoving {
   /* width: fit-content; */
   box-sizing: border-box;
   border: 2px solid black;
-  height: 100% !important;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+/* white-space: pre-wrap; */
+  /* overflow-wrap: break-word;
+  word-wrap: break-word; */
+  
 }
 /* EDITOR */
 .tiptap p {
   margin: 0;
+}
+
+.tiptap {
+  > * + * {
+    margin-top: 0.75em;
+  }
+}
+
+.mention {
+  border: 1px solid #000;
+  border-radius: 0.4rem;
+  box-decoration-break: clone;
+  padding: 0.1rem 0.3rem;
 }
