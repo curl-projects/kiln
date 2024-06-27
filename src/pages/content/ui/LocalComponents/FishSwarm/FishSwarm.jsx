@@ -35,7 +35,7 @@ export default function FishSwarm() {
     }
 
     function handleTextCreated({ x, y, w, h, prompt, fishNames }) {
-        console.log("TEXT CREATED")
+        console.log("TEXT CREATED", fishNames)
         setPrompt(prompt);
         setSelectedPoint({ x: x, y, w, h });
         const offset = 250;

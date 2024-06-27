@@ -9,7 +9,7 @@ export const useFish = () => {
 };
 
 // Simple Event Emitter
-class EventEmitter {
+class EventEmitter { 
     constructor() {
         this.events = {};
     }
@@ -35,8 +35,15 @@ class EventEmitter {
 const fishOrchestrator = new EventEmitter();
 
 export default function FishOrchestrationProvider({ children }) {
-    const [fishConfig, setFishConfig] = useState([{name: 'researcher'}])
-     // 'planner', 'optimist', 'critic'
+    const [fishConfig, setFishConfig] = useState([
+        {name: 'researcher'}, 
+        {name: 'optimist'},
+        // {name: 'critic'},
+        // {name: 'planner'},
+        
+       
+    ])
+    //  'planner', 'optimist', 'critic'
     return (
         <FishContext.Provider value={{ fishOrchestrator, fishConfig, setFishConfig }}>
             {children}

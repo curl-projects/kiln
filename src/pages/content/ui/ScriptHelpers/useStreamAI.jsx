@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 
-async function streamAIResponse(setterFunction, data, promptType){
+export async function streamAIResponse(setterFunction, data, promptType){
     try{
         let url = `${import.meta.env.VITE_REACT_APP_API_DOMAIN}/stream-ai`
 
@@ -19,6 +19,7 @@ async function streamAIResponse(setterFunction, data, promptType){
         const response = await fetch(url, options);
 
         const readStreamOuter = async (response) => {
+            console.log()
             let contentType = response.headers.get('content-type')
 
             if(contentType !== 'text/event-stream'){
@@ -58,6 +59,8 @@ async function streamAIResponse(setterFunction, data, promptType){
                     })
                     .filter(Boolean);
 
+                    console.log(`LINESS :`, lines)
+
                     function removeLastUndefined(arr) {
                         if (arr.length > 0 && arr[arr.length - 1] === "undefined") {
                             arr.pop();
@@ -67,9 +70,9 @@ async function streamAIResponse(setterFunction, data, promptType){
                     
                     lines = removeLastUndefined(lines) 
                     
-                        lines.forEach((line) => {
-                            setterFunction(prevData => prevData + line)
-                        })
+                    lines.forEach((line) => {
+                        setterFunction(prevData => prevData + line)
+                    })
                         
                     // Read the next chunk of data
                     readStream();
@@ -91,7 +94,10 @@ async function streamAIResponse(setterFunction, data, promptType){
 
 export function useStreamAI() {
     const mutation = useMutation({
-        mutationFn: ({ setterFunction, data, promptType }) => streamAIResponse(setterFunction, data, promptType)
+        mutationFn: ({ setterFunction, data, promptType }) => {
+            console.log("Mutation Function Executing", data.fishType)
+            streamAIResponse(setterFunction, data, promptType)
+        }
     });
 
     return mutation;
