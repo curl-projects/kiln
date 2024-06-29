@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Box, TLDefaultFillStyle, TLDefaultFontStyle, TLDefaultHorizontalAlignStyle, TLDefaultVerticalAlignStyle, TLShapeId } from '@tldraw/editor'
-import { TextArea } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextArea'
-import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextHelpers'
-import { isLegacyAlign } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/legacyProps'
-import { useEditableText } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/useEditableTextOLD'
+import { TextArea } from '@root/src/pages/content/ui-old/RichTextShape/TextArea'
+import { TextHelpers } from '@root/src/pages/content/ui-old/RichTextShape/TextHelpers'
+import { isLegacyAlign } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/legacyProps'
+import { useEditableText } from '@root/src/pages/content/ui-old/RichTextShape/useEditableTextOLD'
 
 interface TextLabelProps {
   id: TLShapeId

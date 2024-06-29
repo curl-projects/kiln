@@ -52,19 +52,18 @@ export function handleDoubleClickOnCanvas(info: TLClickEventInfo) {
 	// Create text shape and transition to editing_shape
 	if (this.editor.getInstanceState().isReadonly) return
 
-	this.editor.mark('creating richText text shape')
+	this.editor.mark('creating media text shape')
 	const id = createShapeId()
 	const { x, y } = this.editor.inputs.currentPagePoint
 	this.editor
 			.createShapes([
 				{
 					id,
-					type: 'richText',
+					type: 'media',
 					x,
 					y,
 					props: {
-						text: '',
-						autoSize: true,
+						text: JSON.stringify("Untitled"),
 					},
 				},
 			])

@@ -20,16 +20,16 @@ import {
 	useEditor,
 } from '@tldraw/editor'
 
-import { textShapeMigrations } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/migrations/shapes/TLTextShape";
+import { textShapeMigrations } from "@root/src/pages/content/ui-old/RichTextShape/migrations/shapes/TLTextShape";
 
 import { useCallback } from 'react'
-import { useDefaultColorTheme } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/ShapeFill'
-import { SvgTextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/SvgTextLabel'
-import { TextHelpers } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextHelpers'
-import { TextLabel } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/TextLabel'
-import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/default-shape-constants'
-import { getFontDefForExport } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/defaultStyleDefs'
-import { resizeScaled } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/shared/resizeScaled'
+import { useDefaultColorTheme } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/ShapeFill'
+import { SvgTextLabel } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/SvgTextLabel'
+import { TextHelpers } from '@root/src/pages/content/ui-old/RichTextShape/TextHelpers'
+import { TextLabel } from '@root/src/pages/content/ui-old/RichTextShape/TextLabel'
+import { FONT_FAMILIES, FONT_SIZES, TEXT_PROPS } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/default-shape-constants'
+import { getFontDefForExport } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/defaultStyleDefs'
+import { resizeScaled } from '@root/src/pages/content/ui-old/RichTextShape/shapes/shared/resizeScaled'
 
 const sizeCache = new WeakMapCache<TLTextShape['props'], { height: number; width: number }>()
 

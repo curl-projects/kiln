@@ -19,9 +19,8 @@ function createShape(element, position){
 
             }
         default: 
-            
             console.warn("Unsupported Element Type", element)
-
+            
             return {
                 type: 'geo',
                 x: position.x,

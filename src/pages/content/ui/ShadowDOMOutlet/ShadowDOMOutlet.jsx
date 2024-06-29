@@ -6,16 +6,16 @@ import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/Sha
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 
 const ShadowDOMOutlet = () => {
-    const article = useCustomReadability();
-    const [parsedContent, setParsedContent] = useState({})
-    const [textContent, setTextContent] = useState({})
-    const { fishOrchestrator } = useFish();
-    const [ripples, setRipples] = useState([]);
+    // const article = useCustomReadability();
+    // const [parsedContent, setParsedContent] = useState({})
+    // const [textContent, setTextContent] = useState({})
+    // const { fishOrchestrator } = useFish();
+    // const [ripples, setRipples] = useState([]);
 
 
-    useEffect(() => { 
-        console.log("ARTICLE:", article);
-    }, [article]);
+    // useEffect(() => { 
+    //     console.log("ARTICLE:", article);
+    // }, [article]);
 
     useEffect(() => {
         const shadowHost = document.getElementById('goals-extension-content-view-root');
@@ -75,7 +75,9 @@ const ShadowDOMOutlet = () => {
 
     return (
         <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
-           <ShadowCanvas article={article}/>
+           <ShadowCanvas 
+        //    article={article}
+           />
         </div>
     );
 };

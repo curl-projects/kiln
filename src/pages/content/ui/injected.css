@@ -18,7 +18,7 @@
   }
 
   .tl-background {
-    background-color: transparent;
+    /* background-color: transparent; */
   }
 
 
@@ -88,22 +88,22 @@ svg.slowMoving {
 }
 
 
-.tiptap { 
+/* .tiptap {  */
   /* margin: 10px; */
   /* padding: 10px; */
   /* box-sizing: border-box; */
   /* width: fit-content; */
-  box-sizing: border-box;
+  /* box-sizing: border-box;
   border: 2px solid black;
   min-width: 0;
   min-height: 0;
   height: 100%;
-  width: 100%;
+  width: 100%; */
 /* white-space: pre-wrap; */
   /* overflow-wrap: break-word;
   word-wrap: break-word; */
   
-}
+/* } */
 /* EDITOR */
 .tiptap p {
   margin: 0;
@@ -120,4 +120,67 @@ svg.slowMoving {
   border-radius: 0.4rem;
   box-decoration-break: clone;
   padding: 0.1rem 0.3rem;
+}
+
+/* WORLD MODEL */
+.tl-worldModel-controlButton{
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.tl-worldModel-controlButton:hover{
+  transform: scale(1.05);
+}
+
+p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  opacity: 0.5 !important;
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
+
+/* MEDIA */
+/* Color swatches */
+.concept {
+  background: #fdd;
+  border-bottom: 1px solid #f22;
+  margin-bottom: -1px;
+}
+
+
+
+.color {
+  white-space: nowrap;
+}
+
+.color::before {
+  background-color: var(--color);
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 2px;
+  content: " ";
+  display: inline-block;
+  height: 1em;
+  margin-bottom: 0.15em;
+  margin-right: 0.1em;
+  vertical-align: middle;
+  width: 1em;
+}
+
+
+.tl-media-concept-toggle{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s ease-in-out;
+  cursor: pointer;
+  pointer-events: all;
+  height: 20px;
+}
+
+
+.tl-media-concept-toggle:hover{
+  transform: scale(1.10);
 }

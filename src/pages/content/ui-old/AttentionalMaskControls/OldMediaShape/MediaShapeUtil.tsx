@@ -46,17 +46,15 @@ export function useSizeState() {
 
 // const sizeCache = new WeakMapCache<TipTapNode['props'], { width: number, height: number }>();
 
-export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
-  static override type = 'tiptap' as const;
+export class MediaShapeUtil extends ShapeUtil<TipTapNode> {
+  static override type = 'media' as const;
   // override canScroll = () => true;
   override canEdit = () => true;
 
-  // override isAspectRatioLocked: TLShapeUtilFlag<TipTapNode> = () => true;
-
   getDefaultProps(): TipTapNode['props'] {
     return {
-      w: 34,
-      h: 34,
+      w: 200,
+      h: 200,
       text: '',
       autoSize: true,
       fontSize: 14,
@@ -85,31 +83,31 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     });
   }
 
-  override onEditEnd: TLOnEditEndHandler<TipTapNode> = shape => {
-    // console.log('EDIT END!');
-    const {
-      id,
-      type,
-      props: { text },
-    } = shape;
-    const trimmedText = text.trimEnd();
+  // override onEditEnd: TLOnEditEndHandler<TipTapNode> = shape => {
+  //   // console.log('EDIT END!');
+  //   const {
+  //     id,
+  //     type,
+  //     props: { text },
+  //   } = shape;
+  //   const trimmedText = text.trimEnd();
 
-    if (trimmedText.length === 0) {
-      this.editor.deleteShapes([shape.id]);
-    } else {
-      if (trimmedText !== text) {
-        this.editor.updateShapes([
-          {
-            id,
-            type,
-            props: {
-              text: trimmedText,
-            },
-          },
-        ]);
-      }
-    }
-  };
+  //   if (trimmedText.length === 0) {
+  //     this.editor.deleteShapes([shape.id]);
+  //   } else {
+  //     if (trimmedText !== text) {
+  //       this.editor.updateShapes([
+  //         {
+  //           id,
+  //           type,
+  //           props: {
+  //             text: trimmedText,
+  //           },
+  //         },
+  //       ]);
+  //     }
+  //   }
+  // };
 
   // override onBeforeUpdate = (prev: TipTapNode, next: TipTapNode) => {
   //     console.log("BEFORE UPDATE!")
@@ -168,29 +166,30 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
   //   }
   // }
 
-  override onDoubleClickEdge = (shape: TipTapNode) => {
-    if (!shape.props.autoSize) {
-      return {
-        id: shape.id,
-        type: shape.type,
-        props: {
-          autoSize: true,
-        },
-      };
-    }
+  // override onDoubleClickEdge = (shape: TipTapNode) => {
+  //   if (!shape.props.autoSize) {
+  //     return {
+  //       id: shape.id,
+  //       type: shape.type,
+  //       props: {
+  //         autoSize: true,
+  //       },
+  //     };
+  //   }
 
-    if (shape.props.scale !== 1) {
-      return {
-        id: shape.id,
-        type: shape.type,
-        props: {
-          scale: 1,
-        },
-      };
-    }
-  };
+  //   if (shape.props.scale !== 1) {
+  //     return {
+  //       id: shape.id,
+  //       type: shape.type,
+  //       props: {
+  //         scale: 1,
+  //       },
+  //     };
+  //   }
+  // };
 
   component(shape: TipTapNode) {
+    
     const [justCreated, setJustCreated] = useState(true);
     const { handleChange, handleInputPointerDown } = useEditableText(shape.id, 'tiptap', shape.props.text);
     const { fishOrchestrator, fishConfig } = useFish();
@@ -210,57 +209,56 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     //    }
     // })
 
-    useEffect(() => {
-      if (!isEditing && justCreated) {
+    // useEffect(() => {
+    //   if (!isEditing && justCreated) {
 
-        console.log("JUST CREATED SIDE EFFECTS")
-        // execute "stopped editing for the first time side" effects here
+    //     // execute "stopped editing for the first time side" effects here
 
-        const shapeGeometry: any = this.editor.getShapeGeometry(shape.id)
+    //     const shapeGeometry: any = this.editor.getShapeGeometry(shape.id)
 
-        function getMentionComponentDataIds(htmlString: string) {
-          // Create a new DOM parser
-          const parser = new DOMParser();
-          // Parse the HTML string into a document
-          const doc = parser.parseFromString(htmlString, 'text/html');
-          // Select all mention-component elements
-          const mentionComponents = doc.querySelectorAll('mention-component');
-          // Extract the data-id attributes
-          const dataIds = Array.from(mentionComponents).map(component => component.getAttribute('data-id'));
-          return dataIds;
-        }
+    //     function getMentionComponentDataIds(htmlString: string) {
+    //       // Create a new DOM parser
+    //       const parser = new DOMParser();
+    //       // Parse the HTML string into a document
+    //       const doc = parser.parseFromString(htmlString, 'text/html');
+    //       // Select all mention-component elements
+    //       const mentionComponents = doc.querySelectorAll('mention-component');
+    //       // Extract the data-id attributes
+    //       const dataIds = Array.from(mentionComponents).map(component => component.getAttribute('data-id'));
+    //       return dataIds;
+    //     }
 
-        const mentions = getMentionComponentDataIds(shape.props.text);
+    //     const mentions = getMentionComponentDataIds(shape.props.text);
 
-        console.log("MENTIONS", mentions)
+    //     console.log("MENTIONS", mentions)
 
-        if(shapeGeometry.w){
-          console.log("SHAPE", shape)
-          console.log("SHAPE GEOMETRY:", shapeGeometry)
-          if(mentions && mentions.length > 0){
-            console.log("MENTIONS SET:", [...new Set(mentions)])
-            fishOrchestrator.emit('textCreated', { 
-              x: shape.x, 
-              y: shape.y , 
-              w: shapeGeometry.w,
-              h: shapeGeometry.h,
-              prompt: {
-                promptType: "respondToCreatedText",
-                aiData: {
-                  text: shape.props.plainText
-                }
-              },
-              fishNames: mentions.includes('everyone') ? fishConfig.map(e => e.name) : [...new Set(mentions)]
+    //     if(shapeGeometry.w){
+    //       console.log("SHAPE", shape)
+    //       console.log("SHAPE GEOMETRY:", shapeGeometry)
+    //       if(mentions && mentions.length > 0){
+    //         console.log("MENTIONS SET:", [...new Set(mentions)])
+    //         fishOrchestrator.emit('textCreated', { 
+    //           x: shape.x, 
+    //           y: shape.y , 
+    //           w: shapeGeometry.w,
+    //           h: shapeGeometry.h,
+    //           prompt: {
+    //             promptType: "respondToCreatedText",
+    //             aiData: {
+    //               text: shape.props.plainText
+    //             }
+    //           },
+    //           fishNames: mentions.includes('everyone') ? fishConfig.map(e => e.name) : [...new Set(mentions)]
               
-            })
-          }
+    //         })
+    //       }
       
 
-        }
+    //     }
 
-        setJustCreated(false);
-      }
-    }, [isEditing, setJustCreated]);
+    //     setJustCreated(false);
+    //   }
+    // }, [isEditing, setJustCreated]);
 
     // useEffect(() => {
     //   console.log('JUST CREATED!', justCreated);
@@ -271,44 +269,40 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     // console.log('SHAPE HEIGHT:', shape.props.h, 'SHAPE WIDTH:', shape.props.w);
 
     return (
-      <div
-        id={shape.id}
-        style={{
-          position: 'relative',
-          display: 'grid',
-          height: `${shape.props.h}px`,
-          width: `${shape.props.w}px`,
-          boxSizing: 'border-box',
-          overflow: 'visible',
-          fontSize: '20px',
-          border: '2px solid green',
-          whiteSpace: 'nowrap',
-          letterSpacing: '-0.03em',
-          fontFamily: "HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif",
-          fontWeight: 550,
-          pointerEvents: 'none'
-
-          // whiteSpace: isEditing ? 'nowrap' : 'pre-wrap',
-
-          // wordWrap: 'normal',
-          // overflowWrap: 'anywhere',
-          // whiteSpace: (isEditing ) ? "nowrap" : 'pre-wrap',
-        }}>
-        <TipTap
+      <HTMLContainer>
+        <div
           id={shape.id}
-          type="tiptap"
-          content={shape.props.text}
-          handleChange={handleChange}
-          isEditing={isEditing}
-          isSelected={isSelected}
-          width={shape.props.w}
-          height={shape.props.h}
-          fontSize={shape.props.fontSize}
-          lineHeight={TEXT_PROPS.lineHeight}
-          justCreated={justCreated}
-          fishConfig={fishConfig}
-        />
-      </div>
+          style={{
+            position: 'relative',
+            // display: 'grid',
+            height: `${shape.props.h}px`,
+            width: `${shape.props.w}px`,
+            boxSizing: 'border-box',
+            // overflow: 'visible',
+            // fontSize: '20px',
+            border: '2px solid green',
+            // whiteSpace: 'nowrap',
+            // letterSpacing: '-0.03em',
+            // fontFamily: "HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif",
+            fontWeight: 550,
+            // pointerEvents: 'none'
+          }}>
+          {/* <TipTap
+            id={shape.id}
+            type="tiptap"
+            content={shape.props.text}
+            handleChange={handleChange}
+            isEditing={isEditing}
+            isSelected={isSelected}
+            width={shape.props.w}
+            height={shape.props.h}
+            fontSize={shape.props.fontSize}
+            lineHeight={TEXT_PROPS.lineHeight}
+            justCreated={justCreated}
+            fishConfig={fishConfig}
+          /> */}
+        </div>
+      </HTMLContainer>
     );
   }
 
@@ -318,7 +312,7 @@ export class TipTapShapeUtil extends ShapeUtil<TipTapNode> {
     const bounds = this.editor.getShapeGeometry(shape).bounds;
 
     // console.log("BOUNDS:", bounds)
-    const editor = useEditor();
+    // const editor = useEditor();
     //   if (shape.props.autoSize && editor.getEditingShapeId() === shape.id) return null;
     return <rect width={toDomPrecision(bounds.width)} height={toDomPrecision(bounds.height)} />;
   }

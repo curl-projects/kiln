@@ -1,6 +1,6 @@
 import { StateNode } from '@tldraw/editor'
-import { Idle } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/toolStates/Idle'
-import { Pointing } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/RichTextShape/shapes/text/toolStates/Pointing'
+import { Idle } from '@root/src/pages/content/ui-old/RichTextShape/shapes/text/toolStates/Idle'
+import { Pointing } from '@root/src/pages/content/ui-old/RichTextShape/shapes/text/toolStates/Pointing'
 
 /** @public */
 export class RichTextShapeTool extends StateNode {

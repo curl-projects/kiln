@@ -35,14 +35,24 @@ const CustomToolbar = track(() => {
 					<PiPencilSimpleFill />
 				</ToolbarButton>
 				<ToolbarButton 
-					handleClick={() => editor.setCurrentTool('tiptap')} 
-					active={editor.getCurrentToolId() === 'tiptap'}>
-					<PiTextTBold />
-				</ToolbarButton>
-				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('eraser')} 
 					active={editor.getCurrentToolId() === 'eraser'}>
 					<BiSolidEraser />
+				</ToolbarButton>
+				<ToolbarButton 
+					handleClick={() => editor.setCurrentTool('worldModel')} 
+					active={editor.getCurrentToolId() === 'worldModel'}>
+					F
+				</ToolbarButton>
+				<ToolbarButton 
+					handleClick={() => editor.setCurrentTool('media')} 
+					active={editor.getCurrentToolId() === 'media'}>
+					M
+				</ToolbarButton>
+				<ToolbarButton 
+					handleClick={() => editor.setCurrentTool('concept')} 
+					active={editor.getCurrentToolId() === 'concept'}>
+					C
 				</ToolbarButton>
 			</div>
 		</div>
