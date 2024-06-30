@@ -92,7 +92,7 @@ const styles = {
     top: 0,
     left: 0,
     border: '2px solid pink',
-    // zIndex: -214748364,
+    zIndex: 0, // this needs to change contextually once i've figured out the flow
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     display: 'flex',
     flexDirection: 'column',
