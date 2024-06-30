@@ -20,7 +20,7 @@ import {
 	useValue,
 	HTMLContainer,
 	stopEventPropagation,
-	createShapeId,x
+	createShapeId,
 } from '@tldraw/editor'
 import { Expand } from '@tldraw/utils'
 
@@ -44,6 +44,9 @@ export const worldModelShapeProps = {
 	w: T.nonZeroNumber,
 	h: T.nonZeroNumber,
 	name: T.string,
+	minimized: T.boolean,
+	storedW: T.number,
+	storedH: T.number,
 }
 
 export type RecordPropsType<Config extends Record<string, T.Validatable<any>>> = Expand<{
@@ -64,17 +67,21 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 	static override migrations = frameShapeMigrations
 
 	override canEdit = (shape) => {
-		return shape.props.subordinate ? false : true
+		return shape.props.minimized ? false : true
 	}
 
 	override canBind(){
 		return true
 	}
 
+	override canResize = (shape) => {
+		return shape.props.minimized ? false : true
+	}
+
 	override canCrop = () => true
 
 	override getDefaultProps(): TLWorldModelShape['props'] {
-		return { w: 160 * 2, h: 90 * 2, name: '',}
+		return { w: 160 * 2, h: 90 * 2, name: '', minimized: false, storedW: 160 * 2, storedH: 90 * 2}
 	}
 
 	override getGeometry(shape: TLWorldModelShape): Geometry2d {
@@ -87,12 +94,55 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 	override component(shape: TLWorldModelShape) {
 		const [selectedOutput, setSelectedOutput] = useState(null);
+		const [viewType, setViewType] = useState("media")
 
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 		const selectedShapes = this.editor.getSelectedShapeIds();
 
 		const frameIsAncestor = selectedShapes.some(selectedShape => this.editor.hasAncestor(selectedShape, shape.id))
 		const frameIsSelected = selectedShapes.includes(shape.id)
+
+		useEffect(()=>{
+			// trigger all media objects within the world model to switch form when viewType changes
+			const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+			for(let child of children){
+				if(child.type === 'media'){
+					this.editor.updateShape({id: child.id, type: child.type, props: { view: viewType }})
+				}
+			}
+			
+		}, [viewType])
+
+		useEffect(()=>{
+			console.log("MINIMIZED?", shape.props.minimized)
+
+			const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+			// if minimized, hide all children
+			if(shape.props.minimized){
+				for(let child of children){
+					this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+				}
+				this.editor.updateShape(
+					{id: shape.id, type: shape.type, props: {
+					storedW: shape.props.w,
+					storedH: shape.props.h,
+					w: 270,
+					h: 160,
+				}})
+			}
+			else{
+				for(let child of children){
+					this.editor.updateShape({id: child.id, type: child.type, isLocked: false, opacity: 1})
+				}
+				this.editor.updateShape({id: shape.id, type: shape.type, props: {
+					w: shape.props.storedW,
+					h: shape.props.storedH,
+				}})
+			}
+		}, [shape.props.minimized])
+
 
 		useEffect(()=>{
 			if(!(frameIsSelected || frameIsAncestor)){
@@ -179,37 +229,125 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 	
 		return (
 			<HTMLContainer 
-				style={{position: 'relative', boxSizing: 'border-box'}} 
+				style={{
+					position: 'relative', 
+					boxSizing: 'border-box'}} 
+				
 				onPointerDown={stopEventPropagation}>
-				<SVGContainer>
+				<SVGContainer style={{}}>
 					<defs>
 						<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
 						<feDropShadow dx="0" dy="36" stdDeviation="21" floodColor="#4D4D4D" floodOpacity="0.15"/>
 						</filter>
 					</defs>
 					<rect
-						className={classNames('tl-frame__body', { 'tl-frame__creating': isCreating })}
+						className={classNames({ 'tl-frame__creating': isCreating })}
 						width={bounds.width}
 						height={bounds.height}
 						rx="12"
 						ry="12"
 						fill="#F9F9F8"
-						strokeWidth="1"
+						strokeWidth="2"
 						stroke="#DDDDDA"
 						filter="url(#boxShadow)"
 
 					/>
 				</SVGContainer>
+				<p 
+				onPointerDown={()=>this.editor.updateShape({id: shape.id, type: shape.type, props: { minimized: !shape.props.minimized }})}
+				style={{
+					margin: 0,
+					padding: 0,
+					position: 'absolute',
+					pointerEvents: "all",
+					top: "0px",
+					left: shape.props.w,
+					transform: "translate(-200%, -10%)",
+					display: 'flex',
+					alignContent: 'center',
+					justifyContent: 'center',
+					fontSize: '40px',
+					cursor: 'pointer',
+					}}>{shape.props.minimized ? "+" : "-"}</p>
+				{!shape.props.minimized && 
+					<div style={{
+						position: 'absolute',
+						pointerEvents: "all",
+						bottom: "0px",
+						left: shape.props.w,
+						transform: "translate(-100%, 0%)",
+						height: 'fit-content',
+						width: "100px",
+						display: 'flex',
+						alignContent: 'center',
+						justifyContent: 'center',
+						gap: '12px',
+						paddingBottom: '10px',
+						paddingRight: '10px',
+					}}>
+						<div 
+						onPointerDown={()=>setViewType('media')}
+						className='tl-kiln-transition-control' style={{
+							height: '38px',
+							width: '38px',
+							borderRadius: '8px',
+							border: viewType === 'media' ? '2px solid #63635E' : "2px solid #E8E7E9",
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							cursor: 'pointer',
+						}}>
+							<div style={{
+								height: '8px',
+								width: '8px',
+								backgroundColor: viewType === 'media' ? "#636353" : "#D0CED4",
+								borderRadius: "100%"
+							}}/>
 
+						</div>
+						<div 
+						onPointerDown={()=>setViewType('concepts')}
+						className='tl-kiln-transition-control' style={{
+							height: '38px',
+							width: '38px',
+							borderRadius: '8px',
+							border: viewType === 'concepts' ? '2px solid #63635E' : "2px solid #E8E7E9",
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							cursor: 'pointer',
+						}}>
+							<div style={{
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								height: '26px',
+								width: '26px',
+								border: viewType === 'concepts' ? "1.5px solid #63635E" : "1.5px solid #D0CED4",
+								borderRadius: '100%',
+							}}>
+								<div style={{
+									height: '8px',
+									width: '8px',
+									backgroundColor: viewType === 'concepts' ? "#63635E" : "#D0CED4",
+									borderRadius: "100%"
+								}}/>
+							</div>
+
+						</div>
+
+					</div>
+				}
 				{isCreating  ? null : (
 					<WorldModelHeading
 						id={shape.id}
 						name={shape.props.name}
 						width={bounds.width}
 						height={bounds.height}
+						minimized={shape.props.minimized}
 					/>
 				)}
-				{(!isCreating && (frameIsSelected || frameIsAncestor)) &&
+				{(!shape.props.minimized && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 					<div 
 					onPointerDown={stopEventPropagation}
 					className={classNames('tl-worldModel-controls')} style={{
@@ -405,10 +543,12 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 		// If frame is in a group, keep the shape
 		// moved out in that group
 
-		if (isInGroup) {
-			this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), parent.id)
-		} else {
-			this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), this.editor.getCurrentPageId())
+		if(!_shape.props.minimized){
+			if (isInGroup) {
+				this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), parent.id)
+			} else {
+				this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), this.editor.getCurrentPageId())
+			}
 		}
 	}
 

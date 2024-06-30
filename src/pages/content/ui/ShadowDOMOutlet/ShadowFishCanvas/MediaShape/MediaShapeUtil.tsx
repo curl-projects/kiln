@@ -41,7 +41,8 @@ const mediaShapeProps = {
 	w: T.number,
 	h: T.number,
 	text: T.string,
-	concepts: T.array
+	concepts: T.array,
+	view: T.string,
 }
 
 type MediaShape = TLBaseShape<
@@ -51,6 +52,7 @@ type MediaShape = TLBaseShape<
 		h: number
 		text: string
 		concepts: any
+		view: string
 	}
 >
 
@@ -68,12 +70,13 @@ export class MediaShapeUtil extends BaseBoxShapeUtil<MediaShape> {
 getDefaultProps(): MediaShape['props'] {
 		return { 
 			w: 300,
-			h: 300,
+			h: 300,	
 			text: JSON.stringify(""),
 			concepts: [
 				{"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
 				{"type": "concept", "text": JSON.stringify("The Self & Media")}
-			  ]			  
+			  ],
+			view: 'media',		  
 		}
 	}
 
@@ -89,25 +92,24 @@ getDefaultProps(): MediaShape['props'] {
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 		const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
 		const shapeRef = useRef<HTMLDivElement>();
-		const [highlightedTexts, setHighlightedTexts] = useState('Hello')
-		const [activeView, setActiveView] = useState('media')
+		const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
 
 		useEffect(()=>{
-			if(activeView === 'media'){
+			if(shape.props.view === 'media'){
 				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
 				for(let bind of bindings){
 					const boundConcept = this.editor.getShape(bind.fromId)
 					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 0, isLocked: true})
 				}
 			}
-			else if(activeView === 'concepts'){
+			else if(shape.props.view === 'concepts'){
 				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
 				for(let bind of bindings){
 					const boundConcept = this.editor.getShape(bind.fromId)
 					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 1, isLocked: false})
 				}
 			}
-		}, [activeView])
+		}, [shape.props.view])
 
 		const editor = useEditor({
 			extensions: [
@@ -142,7 +144,7 @@ getDefaultProps(): MediaShape['props'] {
 
 		  useEffect(() => {
 			if (editor) {
-			  editor.commands.updateData({data: highlightedTexts.split(',')})
+			  editor.commands.updateData({data: highlightedTexts})
 			}
 		  }, [highlightedTexts, editor]);
 		
@@ -174,7 +176,7 @@ getDefaultProps(): MediaShape['props'] {
 						justifyContent: 'flex-start',
 						alignItems: 'center',
 					}}>
-						<svg style={{ flexShrink: 0, opacity: activeView === 'concepts' ? 0.2 : 1, }} width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<svg style={{ flexShrink: 0, opacity: shape.props.view === 'concepts' ? 0.2 : 1, }} width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path fillRule="evenodd" clipRule="evenodd" d="M5.36588 1.59401C2.8065 1.59401 0.731709 3.66881 0.731709 6.22819C0.731709 8.78754 2.8065 10.8623 5.36588 10.8623C7.92528 10.8623 10.0001 8.78754 10.0001 6.22819C10.0001 3.66881 7.92528 1.59401 5.36588 1.59401ZM0 6.22819C0 3.26469 2.40239 0.862305 5.36588 0.862305C8.32935 0.862305 10.7318 3.26469 10.7318 6.22819C10.7318 9.19168 8.32935 11.5941 5.36588 11.5941C2.40239 11.5941 0 9.19168 0 6.22819Z" fill="#191400" fillOpacity="0.207843"/>
 							<path fillRule="evenodd" clipRule="evenodd" d="M10.2444 6.55373H0.488281V5.90332H10.2444V6.55373Z" fill="#191400" fillOpacity="0.207843"/>
 							<path fillRule="evenodd" clipRule="evenodd" d="M5.04005 11.1064V1.35021H5.69046V11.1064H5.04005ZM7.70274 6.22827C7.70274 4.46181 7.06748 2.71427 5.8221 1.5588L6.20918 1.1416C7.59266 2.42516 8.27185 4.33619 8.27185 6.22827C8.27185 8.12037 7.59266 10.0314 6.20918 11.315L5.8221 10.8977C7.06748 9.7423 7.70274 7.99475 7.70274 6.22827ZM2.51953 6.22829C2.51953 4.33894 3.17658 2.4289 4.51791 1.14467L4.91148 1.55575C3.70532 2.71057 3.08864 4.45908 3.08864 6.22829C3.08865 7.9975 3.70534 9.74604 4.9115 10.9008L4.51792 11.3119C3.1766 10.0277 2.51954 8.11765 2.51953 6.22829Z" fill="#191400" fillOpacity="0.207843"/>
@@ -191,21 +193,20 @@ getDefaultProps(): MediaShape['props'] {
 							whiteSpace: "nowrap",
 							overflow: "hidden",
 							maxWidth: "90%",
-							opacity: activeView === 'concepts' ? 0.2 : 1,
+							opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 
 						}}>Original Thought</p>
 						<div style={{flex: 1}}/>
 						<div
 						className="tl-media-concept-toggle"
 						onPointerDown={(e)=>{
-							activeView === 'media' 
-							? setActiveView('concepts')
-							: setActiveView('media')
-						
+							shape.props.view === 'media' 
+								? this.editor.updateShape({id: shape.id, type: shape.type, props: { view: "concepts" }})
+								: this.editor.updateShape({id: shape.id, type: shape.type, props: { view: "media" }})
 							}
 						}
 						>
-							{activeView === 'media'
+							{shape.props.view === 'media'
 							?
 							<svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path fillRule="evenodd" clipRule="evenodd" d="M4.24206 14.4874V13.0315H4.2412L5.97585 7.25305L3.83909 0L0 13.0315H3.21818V14.4874H4.24206ZM8.95148 0L12.791 13.0315H9.49929V16.2347H8.47541V13.0315H5.11194L8.95148 0ZM13.6805 13.0315H13.6813V14.4874H14.7052V13.0315H17.9972L14.1576 0L11.9913 7.35243L13.6805 13.0315Z" fill="#D0CED4"/>
@@ -231,17 +232,17 @@ getDefaultProps(): MediaShape['props'] {
 							letterSpacing: '-0.00em',
 							lineHeight: '21px',
 							fontSize: '14px',
-							opacity: activeView === 'concepts' ? 0.2 : 1,
+							opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 						}}
 					/>
 					<input
 					type="text"
-					value={highlightedTexts}
+					value={highlightedTexts.join(",")}
 					onKeyDown={stopEventPropagation}
-					onChange={(e) => setHighlightedTexts(e.target.value)}
+					onChange={(e) => setHighlightedTexts([e.target.value])}
 					placeholder="Enter highlight texts, separated by commas"
 					style={{
-						opacity: activeView === 'concepts' ? 0.2 : 1,
+						opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 					}}
       			/>
 				</div>

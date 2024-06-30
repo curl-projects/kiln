@@ -16,11 +16,13 @@ export const WorldModelHeading = function FrameHeading({
 	name,
 	width,
 	height,
+	minimized
 }: {
 	id: TLShapeId
 	name: string
 	width: number
 	height: number
+	minimized: boolean
 }) {
 	const editor = useEditor()
 	const pageRotation = useValue(
@@ -109,13 +111,33 @@ export const WorldModelHeading = function FrameHeading({
 				fontWeight: 600,
 				fontSize: '12px',
 				letterSpacing: "0.03em",
-
+				paddingRight: minimized ? "0px !important" : "unset",
 			}}
 			onPointerDown={handlePointerDown}
 		>
 			<div className="tl-frame-heading-hit-area">
 				<WorldModelLabelInput ref={rInput} id={id} name={name} isEditing={isEditing} />
 			</div>
+			{minimized &&
+				<div style={{
+					borderRadius: '100%',
+					margin: 0,
+					height: '18px',
+					width: '20px',
+					backgroundColor: "rgba(99, 99, 94, 0.5)",
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					position: 'relative',
+				}}>
+					<p style={{
+						margin: "0px", 
+						
+						color: "rgb(249, 249, 248)"
+					}}>3</p>
+				</div>
+			}
+			
 		</div>
 	)
 }

@@ -7,10 +7,15 @@ import ShadowHostProvider from "@pages/content/ui/ScriptHelpers/ShadowHostProvid
 import FishOrchestrationProvider from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx"
 refreshOnUpdate('pages/content');
 
-const root = document.createElement('div');
-root.id = 'goals-extension-content-view-root';
 
-document.body.append(root);
+const root = document.createElement('div');
+root.id = 'goals-extension-content-view-root'
+
+document.body.appendChild(root);
+// const root = document.createElement('div');
+// root.id = 'goals-extension-content-view-root';
+
+// document.body.append(root);
 
 const rootIntoShadow = document.createElement('div');
 rootIntoShadow.id = 'shadow-root';
@@ -22,6 +27,14 @@ shadowRoot.appendChild(rootIntoShadow);
 const styleElement = document.createElement('style');
 styleElement.innerHTML = injectedStyle;
 shadowRoot.appendChild(styleElement);
+
+
+// Rescale
+// document.body.style.transform = 'scale(0.5)';
+// root.style.transform = 'scale(2)'
+// root.style.zIndex = "-1000000"
+
+
 
 const queryClient = new QueryClient();
 

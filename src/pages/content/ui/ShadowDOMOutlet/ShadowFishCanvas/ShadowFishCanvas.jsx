@@ -3,7 +3,7 @@ import { Tldraw, createTLStore, defaultShapeUtils, react, useEditor, createShape
 import { HTMLContainer, ShapeUtil } from 'tldraw'
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import _ from 'lodash';
-import { handleDoubleClickOnCanvas } from '../../../ui-old/RichTextShape/canvasOverride.tsx';
+import { handleDoubleClickOnCanvas } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/CustomUI/canvasOverride.tsx"
 // IMPORTING UI
 import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
 
@@ -29,6 +29,8 @@ import { MediaConceptBindingUtil } from "@pages/content/ui/ShadowDOMOutlet/Shado
 import { ConceptShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeUtil.tsx"
 import { ConceptShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeTool.tsx"
 
+import { FishShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FishShape/FishShapeUtil.tsx"
+
 // import text tool
 
 // import { TipTapShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/TipTapShape/TipTapShapeTool.tsx"
@@ -36,7 +38,7 @@ import { ConceptShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCa
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
-  const customShapeUtils = [WorldModelShapeUtil, MediaShapeUtil, ConceptShapeUtil, KinematicCanvasShapeUtil]
+  const customShapeUtils = [WorldModelShapeUtil, MediaShapeUtil, ConceptShapeUtil, KinematicCanvasShapeUtil, FishShapeUtil]
 
   const customBindingUtils = [KinematicCanvasBindingUtil, MediaConceptBindingUtil]
   const customTools = [
@@ -217,6 +219,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
         editor.root.children.select.children.resizing._createSnapshot = customCreateSnapshot;
       
+        editor.createShape({type: 'fish', x: 500, y: 500})
        
         editor.root.children.select.children.idle.handleDoubleClickOnCanvas = function(info) {
           handleDoubleClickOnCanvas.call(this, info);
@@ -225,17 +228,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
         setReactEditor(editor)
 
-        
-
-
-        // WORLD MODEL DECLARATION
-        // editor.shapeUtils.frame.component = () => {
-        //   return(
-        //     <div>
-        //       <h1>Hi</h1>
-        //     </div>
-        //   )
-        // }
         editor.on('event', (event) => handleCanvasEvent(event, editor))
         // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))

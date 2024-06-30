@@ -12,7 +12,6 @@ function createShape(element, position){
                 props: {
                     geo: 'rectangle',
                 }
-
             }
         case 'p': 
             return {

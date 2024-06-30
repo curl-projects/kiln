@@ -17,25 +17,25 @@ const ShadowDOMOutlet = () => {
     //     console.log("ARTICLE:", article);
     // }, [article]);
 
-    useEffect(() => {
-        const shadowHost = document.getElementById('goals-extension-content-view-root');
+    // useEffect(() => {
+    //     const shadowHost = document.getElementById('goals-extension-content-view-root');
 
-        if (shadowHost) {
-            const siblings = Array.from(document.body.children).filter(
-                (child) => child !== shadowHost
-            );
+    //     if (shadowHost) {
+    //         const siblings = Array.from(document.body.children).filter(
+    //             (child) => child !== shadowHost
+    //         );
 
-            siblings.forEach((sibling) => {
-                sibling.style.filter = 'blur(20px)';
-            });
+    //         siblings.forEach((sibling) => {
+    //             sibling.style.filter = 'blur(20px)';
+    //         });
 
-            return () => {
-                siblings.forEach((sibling) => {
-                    sibling.style.filter = '';
-                });
-            };
-        }
-    }, []);
+    //         return () => {
+    //             siblings.forEach((sibling) => {
+    //                 sibling.style.filter = '';
+    //             });
+    //         };
+    //     }
+    // }, []);
 
     // const CustomDiv = ({ children, ...props }) => <div {...props}>{children}</div>;
     // const CustomSpan = ({ children, ...props }) => <span {...props}>{children}</span>;
@@ -74,7 +74,7 @@ const ShadowDOMOutlet = () => {
 
 
     return (
-        <div id="goals-extension-content-view-root" className="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
+        <div id="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
            <ShadowCanvas 
         //    article={article}
            />
@@ -92,7 +92,7 @@ const styles = {
     top: 0,
     left: 0,
     border: '2px solid pink',
-    zIndex: 99999999999,
+    // zIndex: -214748364,
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     display: 'flex',
     flexDirection: 'column',

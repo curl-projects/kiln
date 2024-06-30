@@ -14,6 +14,37 @@ import { useState, useEffect } from 'react';
 import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.jsx"
 import FishSwarm from "@pages/content/ui/LocalComponents/FishSwarm/FishSwarm.jsx";
 
+function changePageLayout(){
+  let pageContainer = document.getElementById("kiln-page-container")
+  // create container
+  if(pageContainer){
+    while (pageContainer.firstChild) {
+      document.body.insertBefore(pageContainer.firstChild, pageContainer);
+    }
+  
+    // Remove the pageContainer element
+    pageContainer.remove();
+  }
+  else{
+    const newPageContainer = document.createElement("span");
+    newPageContainer.id = 'kiln-page-container'
+
+    // Move the body's children into this wrapper
+    while (document.body.firstChild){
+      newPageContainer.appendChild(document.body.firstChild);
+    }
+    // Append the wrapper to the body
+    document.body.appendChild(newPageContainer);
+
+    newPageContainer.style.position = 'absolute'
+    // newPageContainer.style.top: 
+    newPageContainer.style.border = '2px solid orange'
+    newPageContainer.style.height = '80vh'
+    newPageContainer.style.width = '40vw'
+    newPageContainer.style.overflow = 'scroll'
+  }
+
+}
 
 export default function App() {
   const [shadowOpen, setShadowOpen] = useState(false);
@@ -26,6 +57,9 @@ export default function App() {
             <circle cx="14.0018" cy="13.9998" r="4.38462" fill="#D0CED4"/>
             <circle cx="14.0015" cy="13.9995" r="12.4231" stroke="#D0CED4" strokeWidth="1.46154"/>
           </svg>
+        </div>
+        <div style={{...styles.canvasActivation, left: '80px'}} onClick={changePageLayout}>
+          <p>Toggle Page</p>
         </div>
       </div>
   );

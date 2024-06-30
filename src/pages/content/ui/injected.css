@@ -184,3 +184,11 @@ p.is-editor-empty:first-child::before {
 .tl-media-concept-toggle:hover{
   transform: scale(1.10);
 }
+
+.tl-kiln-transition-control{
+  transition: all 0.3s ease-in-out;
+}
+
+.tl-kiln-transition-control:hover{
+  filter: contrast(1.05);
+}
