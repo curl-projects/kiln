@@ -232,57 +232,52 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
 
   function handleStoreEvent(change){
-    throttle(async () => {
-      console.log("UPLOADING DATA:");
-      const snapshot = getSnapshot(reactEditor.store);
-      // send message to backend
-      const outMessage = await chrome.runtime.sendMessage({ action: 'save', snapshot: JSON.stringify(snapshot) });
-      // localStorage.setItem('kiln', JSON.stringify(snapshot));
-    }, 500)()
+    // if(change.changes.updated && change.changes.update)
+        for (const record of Object.values(change.changes.added)) {
+            if (record.typeName === 'shape') {
+                console.log(`created shape (${record.type})\n`)
+                if(record.type === 'richText'){
+                    setTextCreated(record)
+                }
+            }
+
+        for (const [from, to] of Object.values(change.changes.updated)) {
+
+
+            if (
+                from.typeName === 'instance' &&
+                to.typeName === 'instance' &&
+                from.currentPageId !== to.currentPageId
+            ) {
+                logChangeEvent(`changed page (${from.currentPageId}, ${to.currentPageId})`)
+            } else if (from.id.startsWith('shape') && to.id.startsWith('shape')) {
+                let diff = _.reduce(
+                    from,
+                    (result, value, key) =>
+                        _.isEqual(value, (to)[key]) ? result : result.concat([key, (to)[key]]),
+                    []
+                )
+                if (diff?.[0] === 'props') {
+                    diff = _.reduce(
+                        (from).props,
+                        (result, value, key) =>
+                            _.isEqual(value, (to).props[key])
+                                ? result
+                                : result.concat([key, (to).props[key]]),
+                        []
+                    )
+                }
+                console.log("update shape:", diff)
+            }
+        }
+
+        for (const record of Object.values(change.changes.removed)) {
+            if (record.typeName === 'shape') {
+              console.log("deleted shape:", (record.type))
+            }
+        }
+    }
   }
-  //       for (const record of Object.values(change.changes.added)) {
-  //           if (record.typeName === 'shape') {
-  //               console.log(`created shape (${record.type})\n`)
-  //               if(record.type === 'richText'){
-  //                   setTextCreated(record)
-  //               }
-  //           }
-
-  //       for (const [from, to] of Object.values(change.changes.updated)) {
-  //           if (
-  //               from.typeName === 'instance' &&
-  //               to.typeName === 'instance' &&
-  //               from.currentPageId !== to.currentPageId
-  //           ) {
-  //               logChangeEvent(`changed page (${from.currentPageId}, ${to.currentPageId})`)
-  //           } else if (from.id.startsWith('shape') && to.id.startsWith('shape')) {
-  //               let diff = _.reduce(
-  //                   from,
-  //                   (result, value, key) =>
-  //                       _.isEqual(value, (to)[key]) ? result : result.concat([key, (to)[key]]),
-  //                   []
-  //               )
-  //               if (diff?.[0] === 'props') {
-  //                   diff = _.reduce(
-  //                       (from).props,
-  //                       (result, value, key) =>
-  //                           _.isEqual(value, (to).props[key])
-  //                               ? result
-  //                               : result.concat([key, (to).props[key]]),
-  //                       []
-  //                   )
-  //               }
-  //               console.log("update shape:", diff)
-  //           }
-  //       }
-
-  //       for (const record of Object.values(change.changes.removed)) {
-  //           if (record.typeName === 'shape') {
-  //             console.log("deleted shape:", (record.type))
-  //           }
-  //       }
-  //   }
-  // }
 
   // function handleUiEvent(e){
   //   console.log("UI EVENT", e)
@@ -318,15 +313,39 @@ export default function ShadowCanvas({ parsedContent, article }) {
       components={customComponents}
       bindingUtils={customBindingUtils}
 
+
       // onUiEvent={handleUiEvent}
       onMount={(editor)=>{
         if(editor){
           editor.root.children.select.children.resizing._createSnapshot = customCreateSnapshot;
-             
+            editor.store.listen(handleStoreEvent)
           editor.root.children.select.children.idle.handleDoubleClickOnCanvas = function(info) {
             handleDoubleClickOnCanvas.call(this, info);
           }.bind({ editor, parent: editor.root.children.select.children.idle.parent });  
         }
+
+        // necessary to avoid weird copy-paste issues
+        document.addEventListener('mouseover', function(event) {
+          var targetElement = event.target; // Get the element that was clicked
+          // console.log("MOUSE OVER", event.target)
+          
+          function getHighestParent(node) {
+            let current = node;
+            while (current.parentNode && current.parentNode !== document.body) {
+                current = current.parentNode;
+            }
+            return current;
+          }
+        
+          const highestParent = getHighestParent(event.target);
+
+          // Check if the clicked element is the div with id kiln-page-container
+          if (highestParent.id === 'kiln-page-container') {
+              editor.setSelectedShapes([])
+          }
+      });
+      
+
     
 
         setReactEditor(editor)
@@ -377,6 +396,10 @@ export default function ShadowCanvas({ parsedContent, article }) {
                 props: {
                   w: shape.props.w
                 }
+              })
+
+              editor.registerExternalContentHandler('text', async ({ point, sources }) => {
+                console.log("HI")
               })
 
               editor.reparentShapes([searchId], shape.id)

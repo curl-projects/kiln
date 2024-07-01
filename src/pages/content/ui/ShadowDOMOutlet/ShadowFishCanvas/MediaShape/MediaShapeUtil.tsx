@@ -74,7 +74,16 @@ getDefaultProps(): MediaShape['props'] {
 		return { 
 			w: 300,
 			h: 300,	
-			text: JSON.stringify(""),
+			text: JSON.stringify({
+				"type": "doc",
+				"content": [
+				  {
+					"type": "paragraph",
+					"content": [
+					]
+				  }
+				]
+			  }),
 			plainText: "",
 			concepts: [
 				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
@@ -98,6 +107,17 @@ getDefaultProps(): MediaShape['props'] {
 		const shapeRef = useRef<HTMLDivElement>();
 		const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
 		const [inferredConcepts, setInferredConcepts] = useState<Concept[]>([]);
+		const [readText, setReadText] = useState("")
+
+		useEffect(()=>{
+			setReadText(shape.props.text)
+			console.log("JSON PARSED EXR", JSON.parse(shape.props.text))
+		}, [shape.props.text])
+
+
+		useEffect(()=>{
+			console.log("READ TEXT", readText)
+		}, [readText])
 
 
 
@@ -117,17 +137,26 @@ getDefaultProps(): MediaShape['props'] {
 			content: JSON.parse(shape.props.text),
 		
 			onUpdate: ({ editor }) => {
+				console.log("UPDATE!")
 				stopEventPropagation;
-				const jsonContent = JSON.stringify(editor.getJSON())
+				const jsonContent = editor.getJSON()
+				console.log("NEW JSON CONTENT!", jsonContent)
+				console.log("NEW JSON CONTENT! STRINGS", JSON.stringify(jsonContent))
+				console.log("NEW JSON CONTENT! PARSED", JSON.parse(JSON.stringify(jsonContent)))
+
 				this.editor.updateShape<MediaShape>({
 					id: shape.id,
 					type: 'media',
 					props: {
-						text: jsonContent,
-						plainText: editor.getText(),
+						text: JSON.stringify(editor.getJSON()),
+						// plainText: editor.getText(),
 						h: Math.max(shape.props.h, shapeRef.current.clientHeight)
 					}
 				})
+
+				console.log("NEW SHAPE VAL:", this.editor.getShape(shape.id))
+
+
 			},
 			onSelectionUpdate: ({ editor }) => {
 			//   stopEventPropagation;
@@ -246,7 +275,7 @@ getDefaultProps(): MediaShape['props'] {
 						<div style={{flex: 1}}/>
 						<div className="tl-media-concept-toggle" onPointerDown={()=>{
 							console.log("Fetching inferred concepts")
-							fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
+							// fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
 						}}>
 							<LuRefreshCcwDot />
 						</div>

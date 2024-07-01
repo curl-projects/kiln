@@ -38,26 +38,24 @@ export default function App() {
   function setUpContainer(){
     const newPageContainer = document.createElement("span");
       newPageContainer.id = 'kiln-page-container'
-  
-  
-      for (let i = 0; i < document.body.childNodes.length; i++) {
-        const child = document.body.childNodes[i];
-        console.log("DOCUMENT CHILD:", child.id);
-        if (child.id !== 'goals-extension-content-view-root') {
-          newPageContainer.appendChild(child)
+    
+      for(let childNode of document.body.children){
+        if (childNode.id !== 'goals-extension-content-view-root') {
+          newPageContainer.appendChild(childNode)
         }
       }
 
       document.body.appendChild(newPageContainer);
     
       Object.assign(newPageContainer.style, {
-        position: 'absolute',
+        position: 'fixed',
         border: '2px solid #DAD9D6', // the last border style will be applied
         height: '84vh',
         width: '44vw',
         overflow: 'scroll',
         left: '24px',
         top: '50%',
+        pointerEvents: 'all',
         transform: 'translateY(-50%)',
         zIndex: '100000000',
         borderRadius: '8px',
