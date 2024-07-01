@@ -16,6 +16,7 @@ import {
 	getDefaultColorTheme,
 	resizeBox,
 	toDomPrecision,
+	ShapeUtil,
 	TLBaseShape,
 	useValue,
 	HTMLContainer,
@@ -41,7 +42,7 @@ import { LuRefreshCcwDot } from "react-icons/lu";
 const mediaShapeProps = {
 	w: T.number,
 	h: T.number,
-	text: T.string,
+	text: T.any,
 	plainText: T.string,
 	concepts: T.array,
 	view: T.string,
@@ -52,7 +53,7 @@ type MediaShape = TLBaseShape<
 	{
 		w: number
 		h: number
-		text: string
+		text: any
 		plainText: string
 		concepts: any
 		view: string
@@ -64,7 +65,7 @@ function getRandomNumber(min, max) {
 }
 
 /** @public */
-export class MediaShapeUtil extends BaseBoxShapeUtil<MediaShape> {
+export class MediaShapeUtil extends ShapeUtil<MediaShape> {
 	static override type = 'media' as const
 	static override props = mediaShapeProps
 
@@ -74,16 +75,7 @@ getDefaultProps(): MediaShape['props'] {
 		return { 
 			w: 300,
 			h: 300,	
-			text: JSON.stringify({
-				"type": "doc",
-				"content": [
-				  {
-					"type": "paragraph",
-					"content": [
-					]
-				  }
-				]
-			  }),
+			text: JSON.stringify(""),
 			plainText: "",
 			concepts: [
 				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
@@ -107,18 +99,40 @@ getDefaultProps(): MediaShape['props'] {
 		const shapeRef = useRef<HTMLDivElement>();
 		const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
 		const [inferredConcepts, setInferredConcepts] = useState<Concept[]>([]);
-		const [readText, setReadText] = useState("")
+		// const [readText, setReadText] = useState(JSON.stringify({
+		// 	"type": "doc",
+		// 	"content": [
+		// 	  {
+		// 		"type": "paragraph",
+		// 		"content": [
+		// 		]
+		// 	  }
+		// 	]
+		//   }))
 
-		useEffect(()=>{
-			setReadText(shape.props.text)
-			console.log("JSON PARSED EXR", JSON.parse(shape.props.text))
-		}, [shape.props.text])
+		// useEffect(()=>{
+		// 	if(shape.props.text){
+		// 		let encoder = new TextEncoder();
+		// 		let utf8Array = encoder.encode(shape.props.text);
+
+		// 		// Decode the text back to a string (ensuring it's UTF-8)
+		// 		let decoder = new TextDecoder('utf-8');
+		// 		let utf8Text = decoder.decode(utf8Array);
+
+		// 		setReadText(utf8Text)
+		// 	}
+			
+		// 	console.log("JSON PARSED EXR", JSON.parse(shape.props.text))
+		// }, [shape.props.text])
 
 
-		useEffect(()=>{
-			console.log("READ TEXT", readText)
-			console.log("READ TEXT PARSED", JSON.parse(readText))
-		}, [readText])
+		// useEffect(()=>{
+		// 	if(readText){
+		// 		console.log("READ TEXT", readText)
+		// 		console.log("READ TEXT PARSED", JSON.parse(readText))
+		// 	}
+
+		// }, [readText])
 
 
 
@@ -128,29 +142,26 @@ getDefaultProps(): MediaShape['props'] {
 			  Document,
 			  Paragraph,
 			  Text,
-			  Placeholder.configure({
-				placeholder: "Capture ideas..."
-			  }),
-			  ColorHighlighter.configure({
-				data: ['Hello']
-			  }),
+			//   Placeholder.configure({
+			// 	placeholder: "Capture ideas..."
+			//   }),
+			//   ColorHighlighter.configure({
+			// 	data: ['Hello']
+			//   }),
 			],
-			content: JSON.parse(shape.props.text),
+			content: shape.props.text,
 		
 			onUpdate: ({ editor }) => {
 				console.log("UPDATE!")
 				stopEventPropagation;
 				const jsonContent = editor.getJSON()
-				console.log("NEW JSON CONTENT!", jsonContent)
-				console.log("NEW JSON CONTENT! STRINGS", JSON.stringify(jsonContent))
-				console.log("NEW JSON CONTENT! PARSED", JSON.parse(JSON.stringify(jsonContent)))
 
 				this.editor.updateShape<MediaShape>({
 					id: shape.id,
 					type: 'media',
 					props: {
-						text: JSON.stringify(editor.getJSON()),
-						// plainText: editor.getText(),
+						text: editor.getJSON(),
+						plainText: editor.getText(),
 						h: Math.max(shape.props.h, shapeRef.current.clientHeight)
 					}
 				})
@@ -160,15 +171,15 @@ getDefaultProps(): MediaShape['props'] {
 
 			},
 			onSelectionUpdate: ({ editor }) => {
-			//   stopEventPropagation;
+			  stopEventPropagation;
 			}
-		  });
+		  }, []);
 
-		  useEffect(() => {
-			if (editor) {
-			  editor.commands.updateData({data: highlightedTexts})
-			}
-		  }, [highlightedTexts, editor]);
+		//   useEffect(() => {
+		// 	if (editor) {
+		// 	  editor.commands.updateData({data: highlightedTexts})
+		// 	}
+		//   }, [highlightedTexts, editor]);
 
 
 		// END TEXT EDITOR
