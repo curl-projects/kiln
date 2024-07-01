@@ -9,20 +9,22 @@ import {
 	useValue,
 } from '@tldraw/editor'
 import { useCallback, useEffect, useRef } from 'react'
-import { WorldModelLabelInput } from './WorldModelLabelInput'
-import Firefly from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FishShape/Firefly.jsx"
-export const WorldModelHeading = function FrameHeading({
+import { FishLabelInput } from './FishLabelInput'
+
+export const FishHeading = function FrameHeading({
 	id,
 	name,
 	width,
 	height,
-	minimized
+	viewMode,
+    worldModel
 }: {
 	id: TLShapeId
 	name: string
 	width: number
 	height: number
-	minimized: boolean
+	viewMode: string
+    worldModel: any
 }) {
 	const editor = useEditor()
 	const pageRotation = useValue(
@@ -90,16 +92,15 @@ export const WorldModelHeading = function FrameHeading({
 
 	return (
 		<div
-			className="tl-frame-heading"
 			style={{
 				overflow: isEditing ? 'visible' : 'hidden',
-				maxWidth: `calc(var(--tl-zoom) * ${
+				maxWidth: worldModel.props.viewMode !== 'fish' ? `calc(var(--tl-zoom) * ${
 					labelSide === 'top' || labelSide === 'bottom' ? Math.ceil(width) : Math.ceil(height)
-				}px + var(--space-5))`,
+				}px + var(--space-5))` : 'unset',
 				// bottom: '100%',
 
-				transform: `scale(var(--tl-scale))`,
-				transformOrigin: "top left",
+				// transform: `scale(var(--tl-scale))`,
+				// transformOrigin: "top left",
 				borderRadius: '6px',
 				backgroundColor: "rgba(255, 255, 255, 0.55)",
 				border: '1px solid rgba(255, 255, 255, 0.95)',
@@ -110,32 +111,77 @@ export const WorldModelHeading = function FrameHeading({
 				textTransform: 'uppercase',
 				fontWeight: 600,
 				fontSize: '12px',
+                display: 'flex',
 				letterSpacing: "0.03em",
-				paddingRight: minimized ? "0px !important" : "unset",
+				// paddingRight: minimized ? "0px !important" : "unset",
 			}}
 			onPointerDown={handlePointerDown}
 		>
 			<div className="tl-frame-heading-hit-area">
-				<WorldModelLabelInput ref={rInput} id={id} name={name} isEditing={isEditing} />
+				<FishLabelInput ref={rInput} id={id} name={name} isEditing={isEditing} />
 			</div>
-			{minimized &&
+			{['fish', 'minimized'].includes(viewMode) &&
+                <div style={{
+                    display: 'flex',
+                    gap: "6px",
+                }}>
 				<div style={{
 					borderRadius: '100%',
 					margin: 0,
 					height: '18px',
 					width: '20px',
-					backgroundColor: "rgba(99, 99, 94, 0.5)",
+					// backgroundColor: "rgba(99, 99, 94, 0.5)",
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
 					position: 'relative',
 				}}>
-					<p style={{
+					<p 
+                    className='kiln-fish-full-button'
+                    onPointerDown={()=>{
+
+                        const worldModelBinding = editor.getBindingsToShape(worldModel.id, 'fishWorldModel')[0]
+                        const fish = editor.getShape(worldModelBinding.fromId)
+                        let [x, y] = [fish.x, fish.y]
+
+                        // reparent world model and place on page
+                        editor.reparentShapes([worldModelBinding.toId], editor.getCurrentPageId())
+
+                        editor.updateShape({
+                            id: worldModel.id,
+                            type: 'worldModel',
+                            isLocked: false,
+                            opacity: 1,
+                            x: x - 10,
+                            y: y - 10,
+                            props: {
+                                viewMode: 'full'
+                            }
+                        })
+
+                        // reparent fish and place on world model
+                        editor.reparentShapes([worldModelBinding.fromId], worldModelBinding.toId)
+
+                        editor.updateShape({
+                            id: worldModelBinding.fromId,
+                            type: 'fish',
+                            x: 10,
+                            y: 10,
+                        })
+
+                        
+                    }}
+                    style={{
 						margin: "0px", 
-						
-						color: "rgb(249, 249, 248)"
-					}}>3</p>
+						cursor: "pointer",
+						color: "rgb(0, 0, 0)",
+                        border: "2px solid black",
+                        height: "20px",
+                        width: '20px',
+					}}>+</p>
 				</div>
+                </div>
+                
 			}
 			
 		</div>

@@ -4,7 +4,6 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/core'
 
 function findColors(doc: Node, data: string[]): DecorationSet {
-  console.log("FIND COLORS DATA:", data)
   const regex = new RegExp(data.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
 
   // const hexColor = /(#[0-9a-f]{3,6})\b/gi

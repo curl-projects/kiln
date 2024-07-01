@@ -3,6 +3,7 @@ import ShadowDOMOutlet from "@pages/content/ui/ShadowDOMOutlet/ShadowDOMOutlet.j
 import { FaExpandArrowsAlt } from "react-icons/fa";
 import { TbBrandPagekit } from "react-icons/tb";
 import { SiPaperswithcode } from "react-icons/si";
+import CaptureHighlight from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/CustomUI/CaptureHighlight.jsx"
 
 export default function App() {
   const [shadowOpen, setShadowOpen] = useState(false);
@@ -20,7 +21,7 @@ export default function App() {
   
   function tearDownContainer(){
     const shadowDOM = document.getElementById('shadowDOMWrapper')
-    if(shadowDOM){shadowDOM.style.zIndex = 'unset'}
+    if(shadowDOM){shadowDOM.style.zIndex = '10000000'}
 
     let pageContainer = document.getElementById("kiln-page-container")
   
@@ -80,6 +81,8 @@ export default function App() {
         // close canvas
 
       case 'mixed': 
+        tearDownContainer();
+        closeCanvas();
         openCanvas();
         setUpContainer();
         break
@@ -97,7 +100,7 @@ export default function App() {
 
   return (
       <div style={styles.app}>
-        {shadowOpen && <ShadowDOMOutlet />}
+        <ShadowDOMOutlet shadowOpen={shadowOpen} canvasMode={canvasMode}/>
         <div style={{
           position: 'fixed',
           bottom: "40px",
@@ -144,7 +147,8 @@ export default function App() {
           <p>Toggle Page</p>
         </div> */}
       {canvasMode === 'mixed' &&
-        <div style={{
+        <div 
+        style={{
           position: 'absolute',
           left: '24px',
           top: '8vh',
@@ -171,7 +175,9 @@ export default function App() {
             color: "#82827C",
             margin: 0,
           }}>A Criticism of Effective Software</p>
-          <div style={{
+          <div 
+          onClick={()=> { setCanvasMode('page') }}
+          style={{
             height: '18px',
             width: '18px',
             margin: 0,
@@ -180,6 +186,7 @@ export default function App() {
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: '100%',
+            cursor: 'pointer',
           }}>
             <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" clipRule="evenodd" d="M0.637995 5.96455C0.506085 5.83264 0.506085 5.61878 0.637994 5.48687L5.12801 0.996841L2.22794 0.996841C2.04139 0.996841 1.89017 0.845614 1.89017 0.659066C1.89017 0.472517 2.04139 0.32129 2.22794 0.32129L5.94348 0.321289C6.03306 0.321289 6.11897 0.356876 6.18232 0.420221C6.24566 0.483567 6.28125 0.569481 6.28125 0.659065L6.28125 4.3746C6.28125 4.56115 6.13002 4.71238 5.94347 4.71238C5.75693 4.71238 5.6057 4.56115 5.6057 4.3746L5.6057 1.47453L1.11568 5.96455C0.983772 6.09646 0.769905 6.09646 0.637995 5.96455Z" fill="#C9C8C9"/>
@@ -187,6 +194,7 @@ export default function App() {
           </div>
         </div>
       }
+      <CaptureHighlight />
       </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { stopEventPropagation } from 'tldraw';
 
-export function WorldModelControlButton({idx, title, icon, activeIcon, setSelectedOutput, isActive}){
+export function WorldModelControlButton({idx, title, icon, activeIcon, setSelectedOutput, isActive, editor, shape}){
     const [isHovered, setIsHovered] = useState(false)
     
     return(
@@ -11,6 +11,16 @@ export function WorldModelControlButton({idx, title, icon, activeIcon, setSelect
                 setSelectedOutput(null)
             }
             else{
+                if(shape.props.viewMode === 'full'){
+                    editor.updateShape({
+                        id: shape.id,
+                        type: shape.type,
+                        props: {
+                            storedW: shape.props.w,
+                            storedH: shape.props.h,
+                        }
+                    })
+                }
                 setSelectedOutput(title)
             }
     

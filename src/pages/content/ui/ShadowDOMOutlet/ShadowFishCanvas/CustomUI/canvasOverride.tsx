@@ -27,8 +27,8 @@ export function handleDoubleClickOnCanvas(info: TLClickEventInfo) {
                 type: shape.type,
                 props: {
                     destination: {
-                        x: 100,
-                        y: 100,
+                        x: x,
+                        y: y,
                     }
                 }
             })

@@ -4,6 +4,9 @@ import { HTMLContainer, ShapeUtil } from 'tldraw'
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import _ from 'lodash';
 import { handleDoubleClickOnCanvas } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/CustomUI/canvasOverride.tsx"
+
+import { fetchInferredConcepts } from "@pages/content/ui/ServerFuncs/api.tsx"
+
 // IMPORTING UI
 import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
 
@@ -29,7 +32,14 @@ import { MediaConceptBindingUtil } from "@pages/content/ui/ShadowDOMOutlet/Shado
 import { ConceptShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeUtil.tsx"
 import { ConceptShapeTool } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeTool.tsx"
 
+import { FeedShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FeedShape/FeedShapeUtil.tsx"
+import { FeedBindingUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FeedShape/FeedShapeBindingUtil.tsx"
+
 import { FishShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FishShape/FishShapeUtil.tsx"
+import { FishWorldModelBindingUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FishShape/FishWorldModelBindingUtil.tsx"
+
+import { SearchShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FeedShape/SearchShape/SearchShapeUtil.tsx"
+import { SearchBindingUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/FeedShape/SearchShape/SearchShapeBindingUtil.tsx"
 
 // import text tool
 
@@ -38,9 +48,9 @@ import { FishShapeUtil } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanva
 
 export default function ShadowCanvas({ parsedContent, article }) {
 //   const [store] = useState(() => createTLStore({ shapeUtils }));
-  const customShapeUtils = [WorldModelShapeUtil, MediaShapeUtil, ConceptShapeUtil, KinematicCanvasShapeUtil, FishShapeUtil]
+  const customShapeUtils = [WorldModelShapeUtil, MediaShapeUtil, ConceptShapeUtil, KinematicCanvasShapeUtil, FishShapeUtil, FeedShapeUtil, SearchShapeUtil]
 
-  const customBindingUtils = [KinematicCanvasBindingUtil, MediaConceptBindingUtil]
+  const customBindingUtils = [KinematicCanvasBindingUtil, MediaConceptBindingUtil, FeedBindingUtil, SearchBindingUtil, FishWorldModelBindingUtil]
   const customTools = [
     WorldModelShapeTool,
     MediaShapeTool,
@@ -254,62 +264,114 @@ export default function ShadowCanvas({ parsedContent, article }) {
         )
 
         editor.sideEffects.registerAfterCreateHandler('shape', (shape) => {
-          console.log("HI!")
-          if(shape.type === 'media'){
+          if(shape.type === 'feed'){
+            editor.batch(()=>{
+              const searchId = createShapeId();
 
-            for(let mediaConcept of shape.props.concepts){
-              let mediaConceptId = createShapeId();
               editor.createShape({
-                id: mediaConceptId,
-                type: mediaConcept.type,
-                x: 0,
-                y: 0,
+                id: searchId,
+                type: "search",
+                x: shape.x,
+                y: shape.y,
                 props: {
-                  text: mediaConcept.text,
+                  w: shape.props.w
                 }
               })
 
-              editor.reparentShapes([mediaConceptId], shape.id)
+              editor.reparentShapes([searchId], shape.id)
 
               editor.createBinding({
-                type: "mediaConcept",
-                fromId: mediaConceptId,
+                type: "searchFeedBinding",
+                fromId: searchId,
                 toId: shape.id,
               })
+
+            })
+          }
+          if(shape.type === 'media'){
+            if(shape.props.text !== "\"\""){
+
+              // generate concepts
+              console.log("Generating Inferred Concepts After Shape Creation")
+              fetchInferredConcepts(editor, shape, [{text: shape.props.text}])
             }
+          }
 
+          if(shape.type === 'worldModel'){
+            editor.batch(()=>{
+              const fishId = createShapeId();
 
+              editor.createShape({
+                id: fishId,
+                type: "fish",
+                x: shape.x,
+                y: shape.y,
+              })
 
-            // const padding = 20
-            // const minX = shape.x + padding, maxX = shape.x + shape.props.w - padding;
-            // const minY = shape.y + padding, maxY = shape.y + shape.props.h - padding;
-            
-            // editor.batch(() => {
-            //   const conceptShapes = shape.props.concepts.map((el) => {
-            //     return(
-            //       {
-            //         id: createShapeId(),
-            //         type: el.type,
-            //         x: minX + Math.random() * (maxX - minX),
-            //         y: minY + Math.random() * (maxY - minY),
-            //         props: {
-            //           text: el.text,
-            //         }
-            //       }
-            //     )	
+              editor.reparentShapes([fishId], shape.id)
+
+              editor.createBinding({
+                type: "fishWorldModel",
+                fromId: fishId,
+                toId: shape.id,
+              })
+
+            })
+          }
+
+            // for(let mediaConcept of shape.props.concepts){
+            //   let mediaConceptId = createShapeId();
+            //   editor.createShape({
+            //     id: mediaConceptId,
+            //     type: mediaConcept.type,
+            //     x: 0,
+            //     y: 0,
+            //     props: {
+            //       text: mediaConcept.text,
+            //     }
             //   })
-  
-            //   console.log("CONCEPT SHAPES:", conceptShapes)
-  
-            //   const createdShapes = editor.createShapes(conceptShapes)
-  
-            //   console.log("CREATED SHAPES:", createdShapes)
-  
-            //   editor.reparentShapes(conceptShapes, shape.id)
-              
-            // })
 
-          }  
+            //   editor.reparentShapes([mediaConceptId], shape.id)
+
+            //   editor.createBinding({
+            //     type: "mediaConcept",
+            //     fromId: mediaConceptId,
+            //     toId: shape.id,
+            //   })
+            // }
+
+
+
+          //   // const padding = 20
+          //   // const minX = shape.x + padding, maxX = shape.x + shape.props.w - padding;
+          //   // const minY = shape.y + padding, maxY = shape.y + shape.props.h - padding;
+            
+          //   // editor.batch(() => {
+          //   //   const conceptShapes = shape.props.concepts.map((el) => {
+          //   //     return(
+          //   //       {
+          //   //         id: createShapeId(),
+          //   //         type: el.type,
+          //   //         x: minX + Math.random() * (maxX - minX),
+          //   //         y: minY + Math.random() * (maxY - minY),
+          //   //         props: {
+          //   //           text: el.text,
+          //   //         }
+          //   //       }
+          //   //     )	
+          //   //   })
+  
+          //   //   console.log("CONCEPT SHAPES:", conceptShapes)
+  
+          //   //   const createdShapes = editor.createShapes(conceptShapes)
+  
+          //   //   console.log("CREATED SHAPES:", createdShapes)
+  
+          //   //   editor.reparentShapes(conceptShapes, shape.id)
+              
+          //   // })
+
+          // }  
         })
 
   

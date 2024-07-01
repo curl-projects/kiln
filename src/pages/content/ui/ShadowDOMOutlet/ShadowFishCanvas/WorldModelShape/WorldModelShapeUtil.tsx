@@ -10,8 +10,8 @@ import {
 	TLShape,
 	canonicalizeRotation,
 	frameShapeMigrations,
-	frameShapeProps,
 	T,
+	frameShapeProps,
 	invLerp,
 	TLBaseShape,
 	getDefaultColorTheme,
@@ -30,6 +30,8 @@ import { createTextJsxFromSpans } from './shared/createTextJsxFromSpans'
 import { useDefaultColorTheme } from './shared/useDefaultColorTheme'
 import { WorldModelHeading } from './WorldModelHeading'
 import { WorldModelControlButton } from './WorldModelControlButton';
+import { handleFeedSearch } from '@pages/content/ui/ServerFuncs/api'
+import { Feed } from "@root/src/pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/WorldModelShape/Feed/Feed.jsx"
 
 export function last<T>(arr: readonly T[]): T | undefined {
 	return arr[arr.length - 1]
@@ -44,7 +46,7 @@ export const worldModelShapeProps = {
 	w: T.nonZeroNumber,
 	h: T.nonZeroNumber,
 	name: T.string,
-	minimized: T.boolean,
+	viewMode: T.string, // full, minimized, fish
 	storedW: T.number,
 	storedH: T.number,
 }
@@ -67,7 +69,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 	static override migrations = frameShapeMigrations
 
 	override canEdit = (shape) => {
-		return shape.props.minimized ? false : true
+		return shape.props.viewMode === 'full' ? true : false
 	}
 
 	override canBind(){
@@ -75,13 +77,13 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 	}
 
 	override canResize = (shape) => {
-		return shape.props.minimized ? false : true
+		return shape.props.viewMode === 'full' ? true : false
 	}
 
 	override canCrop = () => true
 
 	override getDefaultProps(): TLWorldModelShape['props'] {
-		return { w: 160 * 2, h: 90 * 2, name: '', minimized: false, storedW: 160 * 2, storedH: 90 * 2}
+		return { w: 160 * 2, h: 90 * 2, name: '', viewMode: 'full', storedW: 160 * 2, storedH: 90 * 2}
 	}
 
 	override getGeometry(shape: TLWorldModelShape): Geometry2d {
@@ -94,7 +96,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 	override component(shape: TLWorldModelShape) {
 		const [selectedOutput, setSelectedOutput] = useState(null);
-		const [viewType, setViewType] = useState("media")
+		const [childrenViewType, setChildrenViewType] = useState("media")
 
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 		const selectedShapes = this.editor.getSelectedShapeIds();
@@ -108,40 +110,73 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 			for(let child of children){
 				if(child.type === 'media'){
-					this.editor.updateShape({id: child.id, type: child.type, props: { view: viewType }})
+					this.editor.updateShape({id: child.id, type: child.type, props: { view: childrenViewType }})
 				}
 			}
 			
-		}, [viewType])
+		}, [childrenViewType])
 
 		useEffect(()=>{
-			console.log("MINIMIZED?", shape.props.minimized)
+			console.log("VIEW MODE CHANGED", shape.props.viewMode)
 
-			const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
 
-			// if minimized, hide all children
-			if(shape.props.minimized){
-				for(let child of children){
-					this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+				if(shape.props.viewMode === 'minimized'){
+					const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+					for(let child of children){
+						child.type !== 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+					}
+
+					this.editor.updateShape(
+						{id: shape.id, type: shape.type, opacity: 1, isLocked: false, props: {
+						w: 270,
+						h: 160,
+					}})
 				}
-				this.editor.updateShape(
-					{id: shape.id, type: shape.type, props: {
-					storedW: shape.props.w,
-					storedH: shape.props.h,
-					w: 270,
-					h: 160,
-				}})
-			}
-			else{
-				for(let child of children){
-					this.editor.updateShape({id: child.id, type: child.type, isLocked: false, opacity: 1})
+				else if(shape.props.viewMode === 'fish'){
+					const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+					for(let child of children){
+						child.type !== 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+					}
+					// get fish
+					const fishBinding = this.editor.getBindingsToShape(shape, 'fishWorldModel')[0]
+					
+					// change parent relationships
+					
+					let [x, y] = [shape.x, shape.y]
+					this.editor.batch(()=>{
+						
+						this.editor.reparentShapes([fishBinding.fromId], this.editor.getCurrentPageId())
+						this.editor.reparentShapes([fishBinding.toId], fishBinding.fromId),
+
+						console.log("X: Y:L", x, y )
+
+						this.editor.updateShape(
+							{id: shape.id, type: shape.type, opacity: 0, isLocked: true, props: {
+							w: 1,
+							h: 1,
+						}})	
+					})
+					this.editor.updateShape({id: fishBinding.fromId, type: "fish", 
+						x: x + 10,
+						y: y + 10
+			}	)
 				}
-				this.editor.updateShape({id: shape.id, type: shape.type, props: {
-					w: shape.props.storedW,
-					h: shape.props.storedH,
-				}})
-			}
-		}, [shape.props.minimized])
+				else{
+					const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+					for(let child of children){
+						this.editor.updateShape({id: child.id, type: child.type, isLocked: false, opacity: 1})
+					}
+					console.log("SHAPE:", shape)
+					this.editor.updateShape({id: shape.id, type: shape.type, opacity: 1, isLocked: false, props: {
+						w: shape.props.storedW,
+						h: shape.props.storedH,
+	
+					}})
+				}
+		}, [shape.props.viewMode])
 
 
 		useEffect(()=>{
@@ -149,7 +184,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 				// hide canvas when another option is suppressed
 				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
 				for(let child of children){
-					if(child.type === 'kinematicCanvas'){
+					if((child.type === 'kinematicCanvas' || child.type === 'feed')){
 						this.editor.updateShape({...child, opacity: 0, isLocked: true})
 					}
 				}
@@ -157,7 +192,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 			else{
 				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
 				for(let child of children){
-					if(child.type === 'kinematicCanvas'){
+					if((child.type === 'kinematicCanvas' || child.type === 'feed')){
 						this.editor.updateShape({...child, opacity: 1, isLocked: false})
 					}
 				}
@@ -182,6 +217,13 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 		useEffect(() => {
 			if(selectedOutput === 'manipulate'){
 				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+				// delete all other child shapes
+				for(let child of children){
+					if(child.type === 'feed'){
+						this.editor.deleteShape(child)
+					}
+				}
 
 				// if no kinematic canvas exists
 				if(!children.some(child => child.type === 'kinematicCanvas')){
@@ -211,16 +253,57 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 				
 			}
 
-			else{
-				
-				// delete canvas when another option is suppressed
+			else if(selectedOutput === 'discover'){
 				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+
+				// delete all other child shapes
 				for(let child of children){
 					if(child.type === 'kinematicCanvas'){
 						this.editor.deleteShape(child)
 					}
 				}
+
+				// if no kinematic canvas exists
+				if(!children.some(child => child.type === 'feed')){
+
+					// create it
+					const feedId = createShapeId();
+					this.editor.createShape({
+						id: feedId,
+						type: "feed",
+						x: shape.x+shape.props.w+80,
+						y: shape.y,
+						props: {
+							w: 400,
+							h: shape.props.h,
+						}
+					})
+
+					this.editor.reparentShapes([feedId], shape.id)
+
+					// bind it to the world model using the kinematic canvas binding util
+					this.editor.createBinding({
+						type: "feed",
+						fromId: feedId,
+						toId: shape.id,
+					})
+				}
+				
 			}
+			else if(selectedOutput === 'fish'){
+				this.editor.updateShape({id: shape.id, type: shape.type, props: {
+					viewMode: 'fish',
+				}})
+			}
+			else{
+				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
+				 // delete all other child shapes
+				for(let child of children){
+					if((child.type === 'feed' || child.type === 'kinematicCanvas')){
+						this.editor.deleteShape(child)
+					}
+				}
+				}
 		}, [selectedOutput])
 
 		useEffect(()=>{
@@ -231,6 +314,8 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 			<HTMLContainer 
 				style={{
 					position: 'relative', 
+					width: bounds.width,
+					height: bounds.height,
 					boxSizing: 'border-box'}} 
 				
 				onPointerDown={stopEventPropagation}>
@@ -253,8 +338,19 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 					/>
 				</SVGContainer>
+				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 				<p 
-				onPointerDown={()=>this.editor.updateShape({id: shape.id, type: shape.type, props: { minimized: !shape.props.minimized }})}
+				onPointerDown={()=>{
+					selectedOutput === 'fish' && setSelectedOutput(null)
+					this.editor.updateShape({
+						id: shape.id, 
+						type: shape.type, 
+						props: { 
+							viewMode: ['fish', 'minimized'].includes(shape.props.viewMode) ? 'full' : "minimized" ,
+							storedW: shape.props.viewMode === 'full' ? shape.props.w : shape.props.storedW,
+							storedH: shape.props.viewMode === 'full' ? shape.props.h : shape.props.storedH,
+						}
+					})}}
 				style={{
 					margin: 0,
 					padding: 0,
@@ -268,8 +364,9 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 					justifyContent: 'center',
 					fontSize: '40px',
 					cursor: 'pointer',
-					}}>{shape.props.minimized ? "+" : "-"}</p>
-				{!shape.props.minimized && 
+					}}>{['fish', 'minimized'].includes(shape.props.viewMode) ? "-" : "+"}</p>
+				}
+				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 					<div style={{
 						position: 'absolute',
 						pointerEvents: "all",
@@ -286,12 +383,12 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 						paddingRight: '10px',
 					}}>
 						<div 
-						onPointerDown={()=>setViewType('media')}
+						onPointerDown={()=>setChildrenViewType('media')}
 						className='tl-kiln-transition-control' style={{
 							height: '38px',
 							width: '38px',
 							borderRadius: '8px',
-							border: viewType === 'media' ? '2px solid #63635E' : "2px solid #E8E7E9",
+							border: childrenViewType === 'media' ? '2px solid #63635E' : "2px solid #E8E7E9",
 							display: 'flex',
 							justifyContent: 'center',
 							alignItems: 'center',
@@ -300,18 +397,18 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 							<div style={{
 								height: '8px',
 								width: '8px',
-								backgroundColor: viewType === 'media' ? "#636353" : "#D0CED4",
+								backgroundColor: childrenViewType === 'media' ? "#636353" : "#D0CED4",
 								borderRadius: "100%"
 							}}/>
 
 						</div>
 						<div 
-						onPointerDown={()=>setViewType('concepts')}
+						onPointerDown={()=>setChildrenViewType('concepts')}
 						className='tl-kiln-transition-control' style={{
 							height: '38px',
 							width: '38px',
 							borderRadius: '8px',
-							border: viewType === 'concepts' ? '2px solid #63635E' : "2px solid #E8E7E9",
+							border: childrenViewType === 'concepts' ? '2px solid #63635E' : "2px solid #E8E7E9",
 							display: 'flex',
 							justifyContent: 'center',
 							alignItems: 'center',
@@ -323,13 +420,13 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 								alignItems: 'center',
 								height: '26px',
 								width: '26px',
-								border: viewType === 'concepts' ? "1.5px solid #63635E" : "1.5px solid #D0CED4",
+								border: childrenViewType === 'concepts' ? "1.5px solid #63635E" : "1.5px solid #D0CED4",
 								borderRadius: '100%',
 							}}>
 								<div style={{
 									height: '8px',
 									width: '8px',
-									backgroundColor: viewType === 'concepts' ? "#63635E" : "#D0CED4",
+									backgroundColor: childrenViewType === 'concepts' ? "#63635E" : "#D0CED4",
 									borderRadius: "100%"
 								}}/>
 							</div>
@@ -338,7 +435,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 					</div>
 				}
-				{isCreating  ? null : (
+				{/* {isCreating  ? null : (
 					<WorldModelHeading
 						id={shape.id}
 						name={shape.props.name}
@@ -346,8 +443,8 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 						height={bounds.height}
 						minimized={shape.props.minimized}
 					/>
-				)}
-				{(!shape.props.minimized && !isCreating && (frameIsSelected || frameIsAncestor)) &&
+				)} */}
+				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 					<div 
 					onPointerDown={stopEventPropagation}
 					className={classNames('tl-worldModel-controls')} style={{
@@ -459,8 +556,9 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 									icon={el.icon}
 									activeIcon={el.activeIcon}
 									isActive={selectedOutput===el.title}
-
 									setSelectedOutput={setSelectedOutput}
+									editor={this.editor}
+									shape={shape}
 								/>
 							))
 							}
@@ -473,28 +571,10 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 						}}>
 						{{
-							"manipulate": 
-							<SVGContainer>
-							{/* // <svg style={{ height: '100%', width: }}> */}
-								<defs>
-									<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
-									<feDropShadow dx="0" dy="36" stdDeviation="21" floodColor="#4D4D4D" floodOpacity="0.15"/>
-									</filter>
-								</defs>
-								<rect
-									// className={classNames('tl-frame__body', { 'tl-frame__creating': isCreating })}
-									width="100%"
-									height="100%"
-									rx="12"
-									ry="12"
-									fill="#F9F9F8"
-									strokeWidth="1"
-									stroke="#DDDDDA"
-									filter="url(#boxShadow)"
-			
-								/>
-							{/* </svg> */}
-							// </SVGContainer>
+							"manipulate": <div></div>,
+							"discover": <div></div>
+							
+				
 						}[selectedOutput]
 						}
 						</div>
@@ -543,16 +623,37 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 		// If frame is in a group, keep the shape
 		// moved out in that group
 
-		if(!_shape.props.minimized){
+		if(_shape.props.viewMode === 'full'){
 			if (isInGroup) {
-				this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), parent.id)
+				this.editor.reparentShapes(shapes.filter(shape => !['kinematicCanvas', 'feed', 'fish'].includes(shape.type)), parent.id)
 			} else {
-				this.editor.reparentShapes(shapes.filter(shape => shape.type !== 'kinematicCanvas'), this.editor.getCurrentPageId())
+				this.editor.reparentShapes(shapes.filter(shape => !['kinematicCanvas', 'feed', 'fish'].includes(shape.type)), this.editor.getCurrentPageId())
 			}
 		}
 	}
 
-	override onResize: TLOnResizeHandler<any> = (shape, info) => {		
+	override onResize: TLOnResizeHandler<any> = (shape, info) => {	
 		return resizeBox(shape, info)
 	}
 }
+
+			
+// <div style={{
+// 	height: '100%',
+// 	width: '100%',
+// 	border: '2px solid black'
+// }}>
+// 	<button onMouseDown={async()=>{
+// 		const results: any = await handleFeedSearch('hottest AI startups')
+// 		console.log("RESULTS:", results)
+// 		setQueryResults(results)
+// 	}}>Search</button>
+// 	{queryResults && queryResults.map((result, idx) => 
+// 		<div key={idx}>
+// 			<p><b>{result.title} | {result.url}</b></p>
+// 			<p>{result.text}</p>
+// 		</div>
+// 	)
+
+// 	}
+// </div>

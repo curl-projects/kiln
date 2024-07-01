@@ -5,76 +5,21 @@ import { useCustomReadability } from '../ScriptHelpers/useCustomReadability';
 import ShadowCanvas from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ShadowFishCanvas.jsx"
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 
-const ShadowDOMOutlet = () => {
+const ShadowDOMOutlet = ({ shadowOpen, canvasMode}) => {
     // const article = useCustomReadability();
     // const [parsedContent, setParsedContent] = useState({})
     // const [textContent, setTextContent] = useState({})
     // const { fishOrchestrator } = useFish();
     // const [ripples, setRipples] = useState([]);
 
-
-    // useEffect(() => { 
-    //     console.log("ARTICLE:", article);
-    // }, [article]);
-
-    // useEffect(() => {
-    //     const shadowHost = document.getElementById('goals-extension-content-view-root');
-
-    //     if (shadowHost) {
-    //         const siblings = Array.from(document.body.children).filter(
-    //             (child) => child !== shadowHost
-    //         );
-
-    //         siblings.forEach((sibling) => {
-    //             sibling.style.filter = 'blur(20px)';
-    //         });
-
-    //         return () => {
-    //             siblings.forEach((sibling) => {
-    //                 sibling.style.filter = '';
-    //             });
-    //         };
-    //     }
-    // }, []);
-
-    // const CustomDiv = ({ children, ...props }) => <div {...props}>{children}</div>;
-    // const CustomSpan = ({ children, ...props }) => <span {...props}>{children}</span>;
-    // const CustomP = ({ children, ...props }) => <p style={styles.shadowDOMParagraph} {...props}>{children}</p>;
-    // const CustomA = ({ children, ...props }) => <p style={styles.shadowDOMLink} {...props}>{children}</p>;
-
-    // const tagToComponentMap = {
-    //     div: CustomDiv,
-    //     span: CustomSpan,
-    //     p: CustomP,
-    //     a: CustomA,
-    // };
-
-    // const processNode = (node) => {
-    //     if (node.type === 'tag' && tagToComponentMap[node.name]) {
-    //         const CustomComponent = tagToComponentMap[node.name];
-
-    //         console.log("NODE:", node)
-
-    //         return (
-    //             <CustomComponent type={node.type} name={node.name} data={node.data} nodeAttrs={{...node.attribs}}>
-    //                 {domToReact(node.children, { replace: processNode, trim: true })}
-    //             </CustomComponent>
-    //         );
-    //     }
-    //     return node;
-    // };
-    
-    // useEffect(() => {
-    //     if(article?.sanitizedContent){
-    //         const parsed = parse(article.sanitizedContent, { trim: true, replace: processNode  });
-    //         console.log("PARSED:", parsed)
-    //         setParsedContent(parsed)
-    //     }
-    // }, [article]);
-
-
     return (
-        <div id="shadowDOMWrapper" style={styles.shadowDOMWrapper}>
+        <div 
+          id="shadowDOMWrapper" 
+          style={{
+            ...styles.shadowDOMWrapper, 
+            display: shadowOpen ? 'block' : 'none',
+            zIndex: (shadowOpen && canvasMode === 'canvas') ? 21474836 : 0,
+          }}>
            <ShadowCanvas 
         //    article={article}
            />

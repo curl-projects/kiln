@@ -35,12 +35,14 @@ import { Text } from '@tiptap/extension-text';
 import Linter, { BadWords } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/CustomUI/TextExtensions/LinterExtension"
 import { ColorHighlighter } from '../CustomUI/TextExtensions/HighlightExtension/HighlightExtension';
 import Placeholder from '@tiptap/extension-placeholder'
-import { Shapes } from 'lucide-react';
+import { Concept, Media, inferConcepts, systemPrompt, fetchInferredConcepts } from "@pages/content/ui/ServerFuncs/api"
+import { LuRefreshCcwDot } from "react-icons/lu";
 
 const mediaShapeProps = {
 	w: T.number,
 	h: T.number,
 	text: T.string,
+	plainText: T.string,
 	concepts: T.array,
 	view: T.string,
 }
@@ -51,6 +53,7 @@ type MediaShape = TLBaseShape<
 		w: number
 		h: number
 		text: string
+		plainText: string
 		concepts: any
 		view: string
 	}
@@ -72,9 +75,10 @@ getDefaultProps(): MediaShape['props'] {
 			w: 300,
 			h: 300,	
 			text: JSON.stringify(""),
+			plainText: "",
 			concepts: [
-				{"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
-				{"type": "concept", "text": JSON.stringify("The Self & Media")}
+				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
+				// {"type": "concept", "text": JSON.stringify("The Self & Media")}
 			  ],
 			view: 'media',		  
 		}
@@ -88,29 +92,16 @@ getDefaultProps(): MediaShape['props'] {
 		})
 	}
 
-	component(shape: MediaShape) {
+	component(shape: MediaShape) {	
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 		const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
 		const shapeRef = useRef<HTMLDivElement>();
 		const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
+		const [inferredConcepts, setInferredConcepts] = useState<Concept[]>([]);
 
-		useEffect(()=>{
-			if(shape.props.view === 'media'){
-				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
-				for(let bind of bindings){
-					const boundConcept = this.editor.getShape(bind.fromId)
-					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 0, isLocked: true})
-				}
-			}
-			else if(shape.props.view === 'concepts'){
-				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
-				for(let bind of bindings){
-					const boundConcept = this.editor.getShape(bind.fromId)
-					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 1, isLocked: false})
-				}
-			}
-		}, [shape.props.view])
 
+
+		// TEXT EDITOR
 		const editor = useEditor({
 			extensions: [
 			  Document,
@@ -133,6 +124,7 @@ getDefaultProps(): MediaShape['props'] {
 					type: 'media',
 					props: {
 						text: jsonContent,
+						plainText: editor.getText(),
 						h: Math.max(shape.props.h, shapeRef.current.clientHeight)
 					}
 				})
@@ -147,7 +139,62 @@ getDefaultProps(): MediaShape['props'] {
 			  editor.commands.updateData({data: highlightedTexts})
 			}
 		  }, [highlightedTexts, editor]);
+
+
+		// END TEXT EDITOR
+
+		// INFER CONCEPTS
+
+		// useEffect(()=>{
+		// 	if(shape.props.concepts?.length > 0){
+		// 		const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
+		// 		if(bindings.length === 0){
+		// 			for(let mediaConcept of shape.props.concepts){
+		// 				let mediaConceptId = createShapeId();
+		// 				this.editor.createShape({
+		// 				  id: mediaConceptId,
+		// 				  type: mediaConcept.type,
+		// 				  x: 0,
+		// 				  y: 0,
+		// 				  props: {
+		// 					text: mediaConcept.text,
+		// 				  }
+		// 				})
+		  
+		// 				this.editor.reparentShapes([mediaConceptId], shape.id)
+		  
+		// 				this.editor.createBinding({
+		// 				  type: "mediaConcept",
+		// 				  fromId: mediaConceptId,
+		// 				  toId: shape.id,
+		// 				})
+		// 			}
+		// 		}
+		// 	}
+		// }, [shape.props.concepts])
+
+		// END INFER CONCEPTS
 		
+
+		// SWITCH VIEW
+		useEffect(()=>{
+			if(shape.props.view === 'media'){
+				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
+				for(let bind of bindings){
+					const boundConcept = this.editor.getShape(bind.fromId)
+					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 0, isLocked: true})
+				}
+			}
+			else if(shape.props.view === 'concepts'){
+				const bindings = this.editor.getBindingsToShape(shape, 'mediaConcept')
+				for(let bind of bindings){
+					const boundConcept = this.editor.getShape(bind.fromId)
+					this.editor.updateShape({id: boundConcept.id, type: boundConcept.type, opacity: 1, isLocked: false})
+				}
+			}
+		}, [shape.props.view])	
+		
+		// END VIEW
 
 		
 		return (
@@ -197,6 +244,12 @@ getDefaultProps(): MediaShape['props'] {
 
 						}}>Original Thought</p>
 						<div style={{flex: 1}}/>
+						<div className="tl-media-concept-toggle" onPointerDown={()=>{
+							console.log("Fetching inferred concepts")
+							fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
+						}}>
+							<LuRefreshCcwDot />
+						</div>
 						<div
 						className="tl-media-concept-toggle"
 						onPointerDown={(e)=>{

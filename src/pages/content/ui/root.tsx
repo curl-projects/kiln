@@ -7,6 +7,13 @@ import ShadowHostProvider from "@pages/content/ui/ScriptHelpers/ShadowHostProvid
 import FishOrchestrationProvider from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx"
 refreshOnUpdate('pages/content');
 
+// TAILWIND IMPORTS
+// import { twind, cssom, observe } from "@twind/core";
+// import "construct-style-sheets-polyfill";
+// import '@assets/main.css'
+// import config from "./twind.config";
+
+
 
 const root = document.createElement('div');
 root.id = 'goals-extension-content-view-root'
@@ -28,13 +35,17 @@ const styleElement = document.createElement('style');
 styleElement.innerHTML = injectedStyle;
 shadowRoot.appendChild(styleElement);
 
+// TAILWIND
+// const sheet = cssom(new CSSStyleSheet());
+// const tw = twind(config, sheet);
+// shadowRoot.adoptedStyleSheets = [sheet.target];
+// observe(tw, shadowRoot);
+// END TAILWIND
 
 // Rescale
 // document.body.style.transform = 'scale(0.5)';
 // root.style.transform = 'scale(2)'
 // root.style.zIndex = "-1000000"
-
-
 
 const queryClient = new QueryClient();
 

@@ -178,6 +178,7 @@ p.is-editor-empty:first-child::before {
   cursor: pointer;
   pointer-events: all;
   height: 20px;
+  color: #D0CED4;
 }
 
 
@@ -211,4 +212,42 @@ p.is-editor-empty:first-child::before {
 .tl-kiln-outer-controls:hover{
   transform: scale(1.10);
   background-color: rgba(211, 211, 211, 0.8);
+}
+
+/* FEED COMPONENT */
+.kiln-feed-box::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 400px;
+  height: 100px;
+  bottom: 50px;
+  
+  background-image: linear-gradient(to bottom, rgba(255,255, 255,0), rgba(255, 255, 255, 1));
+}
+
+.kiln-feed-search-box{
+  position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 200;
+    transform: translateX(-50%);
+    /* border: 2px solid pink; */
+    height: 24px;
+    width: 100%;
+    pointer-events: all;
+    background-color: #F9F9F8;
+    border: 2px solid #D2D1CD;
+    padding: 30px;
+    line-height: 1.2em;
+    display: flex;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 36px 42px -4px rgba(77, 77, 77, 0.15);
+}
+
+.kiln-feed-search-box:hover{
+  color: #383836;
 }

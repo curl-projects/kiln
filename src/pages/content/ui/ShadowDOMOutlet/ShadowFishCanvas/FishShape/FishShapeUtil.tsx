@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // import FishAgent from "@root/src/pages/content/ui/LocalComponents/FishAgent/FishAgent.jsx";
 
@@ -17,6 +17,7 @@ import {
     TLBaseShape,
     TLDefaultColorStyle
 } from 'tldraw'
+import { FishHeading } from "./FishHeading"
 
 import Firefly from './Firefly.jsx';
 
@@ -73,12 +74,18 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 	}
 
 	component(shape: FishShape) {
-        console.log("SHAPE", shape)
+		const timeoutsRef = useRef([]);
+		const fishSpriteRef: any = useRef()
+
 		const amplitude = 100;
-		const baseWavelength = 400;
+		const baseWavelength = 500;
 		const amplitudeFactor = 0.1;
 		const speedFactor = 2;
 		const distanceFactor = 0.3;
+
+		const worldModelBinding = this.editor.getBindingsFromShape(shape, 'fishWorldModel')[0]
+		const worldModel: any = worldModelBinding ? this.editor.getShape(worldModelBinding.toId) : undefined
+		const worldModelBounds = worldModel ? this.editor.getShapeGeometry(worldModel).bounds : undefined
 
 		const calculatePathPoints = (beginning, destination, amplitudeFactor) => {
 			const {x: startX, y: startY} = beginning
@@ -126,8 +133,6 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 
 
 		useEffect(()=>{
-			console.log("DESTINATION", shape.props.destination)
-
 			if(shape.props.destination){
 				const newPathPoints = calculatePathPoints({x: shape.x, y: shape.y}, shape.props.destination, amplitudeFactor);
 				this.editor.updateShape({id: shape.id, type: shape.type, props: {
@@ -137,37 +142,137 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			// when the destination changes, update the path points
 		}, [shape.props.destination])
 
+		const zoomLevel = this.editor.getZoomLevel();
+
 		useEffect(()=>{
-			const pathPoints = [...shape.props.pathPoints]
-			const currentPoint = pathPoints.pop()
+			if(fishSpriteRef.current){
+				this.editor.updateShape({
+					id: shape.id,
+					type: shape.type,
+					props: {
+						w: fishSpriteRef.current.clientWidth,
+						h: fishSpriteRef.current.clientHeight,
+					}
+				})
+			}
+	
 
-			for(let i of ['hi']){
-				// calculate angle
-				console.log("HI!")
-				
+		}, [zoomLevel])
 
-				// const currentPoint = shape.props.pathPoints.pop()
 
-				// executing movement
-				// this.editor.animateShape({
-				// 	id: shape.id,
-				// 	type: shape.type,
-				// 	x: currentPoint.x,
-				// 	y: currentPoint.y,
-				// 	// props: {
-				// 	// 	currentAngle: ,
-				// 	// }
-				// 	}, {
-				// 	animation: {
-				// 		duration: 10
-				// 		}
-				// 	}
-				// )
+		useEffect(() => {
+			const speed = 15;
+		
+			// Clear previous timeouts if shape.props.pathPoints changes
+			timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+			timeoutsRef.current = [];
+		
+			if (shape.props.pathPoints) {
+			  shape.props.pathPoints.forEach((currentPoint, index) => {
+				const timeout = setTimeout(() => {
+				  this.editor.animateShape({
+					id: shape.id,
+					type: shape.type,
+					x: currentPoint.x,
+					y: currentPoint.y,
+					props: {
+					  currentAngle: currentPoint.angle
+					}
+				  }, {
+					animation: {
+					  duration: speed,
+					  easing: (t) => t,
+					}
+				  });
+				}, index * speed);
+				timeoutsRef.current.push(timeout);
+			  });
 			}
 		
+			// Cleanup function to clear timeouts if the component unmounts
+			return () => {
+			  timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+			};
+		  }, [shape.props.pathPoints, this.editor]);
+		
 
-		}, [shape.props.pathPoints])
+		return (
+			<>
+			<HTMLContainer
+				id={shape.id}
+				
+				style={{
+					border: '1px solid black',
+					height: "fit-content",
+                    width: 'fit-content',
+					pointerEvents: 'all',
+					transform: `scale(var(--tl-scale))`,
+					transformOrigin: "top left",
+				}}
+			>
+			<div 
+			ref={fishSpriteRef}
+			style={{
+				height: '100%',
+				width: '100%',
+				border: '2px solid green',
+			}}>
+               <Firefly 
+			   	angle={shape.props.currentAngle} 
+				worldModel={worldModel}
+				worldModelBounds={worldModelBounds}
+				scale={0.5}
+			   />
+			   <div style={{
+				border: '2px solid pink'
+			   }}>
+				{/* {worldModel &&
+				<FishHeading 
+					id={worldModel.id}
+					name={worldModel.props.name}
+			   		width={worldModelBounds.width}
+					height={worldModelBounds.height}
+					minimized={worldModel.minimized}
+				/>
+				} */}
+			   </div>
+			</div>
+			</HTMLContainer>
+			 {shape.props.pathPoints.map((point, index) => (
+				<div
+					key={index}
+					style={{
+						position: 'fixed',
+						width: '5px',
+						zIndex: '2147483647',
+						height: '5px',
+						backgroundColor: 'red',
+						borderRadius: '50%',
+						opacity: 0.1,
+						left: point.x,
+						top: point.y,
+						
+					}}
+				></div>
+			))}
+			</>
+		)
+	}
 
+	// [7]
+	// indicator(shape: FishShape) {
+	// 	return <rect width={shape.props.w} height={shape.props.h} />
+	// }
+
+    indicator(shape: FishShape) {
+        return null
+    }
+
+	// [8]
+	// override onResize: TLOnResizeHandler<FishShape> = (shape, info) => {
+	// 	return resizeBox(shape, info)
+	// }
+}
 
 
         // console.log("HI!", shape.props.children)
@@ -308,53 +413,3 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 		// 	}
 		// 	return totalDistance;
 		// };
-
-
-		return (
-			<>
-			<HTMLContainer
-				id={shape.id}
-				style={{
-					border: '1px solid black',
-					height: "fit-content",
-                    width: 'fit-content',
-					pointerEvents: 'all',
-				}}
-			>
-               <Firefly />
-			</HTMLContainer>
-			 {shape.props.pathPoints.map((point, index) => (
-				<div
-					key={index}
-					style={{
-						position: 'fixed',
-						width: '5px',
-						zIndex: '2147483647',
-						height: '5px',
-						backgroundColor: 'red',
-						borderRadius: '50%',
-						opacity: 0.1,
-						left: 0,
-						top: 0,
-						transform: `translate(${point.x}px, ${point.y}px)`,
-					}}
-				></div>
-			))}
-			</>
-		)
-	}
-
-	// [7]
-	// indicator(shape: FishShape) {
-	// 	return <rect width={shape.props.w} height={shape.props.h} />
-	// }
-
-    indicator(shape: FishShape) {
-        return null
-    }
-
-	// [8]
-	// override onResize: TLOnResizeHandler<FishShape> = (shape, info) => {
-	// 	return resizeBox(shape, info)
-	// }
-}

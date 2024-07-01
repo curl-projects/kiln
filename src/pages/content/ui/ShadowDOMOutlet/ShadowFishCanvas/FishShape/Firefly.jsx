@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FishHeading } from "./FishHeading"
 
 // const AIIconWrapperStyle = {
 //     display: 'flex',
@@ -15,7 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const outerAITextWrapperStyle = {
     position: 'absolute',
     left: '100%', // Positions it to the right of the fish
-    // transform: 'translateY(-50%)', // Centers it vertically
+    transform: 'translateY(-50%)', // Centers it vertically
 }
 
 const AITextWrapperStyle = {
@@ -66,18 +67,8 @@ const getVerticalTranslation = (angle) => {
 };
 
 
-export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform }) {
-    const [boxDimensions, setBoxDimensions] = useState({ width: 0, height: 0 });
-    const textBoxRef = useRef(null);
+export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform, notMoving, scale, worldModel, worldModelBounds  }) {
 
-    useEffect(() => {
-        if (textBoxRef.current) {
-            const { offsetWidth, offsetHeight } = textBoxRef.current;
-            setBoxDimensions({ width: offsetWidth, height: offsetHeight });
-        }
-    }, [aiState, isMoving]);
-
-    
     useEffect(() => {
         console.log("IS MOVING:", isMoving);
     }, [isMoving]);
@@ -88,12 +79,14 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
         const svgElement = svgRef.current;
         if (!svgElement) return;
     
-        if (isMoving) {
-            svgElement.classList.remove('slowMoving');
-            svgElement.classList.add('moving');
-        } else {
-            svgElement.classList.remove('moving');
-            svgElement.classList.add('slowMoving');
+        if(!notMoving){
+            if (isMoving) {
+                svgElement.classList.remove('slowMoving');
+                svgElement.classList.add('moving');
+            } else {
+                svgElement.classList.remove('moving');
+                svgElement.classList.add('slowMoving');
+            }
         }
     }, [isMoving]);
     
@@ -112,42 +105,11 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
         'planner': '#E6A07A', // orange
     }
 
+
     return (
-        <div ref={fireflyRef} style={{ height: '65px', width: '65px', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
-            <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg) translateY(${-getVerticalTranslation(angle)}px)`}}>
-                <AnimatePresence>
-                    {!isMoving && (
-                        <motion.div
-                            style={{ ...AITextWrapperStyle}}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            variants={variants}
-                            transition={{
-                                hidden: { duration: 0.3 },
-                                visible: { duration: 0.3 },
-                                exit: { duration: 0.3 }
-                            }}>
-                            <div style={AITextNameWrapperStyle}>
-                                <p style={{...AITextNameStyle, color: colorMap[fishType]}}>
-                                    {
-                                        {
-                                        'optimist': 'The Optimist', // green
-                                        'critic': 'The Critic', // pink
-                                        'researcher': 'The Researcher', // blue
-                                        'planner': 'The Planner', // orange
-                                        }[fishType]
-                                    }
-                                </p> 
-                            </div>
-                            <p style={AITextStyle}>
-                                {aiState}
-                            </p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}` }} width="65" height="42" viewBox="0 0 65 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div ref={fireflyRef} style={{ height: '65px', width: 'fit-content', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
+            {/* <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg) translateY(${-getVerticalTranslation(angle)}px)`}}> */}
+            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}` }} width={`${65*scale}`} height={`${42*scale}`} viewBox={`0 0 65 42`} fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" strokeWidth="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />
@@ -407,6 +369,49 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     </filter>
                 </defs>
             </svg>
+            {worldModel &&
+                <FishHeading 
+                    id={worldModel.id}
+                    worldModel={worldModel}
+                    name={worldModel.props.name}
+                    width={worldModelBounds.width}
+                    height={worldModelBounds.height}
+                    viewMode={worldModel.props.viewMode}
+                />
+                
+            }
+                {/* <AnimatePresence>
+                    {!isMoving && (
+                        <motion.div
+                            style={{ ...AITextWrapperStyle}}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={variants}
+                            transition={{
+                                hidden: { duration: 0.3 },
+                                visible: { duration: 0.3 },
+                                exit: { duration: 0.3 }
+                            }}>
+                            <div style={AITextNameWrapperStyle}>
+                                <p style={{...AITextNameStyle, color: colorMap[fishType]}}>
+                                    {
+                                        {
+                                        'optimist': 'The Optimist', // green
+                                        'critic': 'The Critic', // pink
+                                        'researcher': 'The Researcher', // blue
+                                        'planner': 'The Planner', // orange
+                                        }[fishType]
+                                    }
+                                </p> 
+                            </div>
+                            <p style={AITextStyle}>
+                                {aiState}
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence> */}
+            {/* </div> */}
         </div>
     )
 }
