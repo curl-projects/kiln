@@ -279,7 +279,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 		console.log("TRANSLATION STARTED")
 		// media is parent
 		// tear down all generative areas
-		const conceptParent = this.editor.getShapeParent(shape)
+		const conceptParent: any = this.editor.getShapeParent(shape)
 		
 		// on a kinematic canvas
 		if(conceptParent?.type === 'kinematicCanvas'){
@@ -307,6 +307,23 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 			// get binding attributes from existing concept
 			const conceptBinding: any = this.editor.getBindingsFromShape(shape, 'mediaConcept')[0]
 
+			// if a binding doesn't exist, create it
+
+			console.log("CONCEPT BINDING:", conceptBinding)
+
+			if(!conceptBinding){
+				console.log("CREATING BINDING!")
+				this.editor.createBinding({
+					type: 'mediaConcept',
+					fromId: shape.id,
+					toId: conceptParent.id,
+					props: {
+						proportionX: shape.x / conceptParent.props.w,
+						proportionY: shape.y / conceptParent.props.h,
+					}
+				})
+			}
+
 			// create new concept with the same attributes
 			this.editor.createShape({...shape, id: newShapeId, opacity: 0.5})
 			this.editor.reparentShapes([newShapeId], conceptParent.id)
@@ -316,8 +333,8 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 				fromId: newShapeId,
 				toId: conceptParent.id,
 				props: {
-					proportionX: conceptBinding.props.proportionX,
-					proportionY: conceptBinding.props.proportionY
+					proportionX: shape.x / conceptParent.props.w,
+					proportionY: shape.y / conceptParent.props.h,
 				}
 			})
 
@@ -464,6 +481,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 
 		if(conceptParent?.type === 'media'){
 			// get all children of parent
+			console.log("HELLO!")
 			const mediaChildren: any = this.editor.getSortedChildIdsForParent(conceptParent).map(id => this.editor.getShape(id))
 
 			for(let mediaChild of mediaChildren){
@@ -503,4 +521,5 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 		
 		}
 	}
+
 }

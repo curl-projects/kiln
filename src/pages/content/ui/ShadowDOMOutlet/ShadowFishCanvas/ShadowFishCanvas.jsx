@@ -345,8 +345,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
           }
       });
       
-
-    
+  
 
         setReactEditor(editor)
 
@@ -442,6 +441,185 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
             })
           }
+
+        //   if(shape.type === 'concept'){
+        //     console.log("TRANSLATION ENDED")
+        //     const conceptParent = editor.getShapeParent(shape)
+
+            
+        // // calculate distance to other shapes in the kinematic canvas and change styling if close enough (use bindings here)
+        //     if(conceptParent?.type === 'kinematicCanvas'){
+        //       // TODO: inelegant, refactor later
+        //       const allCanvasChildren = editor.getSortedChildIdsForParent(conceptParent).map(id => editor.getShape(id))
+        //       const canvasChildren = editor.getSortedChildIdsForParent(conceptParent).filter(id => id !== shape.id).map(id => editor.getShape(id))
+
+        //       // this version preserves local positioning, unlike the shape object given in onTranslateEnd
+        //       const concept = editor.getSortedChildIdsForParent(conceptParent).filter(id => id === shape.id).map(id => editor.getShape(id))[0]
+
+        //       // // tear down all activated concepts to recalculate distances
+        //       // editor.updateShape({id: concept.id, type: 'concept', props: { activated: false }})
+        //       // for(let child of canvasChildren){
+        //       // 	if(child.type === 'concept' && child.props.activated){
+        //       // 		editor.updateShape({id: child.id, type: child.type, props: { activated: false }})
+        //       // 	}
+        //       // }
+
+        //       console.log("CHILDREN:", editor.getSortedChildIdsForParent(conceptParent).map(id => editor.getShape(id)))
+
+        //       const distanceThreshold = 50;
+
+        //       function calculateCenter(shape){
+        //         console.log("SHAPE POSITION:", shape)
+        //         const shapeX = shape.x + (shape.props.w / 2);
+        //         const shapeY = shape.y + (shape.props.h / 2);
+
+        //         return [shapeX, shapeY]
+        //       }
+
+        //       const [conceptX, conceptY] = calculateCenter(concept)
+
+        //       console.log("CONCEPT POSITION:", conceptX, conceptY)
+
+        //       // find object with minimum distance
+        //       const distances = canvasChildren.map(child => {
+        //         return {shape: child, distance: Math.sqrt(Math.pow(conceptX - calculateCenter(child)[0], 2) + Math.pow(conceptY - calculateCenter(child)[1], 2))}
+        //       })
+
+        //       const minDistanceShape = distances.reduce((closest, current) => {
+        //         return current.distance < closest.distance ? current : closest;
+        //       }, distances[0])
+
+        //       if(minDistanceShape && minDistanceShape.distance < distanceThreshold){
+        //         console.log("DISTANCE THRESHOLD:", minDistanceShape)
+        //         // update shape parameter
+        //         editor.updateShapes([
+        //           {...minDistanceShape.shape, props: {
+        //             ...minDistanceShape.shape.props,
+        //             activated: true
+        //           }},
+        //           {...concept, props: {
+        //             ...concept.props,
+        //             activated: true
+        //           }},
+
+        //         ])
+
+
+
+        //         const [encapCircleX, encapCircleY, encapCircleR] = getEncapsulatingCircle(concept, minDistanceShape.shape)
+
+        //         console.log("CIRCLE DIMS", encapCircleX, encapCircleY)
+
+        //         // convert circle coordinates to world space
+
+        //         console.log("CONCEPT PARENT:", conceptParent)
+        //         const worldEncapCircle = editor.getShapePageTransform(conceptParent.id).applyToPoint({x: encapCircleX, y: encapCircleY})
+        //         // const worldEncapCircleX = editor.getShapePageTransform(conceptParent.id).applyToPoint(), worldEncapCircleY = conceptParent.y + encapCircleY
+                
+        //         function positionShapesOnCircle(centerX, centerY, radius, numShapes) {
+        //           const positions = [];
+        //           const angleStep = (2 * Math.PI) / numShapes;
+                  
+        //           for (let i = 0; i < numShapes; i++) {
+        //             const angle = i * angleStep;
+        //             const x = centerX + radius * Math.cos(angle);
+        //             const y = centerY + radius * Math.sin(angle);
+        //             positions.push({ x, y });
+        //           }
+                  
+        //           return positions;
+        //           }
+
+        //         //   console.log("WORLD CIRCLE DIMS", worldEncapCircleX, worldEncapCircleY)
+
+        //         // placeholder for database
+        //         const conceptArray = [
+        //           {
+        //             props: {
+        //               text: "concept one"
+        //             }
+        //           },
+        //           {
+        //             props: {
+        //               text: "concept two"
+        //             }
+        //           }, 
+        //           {
+        //             props: {
+        //               text: "concept 3"
+        //             }
+        //           }
+        //         ] 
+
+        //         const positions = positionShapesOnCircle(worldEncapCircle.x, worldEncapCircle.y, encapCircleR+80, conceptArray.length)
+                  
+        //         // generate and bind 3 provisional concepts based on this coordinate
+        //         console.log("POSITIONS:", positions)
+
+        //         conceptArray.map((el, idx) => {
+        //           let shapeId = createShapeId()
+        //           editor.createShape({
+        //             id: shapeId,
+        //             type: "concept",
+        //             x: positions[idx].x, // convert to world space and convert from top left to center
+        //             y: positions[idx].y, // convert to world space and convert from top left to center
+        //             opacity: 0.5,
+                    
+        //             props: {
+        //               text: JSON.stringify(el.props.text),
+        //               temporary: true,
+        //               colors: [...new Set([...concept.props.colors, ...minDistanceShape.shape.props.colors])],
+        //             }
+        //           })
+        //           const shape = editor.getShape(shapeId)
+        //           editor.reparentShapes([shape], conceptParent.id)
+        //         })
+        //       }
+
+        //     }
+
+        //     if(conceptParent?.type === 'media'){
+        //       // get all children of parent
+        //       const mediaChildren = editor.getSortedChildIdsForParent(conceptParent).map(id => editor.getShape(id))
+
+        //       for(let mediaChild of mediaChildren){
+        //         if(mediaChild.type === 'concept' && (mediaChild.props.text === shape.props.text) && mediaChild.id !== shape.id){
+        //           editor.deleteShape(mediaChild.id)
+        //         }
+        //       }
+
+        //     // check if there's a binding. if so update. if not, create.	
+        //       const bindings = editor.getBindingsFromShape(shape, 'mediaConcept')
+
+        //       console.log("BINDINGS:", bindings)
+        //       if(bindings && bindings.some(e => e.toId === conceptParent.id)){
+        //         const mediaBinding = bindings.find(e => e.toId ===  conceptParent.id)
+        //         const endShape = editor.getShape(shape)
+
+        //         console.log("UPDATE BINDING", endShape.x / conceptParent.props.w, shape.y / conceptParent.props.h)
+
+        //         editor.updateBinding({id: mediaBinding.id, type: mediaBinding.type, props: {
+        //           proportionX: endShape.x / conceptParent.props.w,
+        //           proportionY: endShape.y / conceptParent.props.h,
+        //         }})
+        //       }
+        //       else{
+        //         console.log("CREATING BINDING")
+        //         const endShape = editor.getShape(shape)
+        //         editor.createBinding({
+        //           type: 'mediaConcept',
+        //           fromId: endShape.id,
+        //           toId: conceptParent.id,
+        //           props: {
+        //             proportionX: endShape.x / conceptParent.props.w,
+        //             proportionY: endShape.y / conceptParent.props.h,
+        //           }
+        //         })
+        //       }
+            
+        //     }
+
+        //   }
 
             // for(let mediaConcept of shape.props.concepts){
             //   let mediaConceptId = createShapeId();

@@ -79,7 +79,7 @@ export const searchExa = async (query: string): Promise<ExaResponse> => {
 
 // Infer Concepts
 export interface InferConceptsRequest {
-    mediaExamples: Media[];
+    media: Media[];
     systemPrompt?: string;
 }
 export interface InferConceptsResponse {
@@ -126,11 +126,11 @@ You facilitate a reflective creative process where new media and knowledge are p
 `
 
 
-export const fetchInferredConcepts = async (editor, shape, mediaExamples: Media[]) => {
-    console.log("Fetching new concepts.", mediaExamples);
+export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
+    console.log("Fetching new concepts.", media);
     try {
         const response = await inferConcepts({
-            mediaExamples,
+            media,
             systemPrompt: systemPrompt
             });
 

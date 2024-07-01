@@ -1,4 +1,4 @@
-/**
+p/**
  * DO NOT USE import someModule from '...';
  *
  * @issue-url https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/issues/160

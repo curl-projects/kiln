@@ -65,7 +65,7 @@ function getRandomNumber(min, max) {
 }
 
 /** @public */
-export class MediaShapeUtil extends ShapeUtil<MediaShape> {
+export class MediaShapeUtil extends BaseBoxShapeUtil<MediaShape> {
 	static override type = 'media' as const
 	static override props = mediaShapeProps
 
@@ -287,7 +287,7 @@ getDefaultProps(): MediaShape['props'] {
 						<div style={{flex: 1}}/>
 						<div className="tl-media-concept-toggle" onPointerDown={()=>{
 							console.log("Fetching inferred concepts")
-							// fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
+							fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
 						}}>
 							<LuRefreshCcwDot />
 						</div>

@@ -287,20 +287,7 @@ export class MediaShapeUtil extends ShapeUtil<TipTapNode> {
             fontWeight: 550,
             // pointerEvents: 'none'
           }}>
-          {/* <TipTap
-            id={shape.id}
-            type="tiptap"
-            content={shape.props.text}
-            handleChange={handleChange}
-            isEditing={isEditing}
-            isSelected={isSelected}
-            width={shape.props.w}
-            height={shape.props.h}
-            fontSize={shape.props.fontSize}
-            lineHeight={TEXT_PROPS.lineHeight}
-            justCreated={justCreated}
-            fishConfig={fishConfig}
-          /> */}
+    
         </div>
       </HTMLContainer>
     );
@@ -311,25 +298,13 @@ export class MediaShapeUtil extends ShapeUtil<TipTapNode> {
 
     const bounds = this.editor.getShapeGeometry(shape).bounds;
 
-    // console.log("BOUNDS:", bounds)
-    // const editor = useEditor();
-    //   if (shape.props.autoSize && editor.getEditingShapeId() === shape.id) return null;
     return <rect width={toDomPrecision(bounds.width)} height={toDomPrecision(bounds.height)} />;
   }
 
   override onResize: TLOnResizeHandler<TipTapNode> = (shape, info) => {
-    // console.log('\n');
-    // console.log('RESIZING HAPPENING!', info);
 
     const { newPoint, initialBounds, initialShape, scaleX, scaleY, handle } = info;
 
-    // if (info.mode === 'scale_shape' || (handle !== 'right' && handle !== 'left')) {
-    //   return {
-    //     id: shape.id,
-    //     type: shape.type,
-    //     ...resizeScaled(shape, info),
-    //   };
-    // } else {
     const nextWidth = Math.max(1, Math.abs(initialBounds.width * scaleX));
     const nextHeight = Math.max(1, Math.abs(initialBounds.height * scaleY));
 
