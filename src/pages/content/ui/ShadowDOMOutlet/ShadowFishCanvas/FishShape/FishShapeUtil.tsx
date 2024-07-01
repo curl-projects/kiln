@@ -60,8 +60,8 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 	override isAspectRatioLocked = (_shape: FishShape) => true
 	override canResize = (_shape: FishShape) => false
 
-    override hideSelectionBoundsFg = (_shape: FishShape) => true
-    override hideSelectionBoundsBg = (_shape: FishShape) => true
+    override hideSelectionBoundsFg = (_shape: FishShape) => false
+    // override hideSelectionBoundsBg = (_shape: FishShape) => false
     override hideResizeHandles = (_shape: FishShape) => true
     override hideRotateHandle = (_shape: FishShape) => true
 
@@ -75,9 +75,10 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 
 	component(shape: FishShape) {
 		const timeoutsRef = useRef([]);
+		const [isMoving, setIsMoving] = useState(false)
 		const fishSpriteRef: any = useRef()
 
-		const amplitude = 100;
+		const amplitude = 50;
 		const baseWavelength = 500;
 		const amplitudeFactor = 0.1;
 		const speedFactor = 2;
@@ -86,7 +87,12 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 		const worldModelBinding = this.editor.getBindingsFromShape(shape, 'fishWorldModel')[0]
 		const worldModel: any = worldModelBinding ? this.editor.getShape(worldModelBinding.toId) : undefined
 		const worldModelBounds = worldModel ? this.editor.getShapeGeometry(worldModel).bounds : undefined
-
+	
+		const findShortestRotationPath = (start, end) => {
+			const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
+			return start + shortestAngle;
+		};
+	
 		const calculatePathPoints = (beginning, destination, amplitudeFactor) => {
 			const {x: startX, y: startY} = beginning
 			const {x: endX, y: endY} = destination
@@ -167,7 +173,8 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
 			timeoutsRef.current = [];
 		
-			if (shape.props.pathPoints) {
+			if (shape.props.pathPoints && shape.props.pathPoints.length !== 0) {
+			  setIsMoving(true); // Set moving state to true
 			  shape.props.pathPoints.forEach((currentPoint, index) => {
 				const timeout = setTimeout(() => {
 				  this.editor.animateShape({
@@ -176,17 +183,30 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 					x: currentPoint.x,
 					y: currentPoint.y,
 					props: {
-					  currentAngle: currentPoint.angle
-					}
+					  currentAngle: currentPoint.angle,
+					},
 				  }, {
 					animation: {
 					  duration: speed,
 					  easing: (t) => t,
-					}
+					},
 				  });
+				  if (index === shape.props.pathPoints.length - 1) {
+					setIsMoving(false); // Set moving state to false after last animation
+				  }
 				}, index * speed);
 				timeoutsRef.current.push(timeout);
 			  });
+
+			// //   const shortestFinalAngle = findShortestRotationPath(shape.props.pathPoints[-1].angle, 0);
+			//   this.editor.animateShape({
+			// 	id: shape.id,
+			// 	type: shape.type,
+			// 	props: {
+			// 		currentAngle: 0,
+			// 	}
+			//   })
+
 			}
 		
 			// Cleanup function to clear timeouts if the component unmounts
@@ -195,6 +215,11 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			};
 		  }, [shape.props.pathPoints, this.editor]);
 		
+		
+		useEffect(()=>{
+			console.log("IS MOVING", isMoving)
+		}, [isMoving ])
+		
 
 		return (
 			<>
@@ -202,7 +227,6 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 				id={shape.id}
 				
 				style={{
-					border: '1px solid black',
 					height: "fit-content",
                     width: 'fit-content',
 					pointerEvents: 'all',
@@ -215,16 +239,15 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			style={{
 				height: '100%',
 				width: '100%',
-				border: '2px solid green',
 			}}>
                <Firefly 
 			   	angle={shape.props.currentAngle} 
 				worldModel={worldModel}
 				worldModelBounds={worldModelBounds}
-				scale={0.5}
+				scale={(worldModel && worldModel.props?.viewMode) === 'fish' ? 1 : 0.5}
+				isMoving={isMoving}
 			   />
 			   <div style={{
-				border: '2px solid pink'
 			   }}>
 				{/* {worldModel &&
 				<FishHeading 

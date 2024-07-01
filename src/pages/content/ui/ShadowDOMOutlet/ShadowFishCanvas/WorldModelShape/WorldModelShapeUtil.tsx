@@ -83,7 +83,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 	override canCrop = () => true
 
 	override getDefaultProps(): TLWorldModelShape['props'] {
-		return { w: 160 * 2, h: 90 * 2, name: '', viewMode: 'full', storedW: 160 * 2, storedH: 90 * 2}
+		return { w: 160 * 2, h: 90 * 2, name: 'World Model', viewMode: 'full', storedW: 160 * 2, storedH: 90 * 2}
 	}
 
 	override getGeometry(shape: TLWorldModelShape): Geometry2d {
@@ -294,6 +294,8 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 				this.editor.updateShape({id: shape.id, type: shape.type, props: {
 					viewMode: 'fish',
 				}})
+
+				setSelectedOutput(null)
 			}
 			else{
 				const children: any = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
@@ -338,34 +340,6 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 					/>
 				</SVGContainer>
-				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
-				<p 
-				onPointerDown={()=>{
-					selectedOutput === 'fish' && setSelectedOutput(null)
-					this.editor.updateShape({
-						id: shape.id, 
-						type: shape.type, 
-						props: { 
-							viewMode: ['fish', 'minimized'].includes(shape.props.viewMode) ? 'full' : "minimized" ,
-							storedW: shape.props.viewMode === 'full' ? shape.props.w : shape.props.storedW,
-							storedH: shape.props.viewMode === 'full' ? shape.props.h : shape.props.storedH,
-						}
-					})}}
-				style={{
-					margin: 0,
-					padding: 0,
-					position: 'absolute',
-					pointerEvents: "all",
-					top: "0px",
-					left: shape.props.w,
-					transform: "translate(-200%, -10%)",
-					display: 'flex',
-					alignContent: 'center',
-					justifyContent: 'center',
-					fontSize: '40px',
-					cursor: 'pointer',
-					}}>{['fish', 'minimized'].includes(shape.props.viewMode) ? "-" : "+"}</p>
-				}
 				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 					<div style={{
 						position: 'absolute',

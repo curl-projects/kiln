@@ -9,7 +9,7 @@ import { fetchInferredConcepts } from "@pages/content/ui/ServerFuncs/api.tsx"
 
 // IMPORTING UI
 import CustomToolbar from './CustomUI/CustomToolbar/CustomToolbar.jsx';
-
+import { CustomProjectTracker } from './CustomUI/CustomToolbar/CustomProjectTracker.jsx';
 import customCreateSnapshot from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/WorldModelShape/shared/customCreateSnapshot.ts"
 // import { ContentTool } from './CustomUI/CustomToolbar/CustomTools/ContentTool.tsx';
 // import { FishShapeUtil } from './FishShape/FishShape.tsx'
@@ -61,12 +61,17 @@ export default function ShadowCanvas({ parsedContent, article }) {
     Toolbar: null,
     HelpMenu: null,
     MainMenu: null,
-    // DebugMenu: null,
+    DebugMenu: null,
+    DebugPanel: null,
+    Minimap: null,
     PageMenu: null,
     ActionsMenu: null,
     ZoomMenu: null,
     QuickActions: null,
-
+    NavigationPanel: null,
+    // ContextMenu: null,
+    StylePanel: null,
+    SharePanel: CustomProjectTracker,
   }
 
   // TODO: think this might be irrelevant
@@ -225,16 +230,14 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
       onUiEvent={handleUiEvent}
       onMount={(editor)=>{
-
-
-        editor.root.children.select.children.resizing._createSnapshot = customCreateSnapshot;
-      
-        editor.createShape({type: 'fish', x: 500, y: 500})
-       
-        editor.root.children.select.children.idle.handleDoubleClickOnCanvas = function(info) {
-          handleDoubleClickOnCanvas.call(this, info);
-        }.bind({ editor, parent: editor.root.children.select.children.idle.parent });
-
+        if(editor){
+          editor.root.children.select.children.resizing._createSnapshot = customCreateSnapshot;
+             
+          editor.root.children.select.children.idle.handleDoubleClickOnCanvas = function(info) {
+            handleDoubleClickOnCanvas.call(this, info);
+          }.bind({ editor, parent: editor.root.children.select.children.idle.parent });  
+        }
+    
 
         setReactEditor(editor)
 

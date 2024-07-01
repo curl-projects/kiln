@@ -11,11 +11,14 @@ import {
 	useTools,
 	track
 } from 'tldraw'
-import { useEffect } from 'react'
+import { useEffect, useState, } from 'react'
 import { PiCursorFill } from "react-icons/pi";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { PiTextTBold } from "react-icons/pi";
 import { BiSolidEraser } from "react-icons/bi";
+import { TbGlobe } from "react-icons/tb";
+import { TbLibrary } from "react-icons/tb";
+import { TbRegex } from "react-icons/tb";
 
 const CustomToolbar = track(() => {
 	const editor = useEditor()
@@ -26,33 +29,39 @@ const CustomToolbar = track(() => {
 			<div style={styles.customToolbar}>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('select')} 
+					name='select'
 					active={editor.getCurrentToolId() === 'select'}>
 					<PiCursorFill />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('draw')} 
+					name='draw'
 					active={editor.getCurrentToolId() === 'draw'}>
 					<PiPencilSimpleFill />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('eraser')} 
+					name='erase'
 					active={editor.getCurrentToolId() === 'eraser'}>
 					<BiSolidEraser />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('worldModel')} 
+					name='world model'
 					active={editor.getCurrentToolId() === 'worldModel'}>
-					F
+					<TbGlobe />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('media')} 
+					name='media'
 					active={editor.getCurrentToolId() === 'media'}>
-					M
+					<TbLibrary />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('concept')} 
+					name='concept'
 					active={editor.getCurrentToolId() === 'concept'}>
-					C
+					<TbRegex />
 				</ToolbarButton>
 			</div>
 		</div>
@@ -83,135 +92,45 @@ const styles = {
 
 
 
-function ToolbarButton({ children, handleClick, active }){
+function ToolbarButton({ children, handleClick, active, name }){
+	const [hovered, setHovered] = useState(false)
 	return(
 		<div 
-			style={{...buttonStyles.buttonWrapper, borderColor: active ? '#FEAC85' : 'inherit'}} 
-			onClick={handleClick}>
-			<p style={{...buttonStyles.buttonText, color: active ? '#FEAC85' : 'inherit'}}>{children}</p>
+			className='tl-kiln-toolbar-controls'
+			style={{backgroundColor: active ? 'rgba(211, 211, 211, 1)' : "rgba(233, 232, 230, 0.95)"}} 
+			onPointerDown={handleClick}
+			onMouseEnter={()=>setHovered(true)}
+			onMouseLeave={()=>setHovered(false)}
+			>
+			{children}
+			{hovered &&
+				<div style={{
+					position: "absolute",
+					bottom: "100%",
+					textWrap: 'no-wrap',
+					marginBottom: '10px',
+					width: 'fit-content',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					backgroundColor: "#F9F9F8",
+					border: "2px solid #D2D1CD",
+					borderRadius: "12px",
+					paddingLeft: "8px",
+					paddingRight: "8px",
+					boxShadow: "0px 36px 42px -4px rgba(77, 77, 77, 0.15)",
+				}}>
+					<p style={{
+						fontWeight: 600,
+						fontSize: '8px',
+						color: "#63635E",
+						display: "flex",
+						alignItems: 'center',
+						margin: 0,
+						fontFamily: 'monospace',
+					}}>{name}</p>
+				</div>
+			}
 		</div>
 	)
 }
-
-const buttonStyles = {
-	buttonWrapper: {
-		border: '3px solid #7F847D',
-		borderRadius: '50%',
-		width: '40px',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		height: '40px',
-		pointerEvents: 'all',
-		cursor: 'pointer',
-	},
-	buttonText: {
-		fontSize: '24px',
-		color: "#7F847D",
-		margin: 0,
-		position: 'relative',
-		top: '2px',
-		}
-}
-
-
-
-// function ToolbarWrapper({ children }){
-// 	return(
-// 		<div className={toolbarStyles.toolbarWrapper}>
-// 			<div className={toolbarStyles.toolbarInnerWrapper}>
-// 				<div className={toolbarStyles.tools}>
-// 					{children}
-// 				</div>
-// 			</div>
-// 		</div>
-// 	)
-// }
-
-
-// const toolbarStyles = {
-// 	toolbarWrapper: {
-// 		display: 'flex',
-// 		alignItems: 'center',
-// 		justifyContent: 'center',
-// 		flexGrow: 2,
-// 		paddingBottom: 'calc(var(--space-3) + var(--sab))',
-// 		position: 'absolute',
-// 		bottom: 0,
-// 		left: 0,
-// 		width: '100%',
-// 	},
-// 	toolbarInnerWrapper: {
-// 		position: 'relative',
-// 		width: 'fit-content',
-// 		display: 'flex',
-// 		gap: 'var(--space-3)',
-// 		alignItems: 'flex-end',
-// 	},
-// 	tools: {
-// 		display: 'flex',
-// 		flexDirection: 'row',
-// 		alignItems: 'center',
-// 		backgroundColor: 'var(--color-low)',
-// 		borderRadius: 'var(--radius-4)',
-// 		zIndex: 'var(--layer-panels)',
-// 		pointerEvents: 'all',
-// 		position: 'relative',
-// 		background: 'var(--color-panel)',
-// 		boxShadow: 'var(--shadow-2)'
-// 	}
-// }
-
-
-
-
-
-// // export default CustomToolbar
-
-// export default function CustomToolbar() {
-// 	const editor = useEditor()
-// 	const tools = useTools()
-//     const isContentSelected = useIsToolSelected(tools['content'])
-
-// 	return (
-// 			<ToolbarWrapper>
-// 				{/* <TldrawUiMenuItem {...tools['content']} isSelected={isContentSelected} /> */}
-
-// 				{/* <DefaultToolbarContent /> */}
-// 				<button
-// 					onClick={() => {
-// 						editor.selectAll().deleteShapes(editor.getSelectedShapeIds())
-// 					}}
-// 					title="delete all"
-// 				>
-// 					🧨
-// 				</button>
-// 				<ToolbarButton 
-// 					handleClick={() => editor.setCurrentTool('select')} 
-// 					active={editor.getCurrentToolId() === 'select'}>
-// 					<PiCursorFill />
-// 				</ToolbarButton>
-// 				<ToolbarButton 
-// 					handleClick={() => editor.setCurrentTool('draw')} 
-// 					active={editor.getCurrentToolId() === 'draw'}>
-// 					<PiPencilSimpleFill />
-// 				</ToolbarButton>
-// 				<ToolbarButton 
-// 					handleClick={() => editor.setCurrentTool('content')} 
-// 					active={editor.getCurrentToolId() === 'content'}>
-// 					<PiTextTBold />
-// 				</ToolbarButton>
-// 				<ToolbarButton 
-// 					handleClick={() => editor.setCurrentTool('text')} 
-// 					active={editor.getCurrentToolId() === 'text'}>
-// 					T
-// 				</ToolbarButton>
-// 				<ToolbarButton 
-// 					handleClick={() => editor.setCurrentTool('eraser')} 
-// 					active={editor.getCurrentToolId() === 'eraser'}>
-// 					<BiSolidEraser />
-// 				</ToolbarButton>
-// 			</ToolbarWrapper>
-// 	)
-// }
-

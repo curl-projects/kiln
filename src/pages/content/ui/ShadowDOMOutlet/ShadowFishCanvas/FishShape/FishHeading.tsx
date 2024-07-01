@@ -10,6 +10,9 @@ import {
 } from '@tldraw/editor'
 import { useCallback, useEffect, useRef } from 'react'
 import { FishLabelInput } from './FishLabelInput'
+import { CgArrowsExpandRight } from "react-icons/cg";
+import { TbArrowsDiagonal } from "react-icons/tb";
+import { TbArrowsDiagonalMinimize2 } from "react-icons/tb";
 
 export const FishHeading = function FrameHeading({
 	id,
@@ -17,7 +20,9 @@ export const FishHeading = function FrameHeading({
 	width,
 	height,
 	viewMode,
-    worldModel
+    worldModel,
+    angle,
+    isMoving,
 }: {
 	id: TLShapeId
 	name: string
@@ -25,6 +30,8 @@ export const FishHeading = function FrameHeading({
 	height: number
 	viewMode: string
     worldModel: any
+    angle: number
+    isMoving: boolean
 }) {
 	const editor = useEditor()
 	const pageRotation = useValue(
@@ -91,6 +98,7 @@ export const FishHeading = function FrameHeading({
 	}
 
 	return (
+        <>
 		<div
 			style={{
 				overflow: isEditing ? 'visible' : 'hidden',
@@ -110,6 +118,7 @@ export const FishHeading = function FrameHeading({
 				color: "#9A98A0",
 				textTransform: 'uppercase',
 				fontWeight: 600,
+                transform: `rotate(${-angle}deg)`,
 				fontSize: '12px',
                 display: 'flex',
 				letterSpacing: "0.03em",
@@ -117,13 +126,17 @@ export const FishHeading = function FrameHeading({
 			}}
 			onPointerDown={handlePointerDown}
 		>
-			<div className="tl-frame-heading-hit-area">
-				<FishLabelInput ref={rInput} id={id} name={name} isEditing={isEditing} />
-			</div>
-			{['fish', 'minimized'].includes(viewMode) &&
+            {/* {(viewMode !== 'fish' || !isMoving) && */}
+            <>
+                <div className="tl-frame-heading-hit-area">
+                    <FishLabelInput ref={rInput} id={id} name={name} isEditing={isEditing} />
+                </div>
+            
                 <div style={{
                     display: 'flex',
                     gap: "6px",
+                    justifyContent: 'center',
+                    alignItems: 'center'
                 }}>
 				<div style={{
 					borderRadius: '100%',
@@ -136,54 +149,94 @@ export const FishHeading = function FrameHeading({
 					justifyContent: 'center',
 					position: 'relative',
 				}}>
-					<p 
+					<button
                     className='kiln-fish-full-button'
-                    onPointerDown={()=>{
-
-                        const worldModelBinding = editor.getBindingsToShape(worldModel.id, 'fishWorldModel')[0]
-                        const fish = editor.getShape(worldModelBinding.fromId)
-                        let [x, y] = [fish.x, fish.y]
-
-                        // reparent world model and place on page
-                        editor.reparentShapes([worldModelBinding.toId], editor.getCurrentPageId())
-
-                        editor.updateShape({
-                            id: worldModel.id,
-                            type: 'worldModel',
-                            isLocked: false,
-                            opacity: 1,
-                            x: x - 10,
-                            y: y - 10,
-                            props: {
-                                viewMode: 'full'
-                            }
-                        })
-
-                        // reparent fish and place on world model
-                        editor.reparentShapes([worldModelBinding.fromId], worldModelBinding.toId)
-
-                        editor.updateShape({
-                            id: worldModelBinding.fromId,
-                            type: 'fish',
-                            x: 10,
-                            y: 10,
-                        })
-
-                        
-                    }}
                     style={{
 						margin: "0px", 
 						cursor: "pointer",
-						color: "rgb(0, 0, 0)",
-                        border: "2px solid black",
+						color: "rgb(77, 77, 77, 0.6)",
                         height: "20px",
                         width: '20px',
-					}}>+</p>
+                        display: 'flex',
+                        fontSize: '20px',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: "unset",
+                        padding: 0,
+                        backgroundColor: "transparent",
+
+					}}
+
+                    onPointerDown={()=>{
+
+                        if(viewMode === 'fish'){
+                            const worldModelBinding = editor.getBindingsToShape(worldModel.id, 'fishWorldModel')[0]
+                            const fish = editor.getShape(worldModelBinding.fromId)
+                            let [x, y] = [fish.x, fish.y]
+
+                            // reparent world model and place on page
+                            editor.reparentShapes([worldModelBinding.toId], editor.getCurrentPageId())
+
+                            editor.updateShape({
+                                id: worldModel.id,
+                                type: 'worldModel',
+                                isLocked: false,
+                                opacity: 1,
+                                x: x - 10,
+                                y: y - 10,
+                                props: {
+                                    viewMode: 'full'
+                                }
+                            })
+
+
+
+                            // reparent fish and place on world model
+                            editor.reparentShapes([worldModelBinding.fromId], worldModelBinding.toId)
+
+                            editor.updateShape({
+                                id: worldModelBinding.fromId,
+                                type: 'fish',
+                                x: 10,
+                                y: 10,
+                            })
+                        }
+                        else if(viewMode === 'minimized'){
+                            editor.updateShape({
+                                id: worldModel.id,
+                                type: worldModel.type,
+                                props: {
+                                    viewMode: 'full',
+                                }
+                            })
+                        }
+                        else if(viewMode === 'full'){
+                            editor.updateShape({
+                                id: worldModel.id,
+                                type: worldModel.type,
+                                props: {
+                                    viewMode: 'minimized',
+                                    storedW: worldModel.props.w,
+							        storedH: worldModel.props.h
+                                }
+                            })
+                        }
+                        else{
+                            console.error("Unknown View Mode")
+                        }
+
+                    }}>
+                    {
+                    viewMode === "full" 
+                    ? <TbArrowsDiagonalMinimize2 />
+                    : <TbArrowsDiagonal />
+                    }
+                </button>
 				</div>
                 </div>
-                
-			}
-			
+            </>
+            {/* // } */}
 		</div>
+        </>
 	)
 }

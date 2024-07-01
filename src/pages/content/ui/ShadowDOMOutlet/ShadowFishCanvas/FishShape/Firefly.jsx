@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
+import { IoMdSearch } from "react-icons/io";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FishHeading } from "./FishHeading"
-
+import { stopEventPropagation } from '@tldraw/editor'
+import { ConversationMessage } from './ConversationMessage';
 // const AIIconWrapperStyle = {
 //     display: 'flex',
 //     alignItems: 'center',
@@ -69,11 +71,9 @@ const getVerticalTranslation = (angle) => {
 
 export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform, notMoving, scale, worldModel, worldModelBounds  }) {
 
-    useEffect(() => {
-        console.log("IS MOVING:", isMoving);
-    }, [isMoving]);
-
     const svgRef = useRef(null);
+    const [fishQuery, setFishQuery] = useState("")
+    const [conversationMessage, setConversationMessage] = useState("")
 
     useEffect(() => {
         const svgElement = svgRef.current;
@@ -107,9 +107,10 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
 
 
     return (
+        <>
         <div ref={fireflyRef} style={{ height: '65px', width: 'fit-content', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
             {/* <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg) translateY(${-getVerticalTranslation(angle)}px)`}}> */}
-            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}` }} width={`${65*scale}`} height={`${42*scale}`} viewBox={`0 0 65 42`} fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}`, transition: "width 0.2s ease-in-out, height 0.2s ease-in-out" }} width={`${65*scale}`} height={`${42*scale}`} viewBox={`0 0 65 42`} fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" strokeWidth="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />
@@ -377,8 +378,9 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     width={worldModelBounds.width}
                     height={worldModelBounds.height}
                     viewMode={worldModel.props.viewMode}
-                />
-                
+                    angle={angle}
+                    isMoving={isMoving}
+                />     
             }
                 {/* <AnimatePresence>
                     {!isMoving && (
@@ -413,5 +415,69 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                 </AnimatePresence> */}
             {/* </div> */}
         </div>
+        {worldModel.props.viewMode === 'fish' && !isMoving &&
+        <>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <textarea 
+                placeholder="Ask a question"
+                onKeyDown={stopEventPropagation}
+                style={{
+                    height: 'auto', // Allow the height to adjust automatically
+                    minHeight: '30px', // Minimum height for the textarea
+                    width: 'fit-content',
+                    zIndex: 200,
+                    padding: "10px",
+                    backgroundColor: '#F9F9F8',
+                    border: '2px solid #D2D1CD',
+                    lineHeight: '1.2em',
+                    display: 'flex',
+                    borderRadius: '12px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    boxShadow: '0px 36px 42px -4px rgba(77, 77, 77, 0.15)',
+                    fontWeight: 600,
+                    fontSize: '12px',
+                    color: "#63635E",
+                    resize: 'none', // Prevent manual resizing, if desired
+                    overflow: 'hidden', // Hide scrollbars
+                }}
+                rows={1} // Initial number of rows
+                onInput={(e) => {
+                    const { value } = e.target;
+                    setFishQuery(value);
+                    e.target.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+                    e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
+                }}
+                />
+                <div style={{
+                    height: "100%",
+                    width: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    fontSize: '20px',
+                }}
+                onPointerDown={()=>{
+                    setFishQuery("")
+                    setConversationMessage('Hey! Nice to meet you!')
+                }}
+                >
+                    {fishQuery && <IoMdSearch/>}
+                </div>
+
+        </div>
+            {conversationMessage &&
+                <ConversationMessage 
+                    text={conversationMessage}
+                    setConversationMessage={setConversationMessage}
+                    name={worldModel.props.name}
+                
+                />
+            }
+        </>
+        }
+        
+        </>
     )
 }

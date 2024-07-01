@@ -114,12 +114,35 @@ export default function App() {
           borderRadius: '8px',
           gap: '10px',
         }}>
-          <div onClick={()=>{ canvasMode !== 'page' && setCanvasMode('page') }} 
+          <CanvasButton 
+            handleClick={()=>{ canvasMode !== 'page' && setCanvasMode('page') }}
+            name='page'
+            active={canvasMode === 'page'}
+          >
+            <TbBrandPagekit />
+          </CanvasButton>
+          {/* <div onClick={()=>{ canvasMode !== 'page' && setCanvasMode('page') }} 
             className='tl-kiln-outer-controls'
             style={{
               backgroundColor: canvasMode === 'page' ? 'rgba(211, 211, 211, 1)' : "rgba(233, 232, 230, 0.95)"
              }}
-          ><TbBrandPagekit /></div>
+          ><TbBrandPagekit /></div> */}
+          <CanvasButton 
+            handleClick={()=>{ canvasMode !== 'mixed' && setCanvasMode('mixed') }}
+            name='mixed'
+            active={canvasMode === 'mixed'}
+          >
+            <SiPaperswithcode />
+          </CanvasButton>
+          <CanvasButton 
+            handleClick={()=>{ canvasMode !== 'canvas' && setCanvasMode('canvas') }}
+            name='canvas'
+            active={canvasMode === 'canvas'}
+          >
+            <FaExpandArrowsAlt />
+          </CanvasButton>
+
+{/* 
           <div onClick={()=>{
             canvasMode !== 'mixed' && setCanvasMode('mixed')
           }}
@@ -128,13 +151,16 @@ export default function App() {
             backgroundColor: canvasMode === 'mixed' ? 'rgba(211, 211, 211, 1)' : "rgba(233, 232, 230, 0.95)"
            }}
           ><SiPaperswithcode /></div>
+       
           <div className='tl-kiln-outer-controls'
              style={{
               backgroundColor: canvasMode === 'canvas' ? 'rgba(211, 211, 211, 1)' : "rgba(233, 232, 230, 0.95)"
              }}
             onClick={()=>{
-              canvasMode !== 'canvas' && setCanvasMode('canvas')}}><FaExpandArrowsAlt /></div>
-        
+              canvasMode !== 'canvas' && setCanvasMode('canvas')}}>
+                <FaExpandArrowsAlt />
+          </div>
+         */}
 
         </div>
         {/* <div style={styles.canvasActivation} onClick={()=>{setShadowOpen(t => !t)}}>
@@ -221,3 +247,46 @@ const styles = {
   }
 
 };
+
+
+function CanvasButton({ children, handleClick, active, name }){
+	const [hovered, setHovered] = useState(false)
+	return(
+		<div 
+			className='tl-kiln-outer-controls'
+			style={{backgroundColor: active ? 'rgba(211, 211, 211, 1)' : "rgba(233, 232, 230, 0.95)"}} 
+			onPointerDown={handleClick}
+			onMouseEnter={()=>setHovered(true)}
+			onMouseLeave={()=>setHovered(false)}
+			>
+			{children}
+			{/* {hovered &&
+				<div style={{
+					position: "absolute",
+					bottom: "100%",
+					marginBottom: '10px',
+					width: 'fit-content',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					backgroundColor: "#F9F9F8",
+					border: "2px solid #D2D1CD",
+					borderRadius: "12px",
+					paddingLeft: "8px",
+					paddingRight: "8px",
+					boxShadow: "0px 36px 42px -4px rgba(77, 77, 77, 0.15)",
+				}}>
+					<p style={{
+						fontWeight: 600,
+						fontSize: '8px',
+						color: "#63635E",
+						display: "flex",
+						alignItems: 'center',
+						margin: 0,
+						fontFamily: 'monospace',
+					}}>{name}</p>
+				</div>
+			} */}
+		</div>
+	)
+}
