@@ -118,7 +118,7 @@ export const FishHeading = function FrameHeading({
 				color: "#9A98A0",
 				textTransform: 'uppercase',
 				fontWeight: 600,
-                transform: `rotate(${-angle}deg)`,
+                transform: angle ? `rotate(${-angle}deg)` : "unset",
 				fontSize: '12px',
                 display: 'flex',
 				letterSpacing: "0.03em",

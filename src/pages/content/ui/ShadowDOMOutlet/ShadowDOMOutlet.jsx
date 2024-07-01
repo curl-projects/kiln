@@ -12,12 +12,12 @@ const ShadowDOMOutlet = ({ shadowOpen, canvasMode}) => {
     // const { fishOrchestrator } = useFish();
     // const [ripples, setRipples] = useState([]);
 
+
     return (
         <div 
           id="shadowDOMWrapper" 
           style={{
             ...styles.shadowDOMWrapper, 
-            display: shadowOpen ? 'block' : 'none',
             zIndex: (shadowOpen && canvasMode === 'canvas') ? 21474836 : 0,
           }}>
            <ShadowCanvas 

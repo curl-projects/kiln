@@ -100,7 +100,9 @@ export default function App() {
 
   return (
       <div style={styles.app}>
+        {shadowOpen &&
         <ShadowDOMOutlet shadowOpen={shadowOpen} canvasMode={canvasMode}/>
+        }
         <div style={{
           position: 'fixed',
           bottom: "40px",

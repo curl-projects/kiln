@@ -29,37 +29,37 @@ const CustomToolbar = track(() => {
 			<div style={styles.customToolbar}>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('select')} 
-					name='select'
+					name='select (V)'
 					active={editor.getCurrentToolId() === 'select'}>
 					<PiCursorFill />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('draw')} 
-					name='draw'
+					name='draw (D)'
 					active={editor.getCurrentToolId() === 'draw'}>
 					<PiPencilSimpleFill />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('eraser')} 
-					name='erase'
+					name='erase (E)'
 					active={editor.getCurrentToolId() === 'eraser'}>
 					<BiSolidEraser />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('worldModel')} 
-					name='world model'
+					name='world model (W)'
 					active={editor.getCurrentToolId() === 'worldModel'}>
 					<TbGlobe />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('media')} 
-					name='media'
+					name='media (M)'
 					active={editor.getCurrentToolId() === 'media'}>
 					<TbLibrary />
 				</ToolbarButton>
 				<ToolbarButton 
 					handleClick={() => editor.setCurrentTool('concept')} 
-					name='concept'
+					name='concept (C)'
 					active={editor.getCurrentToolId() === 'concept'}>
 					<TbRegex />
 				</ToolbarButton>
@@ -107,17 +107,17 @@ function ToolbarButton({ children, handleClick, active, name }){
 				<div style={{
 					position: "absolute",
 					bottom: "100%",
-					textWrap: 'no-wrap',
 					marginBottom: '10px',
 					width: 'fit-content',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
+					textWrap: 'nowrap ',
+					whiteSpace: 'nowrap ',
 					backgroundColor: "#F9F9F8",
 					border: "2px solid #D2D1CD",
 					borderRadius: "12px",
-					paddingLeft: "8px",
-					paddingRight: "8px",
+					padding: "8px",
 					boxShadow: "0px 36px 42px -4px rgba(77, 77, 77, 0.15)",
 				}}>
 					<p style={{
@@ -125,6 +125,8 @@ function ToolbarButton({ children, handleClick, active, name }){
 						fontSize: '8px',
 						color: "#63635E",
 						display: "flex",
+						textWrap: 'nowrap',
+						whiteSpace: 'nowrap',
 						alignItems: 'center',
 						margin: 0,
 						fontFamily: 'monospace',

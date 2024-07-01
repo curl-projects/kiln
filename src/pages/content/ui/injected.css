@@ -295,3 +295,24 @@ p.is-editor-empty:first-child::before {
 .kiln-fish-search-query:hover{
   color: rgba(99, 99, 94, 1);
 }
+
+
+.kiln-project-panel-world-model{
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  padding-bottom: 0px;
+  height: fit-content;
+  color: #9A98A0;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.5s ease-in-out;
+  display: flex;
+  letter-spacing: 0.03em;
+}
+
+.kiln-project-panel-world-model:hover{
+  color: #414043;
+}

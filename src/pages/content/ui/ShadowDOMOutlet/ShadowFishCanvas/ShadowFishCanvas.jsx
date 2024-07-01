@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Tldraw, createTLStore, defaultShapeUtils, react, useEditor, createShapeId  } from 'tldraw';
+import { openDB } from 'idb';
+import { throttle } from 'lodash'
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { Tldraw, createTLStore, defaultShapeUtils, defaultBindingUtils, react, useEditor, createShapeId, DefaultSpinner, getSnapshot, loadSnapshot  } from 'tldraw';
 import { HTMLContainer, ShapeUtil } from 'tldraw'
 import { useFish } from "@pages/content/ui/ScriptHelpers/FishOrchestrationProvider/FishOrchestrationProvider.jsx";
 import _ from 'lodash';
@@ -70,8 +72,8 @@ export default function ShadowCanvas({ parsedContent, article }) {
     QuickActions: null,
     NavigationPanel: null,
     // ContextMenu: null,
-    StylePanel: null,
-    SharePanel: CustomProjectTracker,
+    StylePanel: CustomProjectTracker,
+    // SharePanel: CustomProjectTracker,
   }
 
   // TODO: think this might be irrelevant
@@ -111,124 +113,212 @@ export default function ShadowCanvas({ parsedContent, article }) {
     }
   }
 
+  // STORE CONFIG
+  
+
+
+
   const [reactEditor, setReactEditor] = useState('')
   const [hoveredShape, setHoveredShape] = useState(undefined)
   const [selectedShapes, setSelectedShapes] = useState([])
   const { fishOrchestrator } = useFish();
-  
   const [textCreated, setTextCreated] = useState(null)
+
+
+
+  const PERSISTENCE_KEY = 'kiln-persistence'
+
+  const [store, setStore] = useState(() => createTLStore({ shapeUtils: [...defaultShapeUtils, ...customShapeUtils], bindingUtils: [...defaultBindingUtils, ...customBindingUtils] }))
+	//[2]
+	const [loadingState, setLoadingState] = useState({
+		status: 'loading',
+	})
+	//[3]
   
-  function handleCanvasEvent(e, editor){
-    if(editor){  
-                  
-      const newSelectedShapes = editor.getSelectedShapes();
-      const newHoveredShape = editor.getHoveredShape();
+  
 
-      // console.log("POINTER UP:", newSelectedShapes)
 
-        // Compare and update state only if different
-        if (selectedShapes !== newSelectedShapes) {
-          setSelectedShapes(newSelectedShapes);
+	useLayoutEffect(() => {
+    async function loadData(){
+      setLoadingState({ status: 'loading' })
+      const inMessage = await chrome.runtime.sendMessage({ action: "retrieve" })
+
+      console.log("IN MESSAGE", inMessage)
+      const persistedSnapshot = inMessage?.data?.kiln
+
+      // Get persisted data from local storag
+      if (persistedSnapshot) {
+        try {
+          const snapshot = JSON.parse(persistedSnapshot)
+          loadSnapshot(store, snapshot)
+          setLoadingState({ status: 'ready' })
+        } catch (error) {
+          setLoadingState({ status: 'error', error: error.message }) // Something went wrong
         }
-
-        if (hoveredShape !== newHoveredShape) {
-          setHoveredShape(newHoveredShape);
-        }
-        
-      switch(e.name){
-          case 'pointer_up':
-              // ripple effect
-
-
-              // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
-              break;
-          // case "double_click":
-          //       const editorSelectedShapes = editor.getSelectedShapes()
-          //       if (editorSelectedShapes.length > 0) break;
-          //       editor.setCurrentTool("richText") // Or any other wanted tool
-          //       const id = createShapeId()
-          //       editor.createShapes([
-          //         {
-          //           id,
-          //           type: 'richText',
-          //           x: e.point.x,
-          //           y: e.point.y,
-          //           props: {
-          //             text: '',
-          //             autoSize: true,
-          //           },
-          //         },
-          //       ]).select(id)
-          //       editor.setEditingShape(id)
-          //       // editor.setCurrentTool('select')
-          //       // editor.root.getCurrent()?.transition('editing_shape')
-          //       break
-            
-          default:
-              break;
+      } else {
+        setLoadingState({ status: 'ready' }) // Nothing persisted, continue with the empty store
       }
     }
-  }
+
+    loadData()
+
+    // Each time the store changes, run the (debounced) persist function
+		const cleanupFn = store.listen(
+			throttle(() => {
+				const snapshot = getSnapshot(store)
+				const outMessage = chrome.runtime.sendMessage({ action: 'save', snapshot: JSON.stringify(snapshot) });
+			}, 100)
+		)
+  
+    return () => {
+      cleanupFn();
+    };
+  }, [store]);
+  
+
+
+  
+  // function handleCanvasEvent(e, editor){
+  //   if(editor){  
+                  
+  //     const newSelectedShapes = editor.getSelectedShapes();
+  //     const newHoveredShape = editor.getHoveredShape();
+ 
+  //     // console.log("POINTER UP:", newSelectedShapes)
+
+  //       // Compare and update state only if different
+  //       if (selectedShapes !== newSelectedShapes) {
+  //         setSelectedShapes(newSelectedShapes);
+  //       }
+
+  //       if (hoveredShape !== newHoveredShape) {
+  //         setHoveredShape(newHoveredShape);
+  //       }
+        
+  //     switch(e.name){
+  //         case 'pointer_up':
+  //             // ripple effect
+
+
+  //             // fishOrchestrator.emit('shadowDOMClick', { x: e.point.x, y: e.point.y })
+  //             break;
+  //         // case "double_click":
+  //         //       const editorSelectedShapes = editor.getSelectedShapes()
+  //         //       if (editorSelectedShapes.length > 0) break;
+  //         //       editor.setCurrentTool("richText") // Or any other wanted tool
+  //         //       const id = createShapeId()
+  //         //       editor.createShapes([
+  //         //         {
+  //         //           id,
+  //         //           type: 'richText',
+  //         //           x: e.point.x,
+  //         //           y: e.point.y,
+  //         //           props: {
+  //         //             text: '',
+  //         //             autoSize: true,
+  //         //           },
+  //         //         },
+  //         //       ]).select(id)
+  //         //       editor.setEditingShape(id)
+  //         //       // editor.setCurrentTool('select')
+  //         //       // editor.root.getCurrent()?.transition('editing_shape')
+  //         //       break
+            
+  //         default:
+  //             break;
+  //     }
+  //   }
+  // }
 
 
   function handleStoreEvent(change){
-        for (const record of Object.values(change.changes.added)) {
-            if (record.typeName === 'shape') {
-                console.log(`created shape (${record.type})\n`)
-                if(record.type === 'richText'){
-                    setTextCreated(record)
-                }
-            }
-
-        for (const [from, to] of Object.values(change.changes.updated)) {
-            if (
-                from.typeName === 'instance' &&
-                to.typeName === 'instance' &&
-                from.currentPageId !== to.currentPageId
-            ) {
-                logChangeEvent(`changed page (${from.currentPageId}, ${to.currentPageId})`)
-            } else if (from.id.startsWith('shape') && to.id.startsWith('shape')) {
-                let diff = _.reduce(
-                    from,
-                    (result, value, key) =>
-                        _.isEqual(value, (to)[key]) ? result : result.concat([key, (to)[key]]),
-                    []
-                )
-                if (diff?.[0] === 'props') {
-                    diff = _.reduce(
-                        (from).props,
-                        (result, value, key) =>
-                            _.isEqual(value, (to).props[key])
-                                ? result
-                                : result.concat([key, (to).props[key]]),
-                        []
-                    )
-                }
-                console.log("update shape:", diff)
-            }
-        }
-
-        for (const record of Object.values(change.changes.removed)) {
-            if (record.typeName === 'shape') {
-              console.log("deleted shape:", (record.type))
-            }
-        }
-    }
+    throttle(async () => {
+      console.log("UPLOADING DATA:");
+      const snapshot = getSnapshot(reactEditor.store);
+      // send message to backend
+      const outMessage = await chrome.runtime.sendMessage({ action: 'save', snapshot: JSON.stringify(snapshot) });
+      // localStorage.setItem('kiln', JSON.stringify(snapshot));
+    }, 500)()
   }
+  //       for (const record of Object.values(change.changes.added)) {
+  //           if (record.typeName === 'shape') {
+  //               console.log(`created shape (${record.type})\n`)
+  //               if(record.type === 'richText'){
+  //                   setTextCreated(record)
+  //               }
+  //           }
 
-  function handleUiEvent(e){
-    console.log("UI EVENT", e)
-  }
+  //       for (const [from, to] of Object.values(change.changes.updated)) {
+  //           if (
+  //               from.typeName === 'instance' &&
+  //               to.typeName === 'instance' &&
+  //               from.currentPageId !== to.currentPageId
+  //           ) {
+  //               logChangeEvent(`changed page (${from.currentPageId}, ${to.currentPageId})`)
+  //           } else if (from.id.startsWith('shape') && to.id.startsWith('shape')) {
+  //               let diff = _.reduce(
+  //                   from,
+  //                   (result, value, key) =>
+  //                       _.isEqual(value, (to)[key]) ? result : result.concat([key, (to)[key]]),
+  //                   []
+  //               )
+  //               if (diff?.[0] === 'props') {
+  //                   diff = _.reduce(
+  //                       (from).props,
+  //                       (result, value, key) =>
+  //                           _.isEqual(value, (to).props[key])
+  //                               ? result
+  //                               : result.concat([key, (to).props[key]]),
+  //                       []
+  //                   )
+  //               }
+  //               console.log("update shape:", diff)
+  //           }
+  //       }
+
+  //       for (const record of Object.values(change.changes.removed)) {
+  //           if (record.typeName === 'shape') {
+  //             console.log("deleted shape:", (record.type))
+  //           }
+  //       }
+  //   }
+  // }
+
+  // function handleUiEvent(e){
+  //   console.log("UI EVENT", e)
+  // }
+
+  if (loadingState.status === 'loading') {
+		return (
+			<div className="tldraw__editor">
+				<h2>
+					<DefaultSpinner />
+				</h2>
+			</div>
+		)
+	}
+
+	if (loadingState.status === 'error') {
+		return (
+			<div className="tldraw__editor">
+				<h2>Error!</h2>
+				<p>{loadingState.error}</p>
+			</div>
+		)
+	}
+
 
   return (
     <Tldraw
+      store={store}
       shapeUtils={customShapeUtils}
       tools={customTools}
+      
       overrides={uiOverrides}
       components={customComponents}
       bindingUtils={customBindingUtils}
 
-      onUiEvent={handleUiEvent}
+      // onUiEvent={handleUiEvent}
       onMount={(editor)=>{
         if(editor){
           editor.root.children.select.children.resizing._createSnapshot = customCreateSnapshot;
@@ -241,10 +331,18 @@ export default function ShadowCanvas({ parsedContent, article }) {
 
         setReactEditor(editor)
 
-        editor.on('event', (event) => handleCanvasEvent(event, editor))
+        // editor.on('event', (event) => handleCanvasEvent(event, editor))
         // editor.on('change', (event) => handleChange(event, editor))
         // editor.on('', (e) => console.log("SELECTION CHANGE", e))
-        editor.store.listen(handleStoreEvent)
+        // editor.store.listen(
+        //   throttle(async () => {
+        //     console.log("UPLOADING DATA:");
+        //     const snapshot = getSnapshot(editor.store);
+        //     // send message to backend
+        //     const outMessage = await chrome.runtime.sendMessage({ action: 'save', snapshot: JSON.stringify(snapshot) });
+        //     // localStorage.setItem('kiln', JSON.stringify(snapshot));
+        //   }, 500)
+        // )
         // editor.createShape({ type: 'my-custom-shape', x: 100, y: 100 })
 
         editor.sideEffects.registerBeforeChangeHandler(
