@@ -117,6 +117,7 @@ getDefaultProps(): MediaShape['props'] {
 
 		useEffect(()=>{
 			console.log("READ TEXT", readText)
+			console.log("READ TEXT PARSED", JSON.parse(readText))
 		}, [readText])
 
 
