@@ -121,10 +121,13 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 
 				if(shape.props.viewMode === 'minimized'){
+
+
 					const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
 
 					for(let child of children){
 						child.type !== 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+						child.type === 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true})
 					}
 
 					this.editor.updateShape(
@@ -138,6 +141,7 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 
 					for(let child of children){
 						child.type !== 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true, opacity: 0})
+						child.type === 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: false})
 					}
 					// get fish
 					const fishBinding = this.editor.getBindingsToShape(shape, 'fishWorldModel')[0]
@@ -167,7 +171,9 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 					const children = this.editor.getSortedChildIdsForParent(shape).map(id => this.editor.getShape(id))
 
 					for(let child of children){
-						this.editor.updateShape({id: child.id, type: child.type, isLocked: false, opacity: 1})
+						child.type !== 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: false, opacity: 1})
+						child.type === 'fish' && this.editor.updateShape({id: child.id, type: child.type, isLocked: true})
+						
 					}
 					console.log("SHAPE:", shape)
 					this.editor.updateShape({id: shape.id, type: shape.type, opacity: 1, isLocked: false, props: {
@@ -321,25 +327,25 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 					boxSizing: 'border-box'}} 
 				
 				onPointerDown={stopEventPropagation}>
-				<SVGContainer style={{}}>
-					<defs>
-						<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
-						<feDropShadow dx="0" dy="36" stdDeviation="21" floodColor="#4D4D4D" floodOpacity="0.15"/>
-						</filter>
-					</defs>
-					<rect
-						className={classNames({ 'tl-frame__creating': isCreating })}
-						width={bounds.width}
-						height={bounds.height}
-						rx="12"
-						ry="12"
-						fill="#F9F9F8"
-						strokeWidth="2"
-						stroke="#DDDDDA"
-						filter="url(#boxShadow)"
+					<SVGContainer>
+						<defs>
+							<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
+							<feDropShadow dx="0" dy="36" stdDeviation="21" floodColor="#4D4D4D" floodOpacity="0.15"/>
+							</filter>
+						</defs>
+						<rect
+							className={classNames({ 'tl-frame__creating': isCreating })}
+							width={bounds.width}
+							height={bounds.height}
+							rx="12"
+							ry="12"
+							fill="#F9F9F8"
+							strokeWidth="2"
+							stroke="#DDDDDA"
+							filter="url(#boxShadow)"
 
-					/>
-				</SVGContainer>
+						/>
+					</SVGContainer>
 				{(shape.props.viewMode === 'full' && !isCreating && (frameIsSelected || frameIsAncestor)) &&
 					<div style={{
 						position: 'absolute',
@@ -589,9 +595,33 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 		}
 	}
 
-	override onDragShapesOut = (_shape: TLWorldModelShape, shapes: TLShape[]): void => {
+	override onDragShapesOut = (_shape: TLWorldModelShape, shapes: any): void => {
 		const parent = this.editor.getShape(_shape.parentId)
 		const isInGroup = parent && this.editor.isShapeOfType<TLGroupShape>(parent, 'group')
+
+		const remainingChildren: any = this.editor.getSortedChildIdsForParent(_shape).map(id => this.editor.getShape(id))
+		
+		// update new concept in shape if old one is moved out
+		for(let dragShape of shapes){
+			if(dragShape.type === 'concept'){
+				// remove the media binding from the concept
+				const conceptBinding: any = this.editor.getBindingsFromShape(dragShape, 'mediaConcept')[0]
+
+
+				this.editor.deleteBinding(conceptBinding.id)
+
+				// if a copy of the concept exists, change its opacity to 1 
+				for(let child of remainingChildren){
+					if(child.props.text === dragShape.props.text){
+						this.editor.updateShape({...child, opacity: 1})
+					}
+				}
+
+				console.log("CONCEPT DRAGGED OUT", dragShape)
+				
+			}
+		}
+
 
 		// If frame is in a group, keep the shape
 		// moved out in that group

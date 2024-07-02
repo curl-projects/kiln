@@ -69,6 +69,20 @@ export default function App() {
     }
   }
 
+  // useEffect(()=>{
+  //   (async () => {
+  //     const data: any = chrome.runtime.sendMessage({ action: 'retrieveCanvasMode'})
+  //     if(data?.canvasMode){
+  //       setCanvasMode(data.canvasMode) 
+  //     }
+  //   })()
+  // }, [])
+
+  // useEffect(()=>{
+  //   console.log("SENDING MESSAGE")
+  //   chrome.runtime.sendMessage({ action: "saveCanvasMode", canvasMode: canvasMode})
+  // }, [canvasMode])
+
   useEffect(()=>{
     
     switch(canvasMode){
@@ -201,7 +215,8 @@ export default function App() {
             fontWeight: 500,
             color: "#82827C",
             margin: 0,
-          }}>A Criticism of Effective Software</p>
+            cursor: "pointer",
+          }}>{document.title}</p>
           <div 
           onClick={()=> { setCanvasMode('page') }}
           style={{

@@ -61,143 +61,188 @@ export type SearchShape = TLBaseShape<'search', SearchShapeProps>
 
 /** @public */
 export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
-	static override type = 'search' as const
-	static override props = searchShapeProps
-	static override migrations = frameShapeMigrations
+ static override type = 'search' as const
+ static override props = searchShapeProps
+ static override migrations = frameShapeMigrations
 
-	// override canEdit = (shape) => {
-	// 	return false
-	// }
+ // override canEdit = (shape) => {
+ //  return false
+ // }
 
     override canEdit = () => true
 
     override canScroll = () => true
 
-	override canBind(){
-		return true
-	}
+ override canBind(){
+  return true
+ }
 
-	override canCrop = () => true
+ override canCrop = () => true
 
-	override getDefaultProps(): SearchShape['props'] {
-		return { w: 160 * 2, h: 60, name: ''}
-	}
+ override getDefaultProps(): SearchShape['props'] {
+  return { w: 160 * 2, h: 60, name: ''}
+ }
 
-	override getGeometry(shape: SearchShape): Geometry2d {
-		return new Rectangle2d({
-			width: shape.props.w,
-			height: shape.props.h,
-			isFilled: false,
-		})
-	}
+ override getGeometry(shape: SearchShape): Geometry2d {
+  return new Rectangle2d({
+   width: shape.props.w,
+   height: shape.props.h,
+   isFilled: false,
+  })
+ }
 
-	override component(shape: SearchShape) {
-		const bounds = this.editor.getShapeGeometry(shape).bounds
-
+ override component(shape: SearchShape) {
+        const bounds = this.editor.getShapeGeometry(shape).bounds
         const conceptChildren: any = this.editor.getSortedChildIdsForParent(shape).map(childId => this.editor.getShape(childId)).filter(child => child.type === 'concept')
 
-        useEffect(()=>{
-            console.log("CONCEPT CHILDREN:", conceptChildren)
-        }, [conceptChildren])
+        const [searchInput, setSearchInput] = useState(shape.props.name || "")
+        const [isInputFocused, setIsInputFocused] = useState(false)
 
-
-		return (
-        <HTMLContainer className="kiln-feed-search-box">
-            <p style={{
-                fontWeight: 600,
-                fontSize: '12px',
-                color: "#63635E",
-                display: "flex",
-                alignItems: 'center',
-
-            }}>Articles about
-            {(conceptChildren && conceptChildren.length !== 0)
-            
-            ? conceptChildren.map((concept, idx) => 
-                <SearchShapeConcept key={idx} concept={concept} editor={this.editor}/>)
-            : <span style={{marginLeft: '3px', color: "rgba(100, 99, 99, 0.4)"}}>...anything! Drag concepts in to search.</span>
-        }
-            </p>
-            <div style={{flex: 1}}/>
-            <div 
-            onMouseDown={()=>{
-                const feedBinding = this.editor.getBindingsFromShape(shape, 'searchFeedBinding')[0]
+        const handleSearch = useCallback(() => {
+            const feedBinding = this.editor.getBindingsFromShape(shape, 'searchFeedBinding')[0]
+            if (feedBinding) {
                 const feed = this.editor.getShape(feedBinding.toId)
+                this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: searchInput }})
+            }
+        }, [searchInput])
 
-                // send data to bound shape 
-                // TODO FIX:
-                this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: `Articles about ${conceptChildren.map(el => el.props.text).join(",")}`}})
-            }}
-            style={{
-                height: "100%",
-                width: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: '20px',
-            }}>
-                <IoMdSearch/>
-            </div>
-        </HTMLContainer>
-		)
-	}
+        useEffect(() => {
+            if (shape.props.name !== searchInput) {
+                setSearchInput(shape.props.name)
+            }
+        }, [shape.props.name])
 
-	indicator(shape: SearchShape) {
-		const bounds = this.editor.getShapeGeometry(shape).bounds
+return (
+            <HTMLContainer className="kiln-feed-search-box">
+                <div 
+                    style={{
+                        position: 'relative',
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 10px',
+                    }}
+                >
+                    {!isInputFocused && searchInput === "" && (
+                        <p style={{
+                            position: 'absolute',
+                            fontWeight: 600,
+                            fontSize: '12px',
+                            color: "#63635E",
+                            display: "flex",
+                            alignItems: 'center',
+                            margin: 0,
+                            pointerEvents: 'none',
+                        }}>
+                            Articles about
+                            {(conceptChildren && conceptChildren.length !== 0)
+                                ? conceptChildren.map((concept, idx) => 
+                                    <SearchShapeConcept key={idx} concept={concept} editor={this.editor}/>)
+                                : <span style={{marginLeft: '3px', color: "rgba(100, 99, 99, 0.4)"}}>...anything! Drag concepts in to search.</span>
+                            }
+                        </p>
+                    )}
+                    <input 
+                        type="text" 
+                        value={searchInput} 
+                        onChange={(e) => {
+                            setSearchInput(e.target.value)
+                            this.editor.updateShape({
+                                id: shape.id,
+                                type: 'search',
+                                props: { name: e.target.value }
+                            })
+                        }}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        onFocus={() => setIsInputFocused(true)}
+                        onBlur={() => setIsInputFocused(false)}
+                        placeholder={isInputFocused ? "Enter search query" : ""}
+                        style={{
+                            width: '100%',
+                            height: '40px',
+                            border: 'none',
+                            outline: 'none',
+                            fontWeight: 600,
+                            fontSize: '12px',
+                            color: "#63635E",
+                            background: 'transparent',
+                        }}
+                    />
+                    <div 
+                        onClick={handleSearch}
+                        style={{
+                            height: "100%",
+                            width: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            fontSize: '20px',
+                        }}
+                    >
+                        <IoMdSearch/>
+                    </div>
+                </div>
+            </HTMLContainer>
+        )
+    }
 
-		return (
-			<rect
-				rx="12"
-				ry="12"
-				width={toDomPrecision(bounds.width)}
-				height={toDomPrecision(bounds.height)}
-				className={`tl-frame-indicator`}
-			/>
-		)
-	}
+ indicator(shape: SearchShape) {
+  const bounds = this.editor.getShapeGeometry(shape).bounds
 
-	override onResize: TLOnResizeHandler<any> = (shape, info) => {		
-		return resizeBox(shape, info)
-	}
+  return (
+   <rect
+    rx="12"
+    ry="12"
+    width={toDomPrecision(bounds.width)}
+    height={toDomPrecision(bounds.height)}
+    className={`tl-frame-indicator`}
+   />
+  )
+ }
+
+ override onResize: TLOnResizeHandler<any> = (shape, info) => {  
+  return resizeBox(shape, info)
+ }
 
 
     override canDropShapes = (shape: SearchShape, shapes: TLShape[]): boolean => {
-		if(shapes.every((s) => s.type === 'concept')){
-			return true
-		}
-		else{
-			return false
-		}
-	}
+  if(shapes.every((s) => s.type === 'concept')){
+   return true
+  }
+  else{
+   return false
+  }
+ }
 
-    override onDragShapesOver = (frame: SearchShape, shapes: TLShape[]) => {
-		if (!shapes.every((child) => child.parentId === frame.id)) {
-			this.editor.reparentShapes(shapes, frame.id)
-		}
-	}
-    
-    override onDragShapesOut = (shape: SearchShape, shapes: any): void => {
-        const parent = this.editor.getShape(shape.parentId)
-		const isInGroup = parent && this.editor.isShapeOfType<TLGroupShape>(parent, 'group')
-
-        if (isInGroup) {
-			this.editor.reparentShapes(shapes, parent.id)
-		} else {
-			this.editor.reparentShapes(shapes, this.editor.getCurrentPageId())
-		}
+ override onDragShapesOver = (frame: SearchShape, shapes: TLShape[]) => {
+    if (!shapes.every((child) => child.parentId === frame.id)) {
+     this.editor.reparentShapes(shapes, frame.id)
     }
-
-    override onDropShapesOver = (shape: SearchShape, shapes: any): void => {
-        for(let childShape of shapes){
-            if(childShape.type === 'concept'){
-                this.editor.updateShape({id: childShape.id, type: childShape.id, opacity: 0, isLocked: true})
-            }
-        }
+   }
+      
+      override onDragShapesOut = (shape: SearchShape, shapes: any): void => {
+          const parent = this.editor.getShape(shape.parentId)
+    const isInGroup = parent && this.editor.isShapeOfType<TLGroupShape>(parent, 'group')
+  
+          if (isInGroup) {
+     this.editor.reparentShapes(shapes, parent.id)
+    } else {
+     this.editor.reparentShapes(shapes, this.editor.getCurrentPageId())
     }
-
-    override onChildrenChange: TLOnChildrenChangeHandler<SearchShape> = (shape) => {
-        // get children and re-render text
-	}
-
-}
+      }
+  
+      override onDropShapesOver = (shape: SearchShape, shapes: any): void => {
+          for(let childShape of shapes){
+              if(childShape.type === 'concept'){
+                  this.editor.updateShape({id: childShape.id, type: childShape.id, opacity: 0, isLocked: true})
+              }
+          }
+      }
+  
+      override onChildrenChange: TLOnChildrenChangeHandler<SearchShape> = (shape) => {
+          // get children and re-render text
+   }
+  
+  }

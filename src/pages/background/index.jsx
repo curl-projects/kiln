@@ -30,67 +30,21 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(error
 // Message listeners
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if(message.action === 'save'){
-        console.log("SAVED!")
+        console.log("SAVED!");
         chrome.storage.local.set({
             'kiln': message.snapshot,
-        })
-    }  
-
-    else if(message.action === 'retrieve'){
-        console.log("RETRIEVED!")
-        const data = chrome.storage.local.get(['kiln']).then((response => {
-        console.log("RESPONSE:", response )
-        sendResponse({ status: 'success', data: response})
-        return true
-        }))
-
-
-        
-
-        // .then((result) => {
-        //     console.log("RESULT:", result)
-        //     sendResponse({persistedSnapshot: result.kiln})
-        // })
+        }, () => {
+            sendResponse({ status: 'success' });
+        });
+        return true; // Keep the sendResponse callback valid
+    } else if(message.action === 'retrieve'){
+        console.log("RETRIEVED!");
+        chrome.storage.local.get(['kiln'], (response) => {
+            console.log("RESPONSE:", response);
+            sendResponse({ status: 'success', data: response });
+        });
+        return true; // Keep the sendResponse callback valid
     }
-
-    // return true
-
-    
-    // switch (message.action) {
-    //     case 'query':
-    //         query(message.endpoint, message.params)
-    //             .then((data) => {
-    //                 sendResponse({ success: true, data });
-    //             })
-    //             .catch(error => {
-    //                 sendResponse({ success: false, error: error.message });
-    //             });
-    //         // Return true to indicate an asynchronous response
-    //         return true;
-    //     case 'mutate':
-    //         mutate(message.endpoint, message.data)
-    //             .then((data) => {
-    //                 sendResponse({ success: true, data });
-    //             })
-    //             .catch(error => {
-    //                 sendResponse({ success: false, error: error.message });
-    //             });
-    //         // Return true to indicate an asynchronous response
-    //         return true;
-    //     case 'stream':
-    //         stream(message.endpoint, message.data, message.promptType, message.streamName)
-    //         .then((data) => {
-    //                 sendResponse({ success: true, data });
-    //             })
-    //         .catch(error => {
-    //             sendResponse({ success: false, error: error.message });
-    //         });
-    //         break;
-    //     case 'run':
-    //         break;
-    //     default:
-    //         console.error(`Invalid action sent from ${sender}`);
-    // }
 });
 
 function storeObjectInChromeStorage(dataObject) {

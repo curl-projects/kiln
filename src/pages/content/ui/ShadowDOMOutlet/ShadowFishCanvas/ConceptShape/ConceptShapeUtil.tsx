@@ -301,7 +301,8 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 			}
 		}
 
-		if(conceptParent && conceptParent.type === "media"){
+		if(conceptParent?.type === "media" || conceptParent?.type === 'worldModel'){
+			console.log("HI!")
 			const newShapeId = createShapeId();
 
 			// get binding attributes from existing concept
@@ -337,9 +338,6 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					proportionY: shape.y / conceptParent.props.h,
 				}
 			})
-
-	
-			// create new shape in the same location		}
 		}
 	}
 
@@ -479,7 +477,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 
 		}
 
-		if(conceptParent?.type === 'media'){
+		if(conceptParent?.type === 'media' || conceptParent?.type === 'worldModel'){
 			// get all children of parent
 			console.log("HELLO!")
 			const mediaChildren: any = this.editor.getSortedChildIdsForParent(conceptParent).map(id => this.editor.getShape(id))

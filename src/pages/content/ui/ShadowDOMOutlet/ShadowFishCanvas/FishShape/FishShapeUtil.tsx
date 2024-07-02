@@ -60,8 +60,31 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 	override isAspectRatioLocked = (_shape: FishShape) => true
 	override canResize = (_shape: FishShape) => false
 
-    override hideSelectionBoundsFg = (_shape: FishShape) => false
-    // override hideSelectionBoundsBg = (_shape: FishShape) => false
+    override hideSelectionBoundsFg = (_shape: FishShape) => {
+		
+		const worldModelBinding = this.editor.getBindingsFromShape(_shape, 'fishWorldModel')[0]
+		const worldModel: any = worldModelBinding ? this.editor.getShape(worldModelBinding.toId) : undefined
+
+		if(!worldModel || worldModel.viewMode === 'fish'){
+			return false
+		}
+		else{
+			return true
+		}
+
+
+	}
+    override hideSelectionBoundsBg = (_shape: FishShape) => {
+			const worldModelBinding = this.editor.getBindingsFromShape(_shape, 'fishWorldModel')[0]
+		const worldModel: any = worldModelBinding ? this.editor.getShape(worldModelBinding.toId) : undefined
+
+		if(!worldModel || worldModel.viewMode === 'fish'){
+			return false
+		}
+		else{
+			return true
+		}
+	}
     override hideResizeHandles = (_shape: FishShape) => true
     override hideRotateHandle = (_shape: FishShape) => true
 

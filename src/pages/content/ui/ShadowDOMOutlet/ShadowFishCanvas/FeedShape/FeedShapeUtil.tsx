@@ -86,7 +86,9 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
 
 	override component(shape: FeedModelShape) {
 		const [selectedOutput, setSelectedOutput] = useState(null);
-        const [queryResults, setQueryResults] = useState([{text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}, {text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}, {text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}])
+        const [queryResults, setQueryResults] = useState([
+            // {text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}, {text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}, {text: "Hello my name is Finn", url: "https://github.com/tldraw/tldraw/blob/d6469945542a77f29e0a3281b8e15c79e3780fed/packages/editor/src/lib/app/tools/SelectTool/children/Translating.ts", title: "Test Media"}
+        ])
 		const bounds = this.editor.getShapeGeometry(shape).bounds
         const searchBoxRef: any = useRef();
 

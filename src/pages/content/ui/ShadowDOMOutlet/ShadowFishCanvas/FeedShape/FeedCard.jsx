@@ -1,30 +1,34 @@
 import { createShapeId } from "tldraw"
+import { useRef } from 'react';
 
 
 export function FeedCard({result, idx, editor, worldModel}){
+    const ref = useRef();
+
     return(
         <div key={idx}
-        onPointerDown={(e)=>{
+        ref={ref}
+        onClick={(e)=>{
             console.log("DRAG START!", e)
             console.log("DRAG START 2!", e.target.getBoundingClientRect())
             const { x, y } = editor.inputs.currentPagePoint
 
             const clickX = e.clientX, clickY = e.clientY
-            const rect = e.target.getBoundingClientRect();
+            const rect = ref.current.getBoundingClientRect();
             const distanceX = clickX - rect.left, distanceY = clickY - rect.top
+            const shapeId = createShapeId()
 
-
-               
+            console.log("DISTANCE:", e.target.clientHeight)
             editor.createShape({
                     id: shapeId,
                     type: 'media',
                     x: x-distanceX,
                     y: y-distanceY,
                     props: {
-                        w: e.target.clientWidth,
-                        h: e.target.clientHeight,
+                        w: ref.current.clientWidth,
+                        h: ref.current.clientHeight,
                         // text: JSON.stringify("Hey")
-                        text: JSON.stringify(result.text)
+                        text: result.text
                     }
                 })
             // editor.reparentShapes([shapeId], worldModel.id)
@@ -35,7 +39,7 @@ export function FeedCard({result, idx, editor, worldModel}){
             //     x: 
             // })
 
-                // editor.setCurrentTool('select.pointing_shape', { shape: editor.getShape(shapeId)})
+            editor.setCurrentTool('select.pointing_shape', { shape: editor.getShape(shapeId)})
 
 
                 // editor.setSelectedShapes([shapeId])
