@@ -25,7 +25,7 @@ import {
 	TLOnTranslateStartHandler,
 	TLOnChildrenChangeHandler,
 } from '@tldraw/editor'
-import { T, createShapeId } from 'tldraw';
+import { T, createShapeId, DefaultSpinner } from 'tldraw';
 import { useResizeCreated } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/CustomUI/useJustCreated"
 import { useCallback, useState, useEffect, useRef } from 'react'
 import classNames from 'classnames'
@@ -38,6 +38,7 @@ import { ColorHighlighter } from '../CustomUI/TextExtensions/HighlightExtension/
 import Placeholder from '@tiptap/extension-placeholder'
 import { Concept, Media, inferConcepts, systemPrompt, fetchInferredConcepts } from "@pages/content/ui/ServerFuncs/api"
 import { LuRefreshCcwDot } from "react-icons/lu";
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 const mediaShapeProps = {
 	w: T.number,
@@ -237,6 +238,29 @@ getDefaultProps(): MediaShape['props'] {
 		
 		// END VIEW
 
+		// DATA FETCHING
+
+		const { isPending, isError, mutate, data } = useMutation({
+			mutationFn: async () => await fetchInferredConcepts(this.editor, shape, [{ text: shape.props.plainText }])
+
+		})
+		// const { data, refetch, isPending, isError } = useQuery({
+		// 	queryKey: ['concept-data', this.editor, shape, shape.props.plainText ],
+		// 	queryFn: async () => {
+		// 		try{
+		// 			console.log("Hi!")
+		// 			const data = await fetchInferredConcepts(this.editor, shape, [{ text: shape.props.plainText }])
+		// 			return data
+		// 		}
+		// 		catch(error){
+		// 			throw new Error(error)
+		// 		}
+				
+		// 	},
+		// 	enabled: false,
+		// })
+		
+
 		
 		return (
 			<HTMLContainer 
@@ -255,9 +279,39 @@ getDefaultProps(): MediaShape['props'] {
 					pointerEvents: 'all',	
 					border: "1px solid rgba(255, 255, 255, 0.95)",
 					padding: '28px 24px',
+					position: 'relative',
 				}}
 				ref={shapeRef}
 				>
+					{shape.props.view === 'concepts' && (isPending || isError) &&
+					<div style={{
+						position: 'absolute',
+						top: '50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						display: 'flex',
+						alignItems: 'center',
+						whiteSpace: 'nowrap',
+						justifyContent: 'center',
+						gap: '10px',					
+					}}>
+						
+						<p 
+						style={{
+							fontFamily: 'monospace',
+							letterSpacing: '0.1em',
+							color: isPending ? "#BBAACC" : "#8C1D18",
+							fontWeight: 700,
+							textTransform: 'uppercase',
+							margin: 0,
+							fontSize: '20px',
+						}}>{isPending ? "Analysing Concepts" : "Error"}
+						</p>
+
+						{isPending && <DefaultSpinner />}
+
+					</div>
+					}
 					<div style={{
 						display: 'flex',
 						gap: '8px', 
@@ -287,7 +341,8 @@ getDefaultProps(): MediaShape['props'] {
 						<div style={{flex: 1}}/>
 						<div className="tl-media-concept-toggle" onPointerDown={()=>{
 							console.log("Fetching inferred concepts")
-							fetchInferredConcepts(this.editor, shape, [{text: shape.props.plainText}])
+							this.editor.updateShape({id: shape.id, type: shape.type, props: { view: "concepts" }})
+							mutate();
 						}}>
 							<LuRefreshCcwDot />
 						</div>

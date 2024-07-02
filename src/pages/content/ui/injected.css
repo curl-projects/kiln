@@ -316,3 +316,6 @@ p.is-editor-empty:first-child::before {
 .kiln-project-panel-world-model:hover{
   color: #414043;
 }
+
+/* LOADING INDICATOR */
+

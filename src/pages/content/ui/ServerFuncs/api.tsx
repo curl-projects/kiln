@@ -190,7 +190,7 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
 
             
         } catch (error) {
-            console.error('Error inferring concepts:', error);
+            throw new Error(error)
         }
 };
 
