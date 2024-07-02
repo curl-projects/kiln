@@ -21,11 +21,14 @@ import {
 	HTMLContainer,
 	stopEventPropagation,
 	createShapeId,
+	DefaultSpinner,
 } from '@tldraw/editor'
 import { Expand } from '@tldraw/utils'
-
+import { useMutation } from '@tanstack/react-query'
+import { mergeConcepts } from "@pages/content/ui/ServerFuncs/api"
 import { useCallback, useState, useEffect } from 'react'
 import classNames from 'classnames'
+import { generateLinearGradient } from '../ConceptShape/ConceptShapeUtil'
 
 export function last<T>(arr: readonly T[]): T | undefined {
 	return arr[arr.length - 1]
@@ -40,6 +43,8 @@ export const kinematicCanvasModelShapeProps = {
 	w: T.nonZeroNumber,
 	h: T.nonZeroNumber,
 	name: T.string,
+	mergedConcepts: T.any,
+	mergedConceptsPositions: T.any,
 }
 
 export type RecordPropsType<Config extends Record<string, T.Validatable<any>>> = Expand<{
@@ -70,7 +75,7 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 	override canCrop = () => true
 
 	override getDefaultProps(): KinematicCanvasModelShape['props'] {
-		return { w: 160 * 2, h: 90 * 2, name: '',}
+		return { w: 160 * 2, h: 90 * 2, name: '', mergedConcepts: [], mergedConceptsPositions: []}
 	}
 
 	override getGeometry(shape: KinematicCanvasModelShape): Geometry2d {
@@ -85,6 +90,41 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 		const [selectedOutput, setSelectedOutput] = useState(null);
 
 		const bounds = this.editor.getShapeGeometry(shape).bounds
+
+		const { isPending, isError, mutate, data } = useMutation({
+			mutationFn: async (mergedConcepts) => await mergeConcepts({
+				concepts: mergedConcepts.map((el) => {return {name: el.name, description: el.description || ""}})
+			})
+			})
+
+		useEffect(()=>{
+			console.log("MERGED CONCEPT POSITIONS:", shape.props.mergedConceptsPositions)
+		}, [shape.props.mergedConceptsPositions])
+
+		useEffect(()=>{
+			if(shape.props.mergedConcepts && shape.props.mergedConcepts.length !== 0){
+				mutate(shape.props.mergedConcepts, {
+					onSuccess: (data) => {
+						data.merged_concepts.map((el, idx) => {
+							let newShapeId = createShapeId()
+							this.editor.createShape({
+								id: newShapeId,
+								type: "concept",
+								x: shape.props.mergedConceptsPositions[idx].x, // convert to world space and convert from top left to center
+								y: shape.props.mergedConceptsPositions[idx].y, // convert to world space and convert from top left to center
+								opacity: 0.5,
+								props: {
+									text: JSON.stringify(el.name),
+									temporary: true,
+									colors: [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])],
+								}
+							})
+							this.editor.reparentShapes([newShapeId], shape.id)
+						})
+					},
+				})
+			}
+		}, [shape.props.mergedConcepts])
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const isCreating = useValue(
@@ -129,6 +169,28 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 
 					/>
 				</SVGContainer>
+				{/* {isPending && */}
+				{shape.props.mergedConceptsPositions &&
+					shape.props.mergedConceptsPositions.map((position, idx) => 
+					<div 
+					key={idx}
+					className='kiln-concept-positions'
+					style={{
+						position: 'absolute',
+						top: shape.props.mergedConceptsPositions[idx].y-this.editor.getShapePageBounds(shape).x,
+						left: shape.props.mergedConceptsPositions[idx].x-this.editor.getShapePageBounds(shape).y,
+						border: '2px solid black', 
+						height: '20px',
+						width: '20px',
+						zIndex: '100000',
+						color: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => {
+							console.log("CONCEPT:", concept)
+							concept.colors}))],)
+					}}>
+						<DefaultSpinner />
+					</div>
+					)
+				}
 			</HTMLContainer>
 		)
 	}

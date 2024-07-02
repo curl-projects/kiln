@@ -150,6 +150,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
           loadSnapshot(store, snapshot)
           setLoadingState({ status: 'ready' })
         } catch (error) {
+          console.log("ERROR", error)
           setLoadingState({ status: 'error', error: error.message }) // Something went wrong
         }
       } else {

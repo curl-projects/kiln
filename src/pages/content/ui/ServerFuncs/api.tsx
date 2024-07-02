@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { createShapeId } from 'tldraw';
 
+
+
+
+
 export interface MediaMetadata {
     type: string;
     url: string;
@@ -42,6 +46,7 @@ export interface ConstructQueryResponse {
 
 // API functions
 const API_BASE_URL = 'https://craft-server.fly.dev';
+// const API_BASE_URL = 'http://0.0.0.0:8000';
 
 // DONE
 
@@ -86,6 +91,19 @@ export interface InferConceptsResponse {
     concepts: Concept[];
 }
 
+
+// MERGE CONCEPTS
+export interface MergeConceptsRequest {
+    concepts: Concept[]
+}
+
+export interface MergeConceptsResponse {
+   merged_concepts: Concept[]
+}
+
+
+
+
 export const inferConcepts = async (request: InferConceptsRequest): Promise<InferConceptsResponse> => {
     const response = await axios.post<InferConceptsResponse>(`${API_BASE_URL}/inferConcepts`, request);
     return response.data;
@@ -95,6 +113,23 @@ export const constructQuery = async (request: ConstructQueryRequest): Promise<Co
     const response = await axios.post<ConstructQueryResponse>(`${API_BASE_URL}/constructQuery`, request);
     return response.data;
 };
+
+
+export const mergeConcepts = async(request): Promise<any> => {
+    console.log("REQUEST:", request)
+    const response = await axios.post<any>(`${API_BASE_URL}/mergeConcepts`, request);
+    return response.data
+}
+
+export const highlightMediaWithConcepts = async (request: HighlightRequest): Promise<HighlightResponse> => {
+    const response = await axios.post<HighlightResponse>(`${API_BASE_URL}/highlightMediaWithConcepts`, request);
+    return response.data;
+};
+
+
+
+
+
 
 
 // Highlight Media with Concepts
@@ -117,6 +152,7 @@ export interface HighlightResponse {
 
 
 
+
 export const systemPrompt = `
 You are a system designed to support the human creative process on a shared canvas. This process focuses on creating new media (e.g., text, images, videos) derived from a World Model composed of existing media and concepts. World Models guide the creative process by providing context, facilitating the discovery of new media and concepts, and ultimately manifesting as new media. Your core responsibilities include understanding the user's intent, guiding their knowledge discovery, and inferring the underlying World Model behind any piece of media.
 
@@ -136,11 +172,15 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
 
             console.log("RESPONSE CONCEPTS:", response.concepts)
 
-            const mappedConcepts = response.concepts.map(con => {
+            const mappedConcepts: any = response.concepts.map(con => {
                 return {text: JSON.stringify(con.name),
                 description: con.description,
-                type: "concept",}
+                type: "concept",
+                // TODO: fix this using the scheam
+                highlight: con.highlight,
+            }
              })
+
 
             // tear down any existing concepts
             const bindings = editor.getBindingsToShape(shape, "mediaConcept")
@@ -149,19 +189,30 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                 editor.deleteShape(bind.fromId)
             }
 
+
+            const mediaConceptIds = mappedConcepts.map(i => createShapeId())
             // create new concepts
             editor.updateShape({
                 id: shape.id,
                 type: shape.type,
                 props: {
-                    concepts: mappedConcepts
+                    concepts: mappedConcepts,
+                    highlightText: mappedConcepts.map((highlight, idx) => {
+                        return {
+                            conceptId: mediaConceptIds[idx],
+                            conceptText: JSON.stringify(highlight.name),
+                            // TODO: fix this
+                            highlight: highlight.highlight 
+                        }
+                    })
                 }
             })
 
+            let index = 0;
             for(let mediaConcept of shape.props.concepts){
                 let mediaConceptId = createShapeId();
                 editor.createShape({
-                  id: mediaConceptId,
+                  id: mediaConceptIds[index],
                   type: mediaConcept.type,
                   x: 0,
                   y: 0,
@@ -169,6 +220,7 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                     text: mediaConcept.text,
                   }
                 })
+                index++
   
                 editor.reparentShapes([mediaConceptId], shape.id)
   
@@ -192,11 +244,6 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
         } catch (error) {
             throw new Error(error)
         }
-};
-
-export const highlightMediaWithConcepts = async (request: HighlightRequest): Promise<HighlightResponse> => {
-    const response = await axios.post<HighlightResponse>(`${API_BASE_URL}/highlightMediaWithConcepts`, request);
-    return response.data;
 };
 
 // const [query, setQuery] = useState('hottest ai startups');

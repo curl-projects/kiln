@@ -47,6 +47,7 @@ const mediaShapeProps = {
 	plainText: T.string,
 	concepts: T.array,
 	view: T.string,
+	highlightText: T.any,
 }
 
 type MediaShape = TLBaseShape<
@@ -58,6 +59,7 @@ type MediaShape = TLBaseShape<
 		plainText: string
 		concepts: any
 		view: string
+		highlightText: any,
 	}
 >
 
@@ -77,7 +79,10 @@ getDefaultProps(): MediaShape['props'] {
 			w: 300,
 			h: 300,	
 			text: JSON.stringify(""),
-			plainText: "",
+			plainText: "", 
+			highlightText: [
+				{conceptId: 1, conceptText: 'hello', highlight: "highlight text"},
+			],
 			concepts: [
 				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
 				// {"type": "concept", "text": JSON.stringify("The Self & Media")}
@@ -98,8 +103,8 @@ getDefaultProps(): MediaShape['props'] {
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 		const isSelected = shape.id === this.editor.getOnlySelectedShapeId();
 		const shapeRef = useRef<HTMLDivElement>();
-		const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
-		const [inferredConcepts, setInferredConcepts] = useState<Concept[]>([]);
+		// const [highlightedTexts, setHighlightedTexts] = useState(shape.props.concepts.map(e => JSON.parse(e.text)))
+		// const [inferredConcepts, setInferredConcepts] = useState<Concept[]>([]);
 		// const [readText, setReadText] = useState(JSON.stringify({
 		// 	"type": "doc",
 		// 	"content": [
@@ -143,12 +148,12 @@ getDefaultProps(): MediaShape['props'] {
 			  Document,
 			  Paragraph,
 			  Text,
-			//   Placeholder.configure({
-			// 	placeholder: "Capture ideas..."
-			//   }),
-			//   ColorHighlighter.configure({
-			// 	data: ['Hello']
-			//   }),
+			  Placeholder.configure({
+				placeholder: "Capture ideas..."
+			  }),
+			  ColorHighlighter.configure({
+				data: ['Hello']
+			  }),
 			],
 			content: shape.props.text,
 		
@@ -176,11 +181,11 @@ getDefaultProps(): MediaShape['props'] {
 			}
 		  }, []);
 
-		//   useEffect(() => {
-		// 	if (editor) {
-		// 	  editor.commands.updateData({data: highlightedTexts})
-		// 	}
-		//   }, [highlightedTexts, editor]);
+		  useEffect(() => {
+			if (editor) {
+			  editor.commands.updateData({data: shape.props.highlightText})
+			}
+		  }, [shape.props.highlightText, editor]);
 
 
 		// END TEXT EDITOR
@@ -384,7 +389,7 @@ getDefaultProps(): MediaShape['props'] {
 							opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 						}}
 					/>
-					<input
+					{/* <input
 					type="text"
 					value={highlightedTexts.join(",")}
 					onKeyDown={stopEventPropagation}
@@ -393,7 +398,7 @@ getDefaultProps(): MediaShape['props'] {
 					style={{
 						opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 					}}
-      			/>
+      			/> */}
 				</div>
 				{/* <SVGContainer>
 					<rect

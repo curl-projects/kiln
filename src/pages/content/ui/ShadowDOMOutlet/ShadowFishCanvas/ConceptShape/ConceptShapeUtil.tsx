@@ -32,11 +32,11 @@ import { Text } from '@tiptap/extension-text';
 import { Node } from "@tiptap/core";
 import Placeholder from '@tiptap/extension-placeholder'
 
-
 const conceptShapeProps = {
 	w: T.number,
 	h: T.number,
 	text: T.string,
+	plainText: T.any,
 	activated: T.boolean,
 	temporary: T.boolean,
 	colors: T.array,
@@ -48,6 +48,7 @@ type ConceptShape = TLBaseShape<
 		w: number
 		h: number
 		text: string,
+		plainText: any,
 		activated: boolean,
 		temporary: boolean,
 		colors: any,
@@ -92,7 +93,7 @@ const conceptColors = [
 	return [centerX, centerY, radius];
   }
 
-  function generateLinearGradient(colors) {
+  export function generateLinearGradient(colors) {
 	if (colors.length < 1) {
 	  console.error('At least one color is required to create a gradient.');
 	  return '';
@@ -116,7 +117,7 @@ const conceptColors = [
 	
 	return gradient;
   }
-  
+
 
 /** @public */
 export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
@@ -133,6 +134,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 			w: 100,
 			h: 20,
 			text: JSON.stringify(""),
+			plainText: "",
 			activated: false,
 			temporary: false,
 			colors: [conceptColors[Math.floor(Math.random() * conceptColors.length)]],
@@ -174,6 +176,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					type: 'concept',
 					props: {
 						text: jsonContent,
+						plainText: editor.getText(),
 						w: (shapeRef.current?.clientWidth+buffer) || 100,
 						h: (shapeRef.current?.clientHeight+buffer) || 20,
 					}
@@ -221,8 +224,8 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					filter: "blur(40px)",
 					backgroundImage: generateLinearGradient(shape.props.colors),
 					borderRadius: '100%',
-					width: shapeRef.current.clientWidth-40 || '100px',
-					height: shapeRef.current.clientWidth-40 || '100px',
+					width: shapeRef.current?.clientWidth-40 || '100px',
+					height: shapeRef.current?.clientWidth-40 || '100px',
 				}}/>}
 				<div style={{
 					minHeight: "100%",
@@ -403,8 +406,6 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 
 				])
 
-
-
 				const [encapCircleX, encapCircleY, encapCircleR] = getEncapsulatingCircle(concept, minDistanceShape.shape)
 
 				console.log("CIRCLE DIMS", encapCircleX, encapCircleY)
@@ -413,7 +414,6 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 
 				console.log("CONCEPT PARENT:", conceptParent)
 				const worldEncapCircle = this.editor.getShapePageTransform(conceptParent.id).applyToPoint({x: encapCircleX, y: encapCircleY})
-				// const worldEncapCircleX = this.editor.getShapePageTransform(conceptParent.id).applyToPoint(), worldEncapCircleY = conceptParent.y + encapCircleY
 				
 				function positionShapesOnCircle(centerX, centerY, radius, numShapes) {
 					const positions = [];
@@ -424,7 +424,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					  const x = centerX + radius * Math.cos(angle);
 					  const y = centerY + radius * Math.sin(angle);
 					  positions.push({ x, y });
-					}
+					} 
 				  
 					return positions;
 				  }
@@ -436,7 +436,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					{
 						props: {
 							text: "concept one"
-						}
+						} 
 					},
 					{
 						props: {
@@ -448,31 +448,47 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 							text: "concept 3"
 						}
 					}
-				] 
+				]
+
+				
 
 				const positions = positionShapesOnCircle(worldEncapCircle.x, worldEncapCircle.y, encapCircleR+80, conceptArray.length)
+
+				
+				console.log("MIN DISTANCE SHAPE:", minDistanceShape)
+
+				this.editor.updateShape({
+					id: conceptParent.id,
+					type: conceptParent.type,
+					props: {
+						mergedConcepts: [
+							{name: concept.props.plainText, description: concept.description || "", colors: concept.props.colors}, 
+							{name: minDistanceShape.shape.props.plainText, description: minDistanceShape.shape.props.description || "", colors: minDistanceShape.shape.props.colors}],
+						mergedConceptsPositions: positions,
+					}
+				})
 				  
 				// generate and bind 3 provisional concepts based on this coordinate
 				console.log("POSITIONS:", positions)
 
-				conceptArray.map((el, idx) => {
-					let shapeId = createShapeId()
-					this.editor.createShape({
-						id: shapeId,
-						type: "concept",
-						x: positions[idx].x, // convert to world space and convert from top left to center
-						y: positions[idx].y, // convert to world space and convert from top left to center
-						opacity: 0.5,
+				// conceptArray.map((el, idx) => {
+				// 	let shapeId = createShapeId()
+				// 	this.editor.createShape({
+				// 		id: shapeId,
+				// 		type: "concept",
+				// 		x: positions[idx].x, // convert to world space and convert from top left to center
+				// 		y: positions[idx].y, // convert to world space and convert from top left to center
+				// 		opacity: 0.5,
 						
-						props: {
-							text: JSON.stringify(el.props.text),
-							temporary: true,
-							colors: [...new Set([...concept.props.colors, ...minDistanceShape.shape.props.colors])],
-						}
-					})
-					const shape = this.editor.getShape(shapeId)
-					this.editor.reparentShapes([shape], conceptParent.id)
-				})
+				// 		props: {
+				// 			text: JSON.stringify(el.props.text),
+				// 			temporary: true,
+				// 			colors: [...new Set([...concept.props.colors, ...minDistanceShape.shape.props.colors])],
+				// 		}
+				// 	})
+				// 	const shape = this.editor.getShape(shapeId)
+				// 	this.editor.reparentShapes([shape], conceptParent.id)
+				// })
 			}
 
 		}

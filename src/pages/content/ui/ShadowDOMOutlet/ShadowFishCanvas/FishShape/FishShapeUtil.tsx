@@ -278,7 +278,7 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 					name={worldModel.props.name}
 			   		width={worldModelBounds.width}
 					height={worldModelBounds.height}
-					minimized={worldModel.minimized}
+					minimized={worldModel.minimized} 
 				/>
 				} */}
 			   </div>

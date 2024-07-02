@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FishHeading } from "./FishHeading"
 import { stopEventPropagation } from '@tldraw/editor'
 import { ConversationMessage } from './ConversationMessage';
+import { streamAIResponse } from "@pages/content/ui/ServerFuncs/useStreamAi.jsx"
+import { useMutation } from '@tanstack/react-query'
+
 // const AIIconWrapperStyle = {
 //     display: 'flex',
 //     alignItems: 'center',
@@ -89,8 +92,20 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
             }
         }
     }, [isMoving]);
-    
 
+    // TODO: fix the connection to the backend, and maybe replace with EventSource API ?
+    const { mutate, error } = useMutation(streamAIResponse);
+
+    useEffect(()=>{
+        if(mutate){
+            mutate({
+                setterFunction: setConversationMessage,
+                data: { },
+            })
+        }
+    }, [mutate])
+
+    
     const hueMap = {
         'optimist': '90deg', // green
         'critic': '270deg', // pink
