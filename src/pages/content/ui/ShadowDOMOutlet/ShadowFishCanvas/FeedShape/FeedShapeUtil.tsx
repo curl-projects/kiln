@@ -26,10 +26,12 @@ import { Expand } from '@tldraw/utils'
 import { handleFeedSearch } from '@pages/content/ui/ServerFuncs/api'
 import { FeedCard } from "./FeedCard"
 import { IoMdSearch } from "react-icons/io";
+import { DefaultSpinner } from 'tldraw';
 
 import { useCallback, useState, useEffect } from 'react'
 import classNames from 'classnames'
 import { useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 export const feedShapeProps = {
 	w: T.nonZeroNumber,
@@ -88,13 +90,25 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
 		const bounds = this.editor.getShapeGeometry(shape).bounds
         const searchBoxRef: any = useRef();
 
+        const binding = this.editor.getBindingsFromShape(shape, 'feed')[0]
+        const worldModel: any = this.editor.getShape(binding.toId)
+
+        const searchBinding = this.editor.getBindingsToShape(shape, "searchFeedBinding")[0]
+        const searchBox: any = this.editor.getShape(searchBinding.fromId)
+
+        const { isPending, isError, mutate, data } = useMutation({
+			mutationFn: async () => {    
+                const results = await handleFeedSearch(shape.props.searchQuery)
+                setQueryResults(results)
+            }
+
+		})
+
         useEffect(() => {
-            async function feedFetch(){
-                if(shape.props.searchQuery){
-                    const results = await handleFeedSearch('hottest AI Startups')
-                    setQueryResults(results)
-                }
-            } 
+            if(shape.props.searchQuery){
+                console.log("MUTATION!")
+                mutate()
+            }
         }, [shape.props.searchQuery])
 
 	
@@ -102,7 +116,10 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
             <HTMLContainer 
 
             onMouseEnter={()=>{
-                this.editor.setEditingShape(shape)
+                console.log("Feed Entered")
+                if(!['fish', "minimized"].includes(worldModel.props.viewMode) || !this.editor.getSelectedShapes().map(shape => shape.id).includes(worldModel.id)){
+                    this.editor.setEditingShape(shape)
+                }
             }}
             onMouseDown={()=>{
                 this.editor.setEditingShape(shape)
@@ -111,6 +128,37 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
                 position: 'relative',
                 backgroundColor: "transparent",
             }}>
+            {(isPending || isError) &&
+            	<div 
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    whiteSpace: 'nowrap',
+                    zIndex: 10000,
+                    justifyContent: 'center',
+                    gap: '10px',					
+                }}>
+                    
+                    <p 
+                    style={{
+                        fontFamily: 'monospace',
+                        letterSpacing: '0.1em',
+                        color: isPending ? "#BBAACC" : "#8C1D18",
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        margin: 0,
+                        fontSize: '20px',
+                    }}>{isPending ? "Finding Media" : "Error"}
+                    </p>
+
+                    {isPending && <DefaultSpinner />}
+
+                </div>
+             }
 			<div 
                 className='kiln-feed-box'
 				style={{
@@ -124,14 +172,13 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
                     boxShadow: "0px 36px 21px rgba(77, 77, 77, 0.15)",
                     overflow: "scroll",
                     display: 'flex',
-                    // paddingTop: , 
-                    // TODO: padding top logic
+                    paddingTop: searchBox.props.h, 
                     flexDirection: 'column',
                     gap: '20px',
                 }} 
 				onPointerDown={stopEventPropagation}>
                 {queryResults && queryResults.map((result, idx) => 
-                   <FeedCard key={idx} idx={idx} result={result} editor={this.editor}/>
+                   <FeedCard key={idx} idx={idx} result={result} editor={this.editor} worldModel={worldModel}/>
                 )}
                 </div>
                 {/* <div 

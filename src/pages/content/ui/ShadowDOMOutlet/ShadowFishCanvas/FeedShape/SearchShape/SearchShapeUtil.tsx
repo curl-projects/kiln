@@ -94,7 +94,7 @@ export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
 	override component(shape: SearchShape) {
 		const bounds = this.editor.getShapeGeometry(shape).bounds
 
-        const conceptChildren = this.editor.getSortedChildIdsForParent(shape).map(childId => this.editor.getShape(childId)).filter(child => child.type === 'concept')
+        const conceptChildren: any = this.editor.getSortedChildIdsForParent(shape).map(childId => this.editor.getShape(childId)).filter(child => child.type === 'concept')
 
         useEffect(()=>{
             console.log("CONCEPT CHILDREN:", conceptChildren)
@@ -102,17 +102,7 @@ export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
 
 
 		return (
-        <HTMLContainer 
-            className="kiln-feed-search-box"
-            onMouseDown={async()=>{
-                const feedBinding = this.editor.getBindingsFromShape(shape, 'searchFeedBinding')[0]
-                const feed = this.editor.getShape(feedBinding.toId)
-
-                // send data to bound shape 
-                // TODO FIX:
-                this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: 'Placeholder Search'}})
-            }}
-        >
+        <HTMLContainer className="kiln-feed-search-box">
             <p style={{
                 fontWeight: 600,
                 fontSize: '12px',
@@ -127,10 +117,18 @@ export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
                 <SearchShapeConcept key={idx} concept={concept} editor={this.editor}/>)
             : <span style={{marginLeft: '3px', color: "rgba(100, 99, 99, 0.4)"}}>...anything! Drag concepts in to search.</span>
         }
-            
             </p>
             <div style={{flex: 1}}/>
-            <div style={{
+            <div 
+            onMouseDown={()=>{
+                const feedBinding = this.editor.getBindingsFromShape(shape, 'searchFeedBinding')[0]
+                const feed = this.editor.getShape(feedBinding.toId)
+
+                // send data to bound shape 
+                // TODO FIX:
+                this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: `Articles about ${conceptChildren.map(el => el.props.text).join(",")}`}})
+            }}
+            style={{
                 height: "100%",
                 width: '20px',
                 display: 'flex',

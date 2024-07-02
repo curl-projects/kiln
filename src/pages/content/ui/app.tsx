@@ -54,6 +54,7 @@ export default function App() {
         width: '44vw',
         overflow: 'scroll',
         left: '24px',
+        background: window.getComputedStyle(document.body).background,
         top: '50%',
         pointerEvents: 'all',
         transform: 'translateY(-50%)',

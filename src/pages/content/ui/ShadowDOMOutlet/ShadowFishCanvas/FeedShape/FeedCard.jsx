@@ -1,45 +1,53 @@
 import { createShapeId } from "tldraw"
 
 
-export function FeedCard({result, idx, editor}){
+export function FeedCard({result, idx, editor, worldModel}){
     return(
         <div key={idx}
         onPointerDown={(e)=>{
             console.log("DRAG START!", e)
             console.log("DRAG START 2!", e.target.getBoundingClientRect())
-            const boundingRect = e.target.getBoundingClientRect()
-            const shapeId = createShapeId()
+            const { x, y } = editor.inputs.currentPagePoint
+
+            const clickX = e.clientX, clickY = e.clientY
+            const rect = e.target.getBoundingClientRect();
+            const distanceX = clickX - rect.left, distanceY = clickY - rect.top
+
 
                
-            editor.batch(()=>{
-                editor.createShape({
+            editor.createShape({
                     id: shapeId,
                     type: 'media',
-                    x: boundingRect.left,
-                    y: boundingRect.top,
+                    x: x-distanceX,
+                    y: y-distanceY,
                     props: {
                         w: e.target.clientWidth,
-                        h: 300,
-                        text: JSON.stringify("Hey")
-                        // text: JSON.stringify(result.text)
+                        h: e.target.clientHeight,
+                        // text: JSON.stringify("Hey")
+                        text: JSON.stringify(result.text)
                     }
                 })
+            // editor.reparentShapes([shapeId], worldModel.id)
+
+            // this.editor.updateShape({
+            //     id: shapeId,
+            //     type: 'media',
+            //     x: 
+            // })
 
                 // editor.setCurrentTool('select.pointing_shape', { shape: editor.getShape(shapeId)})
 
-            })
 
-
-                editor.setSelectedShapes([shapeId])
-                editor.setEditingId(editor.onlySelectedShape.id)
-                editor.root.current.value.transition('editing_shape', {target: 'shape', id: shapeId, shape: editor.getShape(shapeId)})
+                // editor.setSelectedShapes([shapeId])
+                // // editor.setEditingId(editor.onlySelectedShape.id)
+                // editor.root.current.value.transition('editing_shape', {target: 'shape', id: shapeId, shape: editor.getShape(shapeId)})
              
                 // editor.setEditingShape(shapeId)
                 // editor.setCurrentTool('select.pointing_shape', { shape: editor.getShape(shapeId) })
                 // const currentTool = editor.getCurrentTool();
                 // currentTool.transition('translating', currentTool.info)
                 
-                // editor.reparentShapes([shapeId])
+                
                 
             // editor.setCurrentTool('select')
             // editor.setCurrentTool('select.rd', { shape: editor.getShape(shapeId) })

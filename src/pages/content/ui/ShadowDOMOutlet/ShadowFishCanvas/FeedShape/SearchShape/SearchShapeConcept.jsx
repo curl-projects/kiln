@@ -21,6 +21,7 @@ export function SearchShapeConcept({ concept, editor, idx }) {
     const shape = editor.getShape({ id: concept.id, type: concept.type })
     const shapeRef = useRef();
     const buffer = 2
+    const [isHovered, setIsHovered] = useState(false);
 
     console.log("SHAPE TEXT:", shape.props, shape.props.text, JSON.parse(shape.props.text))
 
@@ -84,6 +85,18 @@ export function SearchShapeConcept({ concept, editor, idx }) {
                 display: 'inline !important',
             }}
         >
+            <div 
+                style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    left: '-10px',
+                    right: '-10px',
+                    bottom: '-10px',
+                    pointerEvents: 'all',
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            />
             <div style={{
                 minHeight: "100%",
                 minWidth: '100%',
@@ -122,6 +135,14 @@ export function SearchShapeConcept({ concept, editor, idx }) {
                         whiteSpace: 'nowrap',
                     }}
                 />
+                {isHovered && (
+                    <IoMdClose style={{
+                        marginLeft: '-6px',
+                        cursor: 'pointer',
+                        color: 'rgba(0, 0, 0, 0.8)',
+                        fontWeight: 'bold',
+                    }} />
+                )}
             </div>
         </span>
     )

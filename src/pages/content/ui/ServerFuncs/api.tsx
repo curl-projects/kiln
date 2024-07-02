@@ -229,6 +229,6 @@ export const handleFeedSearch = async (query) => {
         //     return newCache;
         // });
     } catch (error) {
-        console.error('Error searching Exa:', error);
+        throw new Error(error)
     }
     };
