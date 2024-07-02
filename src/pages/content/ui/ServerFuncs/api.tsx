@@ -2,6 +2,7 @@ import axios from 'axios';
 import { createShapeId } from 'tldraw';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { conceptColors } from  "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeUtil"
+import { getRandomNumber } from "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/MediaShape/MediaConceptBindUtil"
 
 export interface MediaMetadata {
     type: string;
@@ -241,27 +242,40 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
             
             for(let mediaConcept of mappedConcepts){
                 
-                let mediaConceptId = createShapeId();
                 editor.batch(() => {
-                editor.createShape({
-                  id: mediaConceptIds[index],
-                  type: mediaConcept.type,
-                  x: 0,
-                  y: 0,
-                  props: {
-                    text: mediaConcept.text,
-                    colors: mediaConcept.colors,
-                  }
-                })
-                
+
+                    const  proportionX = getRandomNumber(0.2, 0.8), proportionY = getRandomNumber(0.2, 0.8)
+
+                    editor.createShape({
+                    id: mediaConceptIds[index],
+                    type: mediaConcept.type,
+                    x: 0,
+                    y: 0,
+                    props: {
+                        text: mediaConcept.text,
+                        colors: mediaConcept.colors,
+                    }
+                    })
   
-                editor.reparentShapes([mediaConceptId], shape.id)
-  
-                editor.createBinding({
-                  type: "mediaConcept",
-                  fromId: mediaConceptId,
-                  toId: shape.id,
-                })
+                    editor.reparentShapes([mediaConceptIds[index]], shape.id)
+
+
+                    editor.updateShape({
+                        type: mediaConcept.type,
+                        id: mediaConceptIds[index],
+                        x: proportionX * shape.props.w,
+                        y: proportionY * shape.props.h,
+                    })
+
+                    editor.createBinding({
+                    type: "mediaConcept",
+                    fromId: mediaConceptIds[index],
+                    toId: shape.id,
+                    props: {
+                        proportionX: proportionX,
+                        proportionY: proportionY
+                    }
+                    })
                 index++
                 })
             }
