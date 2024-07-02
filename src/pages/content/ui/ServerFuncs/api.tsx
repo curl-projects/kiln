@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { createShapeId } from 'tldraw';
-
-
-
-
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { conceptColors } from  "@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeUtil"
 
 export interface MediaMetadata {
     type: string;
@@ -109,6 +107,33 @@ export const inferConcepts = async (request: InferConceptsRequest): Promise<Infe
     return response.data;
 };
 
+interface ConceptWithHighlight {
+    name: string;
+    description: string;
+    highlight: string;
+  }
+
+interface InferConceptsWithHighlightsRequest {
+    media: Media[];
+    systemPrompt?: string;
+  }
+  
+  interface InferConceptsWithHighlightsResponse {
+    concepts: ConceptWithHighlight[];
+  }
+
+export const inferConceptsWithHighlights = async (
+    request: InferConceptsWithHighlightsRequest
+  ): Promise<InferConceptsWithHighlightsResponse> => {
+    const response = await axios.post<InferConceptsWithHighlightsResponse>(
+      `${API_BASE_URL}/inferConceptsWithHighlights`,
+      request
+    );
+    return response.data;
+  };
+
+
+
 export const constructQuery = async (request: ConstructQueryRequest): Promise<ConstructQueryResponse> => {
     const response = await axios.post<ConstructQueryResponse>(`${API_BASE_URL}/constructQuery`, request);
     return response.data;
@@ -165,19 +190,24 @@ You facilitate a reflective creative process where new media and knowledge are p
 export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
     console.log("Fetching new concepts.", media);
     try {
-        const response = await inferConcepts({
+        const response = await inferConceptsWithHighlights({
             media,
             systemPrompt: systemPrompt
             });
 
             console.log("RESPONSE CONCEPTS:", response.concepts)
 
+            // const mappedConcepts = response.concepts
+            
+            const conceptColor = conceptColors[Math.floor(Math.random() * conceptColors.length)]
+
             const mappedConcepts: any = response.concepts.map(con => {
-                return {text: JSON.stringify(con.name),
+                return {text: con.name,
                 description: con.description,
                 type: "concept",
                 // TODO: fix this using the scheam
                 highlight: con.highlight,
+                colors: [conceptColor],
             }
              })
 
@@ -189,7 +219,6 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                 editor.deleteShape(bind.fromId)
             }
 
-
             const mediaConceptIds = mappedConcepts.map(i => createShapeId())
             // create new concepts
             editor.updateShape({
@@ -197,20 +226,23 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                 type: shape.type,
                 props: {
                     concepts: mappedConcepts,
-                    highlightText: mappedConcepts.map((highlight, idx) => {
-                        return {
-                            conceptId: mediaConceptIds[idx],
-                            conceptText: JSON.stringify(highlight.name),
-                            // TODO: fix this
-                            highlight: highlight.highlight 
-                        }
-                    })
+                    // highlightText: mappedConcepts.map((highlight, idx) => {
+                    //     return {
+                    //         conceptId: mediaConceptIds[idx],
+                    //         conceptText: JSON.stringify(highlight.name),
+                    //         // TODO: fix this
+                    //         highlight: highlight.highlight 
+                    //     }
+                    // })
                 }
             })
 
             let index = 0;
-            for(let mediaConcept of shape.props.concepts){
+            
+            for(let mediaConcept of mappedConcepts){
+                
                 let mediaConceptId = createShapeId();
+                editor.batch(() => {
                 editor.createShape({
                   id: mediaConceptIds[index],
                   type: mediaConcept.type,
@@ -218,9 +250,10 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                   y: 0,
                   props: {
                     text: mediaConcept.text,
+                    colors: mediaConcept.colors,
                   }
                 })
-                index++
+                
   
                 editor.reparentShapes([mediaConceptId], shape.id)
   
@@ -229,17 +262,9 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                   fromId: mediaConceptId,
                   toId: shape.id,
                 })
+                index++
+                })
             }
-
-            // trigger highlights
-            const highlights = await highlightMediaWithConcepts({
-                media: { text: shape.props.plainText },
-                concepts: response.concepts,
-            })
-
-            console.log("HIGHLIGHTS:", highlights)
-
-
             
         } catch (error) {
             throw new Error(error)
@@ -278,4 +303,50 @@ export const handleFeedSearch = async (query) => {
     } catch (error) {
         throw new Error(error)
     }
+    };
+
+export const talkToFish = async ({ userInput, messages, worldModel, setMessages }) => {
+        if (!userInput.trim()) return;
+
+        const newMessages = [...messages, { role: 'user' as const, content: userInput }];
+        setMessages(newMessages);
+
+        let fullResponse = '';
+
+        console.log(newMessages)
+
+        try {
+            await fetchEventSource('http://0.0.0.0:8000/talkToFish', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: newMessages,
+                    world_model: worldModel,
+                }),
+                onmessage(event) {
+                    fullResponse += event.data;
+                    setMessages(prev => {
+                        if (prev[prev.length - 1].role === 'user') {
+                            return [
+                                ...prev,
+                                { role: 'assistant', content: fullResponse },
+                            ];
+                        } else {
+                            return [
+                                ...prev.slice(0, -1),
+                                { role: 'assistant', content: fullResponse },
+                            ];
+                        }
+                    });
+                },
+                onerror(err) {
+                    console.error('Error:', err);
+                },
+            });
+        } catch(error){
+            console.log("TalkToFish Error", error)
+            throw new Error(error)
+        } 
     };

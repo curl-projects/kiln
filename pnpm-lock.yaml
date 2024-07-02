@@ -26,6 +26,9 @@ importers:
       '@lexical/utils':
         specifier: ^0.15.0
         version: 0.15.0
+      '@microsoft/fetch-event-source':
+        specifier: ^2.0.1
+        version: 2.0.1
       '@mozilla/readability':
         specifier: ^0.5.0
         version: 0.5.0
@@ -1067,6 +1070,9 @@ packages:
     resolution: {integrity: sha512-Rf4AIu620Cq90li6GU58gkzlGRdntHP4ZeZrbJ3ToW7vEEnkW6Wl9/HhO647GG4OL5w46M0iWvx1b1b8xjYT1w==}
     peerDependencies:
       yjs: '>=13.5.22'
+
+  '@microsoft/fetch-event-source@2.0.1':
+    resolution: {integrity: sha512-W6CLUJ2eBMw3Rec70qrsEW0jOm/3twwJv21mrmj2yORiaVmVYGS4sSS5yUwvQc1ZlDLYGPnClVWmUUMagKNsfA==}
 
   '@mozilla/readability@0.5.0':
     resolution: {integrity: sha512-Z+CZ3QaosfFaTqvhQsIktyGrjFjSC0Fa4EMph4mqKnWhmyoGICsV/8QK+8HpXut6zV7zwfWwqDmEjtk1Qf6EgQ==}
@@ -6323,6 +6329,8 @@ snapshots:
       '@lexical/offset': 0.15.0
       lexical: 0.15.0
       yjs: 13.6.15
+
+  '@microsoft/fetch-event-source@2.0.1': {}
 
   '@mozilla/readability@0.5.0': {}
 

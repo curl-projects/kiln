@@ -47,7 +47,7 @@ const mediaShapeProps = {
 	plainText: T.string,
 	concepts: T.array,
 	view: T.string,
-	highlightText: T.any,
+	// highlightText: T.any,
 }
 
 type MediaShape = TLBaseShape<
@@ -59,7 +59,7 @@ type MediaShape = TLBaseShape<
 		plainText: string
 		concepts: any
 		view: string
-		highlightText: any,
+		// highlightText: any,
 	}
 >
 
@@ -78,11 +78,8 @@ getDefaultProps(): MediaShape['props'] {
 		return { 
 			w: 300,
 			h: 300,	
-			text: JSON.stringify(""),
+			text: "",
 			plainText: "", 
-			highlightText: [
-				{conceptId: 1, conceptText: 'hello', highlight: "highlight text"},
-			],
 			concepts: [
 				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
 				// {"type": "concept", "text": JSON.stringify("The Self & Media")}
@@ -160,7 +157,6 @@ getDefaultProps(): MediaShape['props'] {
 			onUpdate: ({ editor }) => {
 				console.log("UPDATE!")
 				stopEventPropagation;
-				const jsonContent = editor.getJSON()
 
 				this.editor.updateShape<MediaShape>({
 					id: shape.id,
@@ -182,10 +178,13 @@ getDefaultProps(): MediaShape['props'] {
 		  }, []);
 
 		  useEffect(() => {
-			if (editor) {
-			  editor.commands.updateData({data: shape.props.highlightText})
+			if (editor && shape.props.concepts?.length !== 0) {
+			  editor.commands.updateData({
+				highlights: shape.props.concepts.map(concept => concept.highlight),
+				color: shape.props?.concepts[0]?.colors[0] || "rgb(130, 162, 223)"
+			})
 			}
-		  }, [shape.props.highlightText, editor]);
+		  }, [shape.props.concepts, editor]);
 
 
 		// END TEXT EDITOR

@@ -35,9 +35,10 @@ import Placeholder from '@tiptap/extension-placeholder'
 const conceptShapeProps = {
 	w: T.number,
 	h: T.number,
-	text: T.string,
+	text: T.any,
 	plainText: T.any,
 	activated: T.boolean,
+	description: T.string,
 	temporary: T.boolean,
 	colors: T.array,
 }
@@ -47,11 +48,12 @@ type ConceptShape = TLBaseShape<
 	{
 		w: number
 		h: number
-		text: string,
+		text: any,
 		plainText: any,
 		activated: boolean,
 		temporary: boolean,
 		colors: any,
+		description: string,
 	}
 >
 
@@ -61,15 +63,16 @@ const OneLiner = Node.create({
 	content: "block",
   });
  
-const conceptColors = [
-	"#BBAACC",
-	"#82A2DF",
-	"#D0E496",
-	"#96E4D1",
-	"#166552",
-	"#36430F",
-	"#FF2D55",
+export const conceptColors = [
+	'rgb(187, 170, 204)',
+	'rgb(130, 162, 223)',
+	'rgb(208, 228, 150)',
+	'rgb(150, 228, 209)',
+	'rgb(22, 101, 82)',
+	'rgb(54, 67, 15)',
+	'rgb(255, 45, 85)'
 ]
+
 
   function getEncapsulatingCircle(shape1, shape2) {
 	// Calculate the boundaries of the smallest containing rectangle
@@ -133,11 +136,12 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 		return { 
 			w: 100,
 			h: 20,
-			text: JSON.stringify(""),
+			text: "",
 			plainText: "",
 			activated: false,
 			temporary: false,
 			colors: [conceptColors[Math.floor(Math.random() * conceptColors.length)]],
+			description: "",
 		}
 	
 	}
@@ -165,17 +169,17 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 				placeholder: "Unknown Concept"
 			  })
 			],
-			content: JSON.parse(shape.props.text),
+			content: shape.props.text,
 		
 
 			onUpdate: ({ editor }) => {
 				stopEventPropagation;
-				const jsonContent = JSON.stringify(editor.getJSON())
+
 				this.editor.updateShape<ConceptShape>({
 					id: shape.id,
 					type: 'concept',
 					props: {
-						text: jsonContent,
+						text: editor.getJSON(),
 						plainText: editor.getText(),
 						w: (shapeRef.current?.clientWidth+buffer) || 100,
 						h: (shapeRef.current?.clientHeight+buffer) || 20,

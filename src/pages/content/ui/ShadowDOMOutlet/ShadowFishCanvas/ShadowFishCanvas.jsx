@@ -132,8 +132,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
 	})
 	//[3]
   
-  
-
 
 	useLayoutEffect(() => {
     async function loadData(){
@@ -410,7 +408,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
             })
           }
           if(shape.type === 'media'){
-            if(shape.props.text !== "\"\""){
+            if(shape.props.text !== ""){
 
               // generate concepts
               console.log("Generating Inferred Concepts After Shape Creation")

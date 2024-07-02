@@ -99,6 +99,13 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 
 		useEffect(()=>{
 			console.log("MERGED CONCEPT POSITIONS:", shape.props.mergedConceptsPositions)
+			if(shape.props.mergedConceptsPositions?.length !== 0){
+				for(let i in shape.props.mergedConceptsPositions){
+					console.log("X:", this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[i].x, y: shape.props.mergedConceptsPositions[i].y}).x)
+					console.log("Y:", this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[i].x, y: shape.props.mergedConceptsPositions[i].y}).y)
+				}
+				
+			}
 		}, [shape.props.mergedConceptsPositions])
 
 		useEffect(()=>{
@@ -169,23 +176,20 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 
 					/>
 				</SVGContainer>
-				{/* {isPending && */}
-				{shape.props.mergedConceptsPositions &&
+				{isPending &&
 					shape.props.mergedConceptsPositions.map((position, idx) => 
 					<div 
 					key={idx}
 					className='kiln-concept-positions'
 					style={{
 						position: 'absolute',
-						top: shape.props.mergedConceptsPositions[idx].y-this.editor.getShapePageBounds(shape).x,
-						left: shape.props.mergedConceptsPositions[idx].x-this.editor.getShapePageBounds(shape).y,
-						border: '2px solid black', 
-						height: '20px',
-						width: '20px',
+						borderRadius: '100%',
+						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors}))],),
+						height: '14px',
+						width: '14x',
+						top: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).y,
+						left: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).x,
 						zIndex: '100000',
-						color: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => {
-							console.log("CONCEPT:", concept)
-							concept.colors}))],)
 					}}>
 						<DefaultSpinner />
 					</div>

@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FishHeading } from "./FishHeading"
 import { stopEventPropagation } from '@tldraw/editor'
 import { ConversationMessage } from './ConversationMessage';
-import { streamAIResponse } from "@pages/content/ui/ServerFuncs/useStreamAi.jsx"
 import { useMutation } from '@tanstack/react-query'
+import { talkToFish } from "@pages/content/ui/ServerFuncs/api"
 
 // const AIIconWrapperStyle = {
 //     display: 'flex',
@@ -15,7 +15,6 @@ import { useMutation } from '@tanstack/react-query'
 //     top: 0,
 //     left: 0
 // };
-
 
 
 const outerAITextWrapperStyle = {
@@ -76,7 +75,7 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
 
     const svgRef = useRef(null);
     const [fishQuery, setFishQuery] = useState("")
-    const [conversationMessage, setConversationMessage] = useState("")
+    const [messages, setMessages] = useState([])
 
     useEffect(() => {
         const svgElement = svgRef.current;
@@ -94,16 +93,25 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
     }, [isMoving]);
 
     // TODO: fix the connection to the backend, and maybe replace with EventSource API ?
-    const { mutate, error } = useMutation(streamAIResponse);
+    const { mutate, error } = useMutation({
+        mutationFn: async () => await talkToFish({
+            setMessages: setMessages,
+            userInput: fishQuery,
+            messages: [],
+            worldModel: {
+                concepts: [],
+                media: []
+            },
 
-    useEffect(()=>{
-        if(mutate){
-            mutate({
-                setterFunction: setConversationMessage,
-                data: { },
-            })
-        }
-    }, [mutate])
+        }),
+    });
+
+    // useEffect(()=>{
+    //     if(mutate){
+    //         mutate()
+    //         setFishQuery("")
+    //     }
+    // }, [mutate])
 
     
     const hueMap = {

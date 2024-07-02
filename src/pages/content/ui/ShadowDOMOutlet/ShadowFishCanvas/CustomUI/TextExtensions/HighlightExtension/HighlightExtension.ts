@@ -3,9 +3,32 @@ import { Node } from '@tiptap/pm/model'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension } from '@tiptap/core'
 
-function findColors(doc: Node, data: string[]): DecorationSet {
-  const regex = new RegExp(data.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
+function rgbToRgba(rgbString, alpha = 0.3) {
+  // Match the RGB values using a regular expression
+  console.log("RGB STRING:", rgbString)
+  const rgbMatch = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 
+  if(rgbMatch){
+
+    // Extract the R, G, and B values
+    const [r, g, b] = rgbMatch.slice(1).map(Number);
+
+    // Return the RGBA string
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  
+  console.warn("No RGB String Found")
+  return rgbString
+
+}
+
+
+
+function findColors(doc: Node, highlights: any, color: string): DecorationSet {
+  const regex = highlights?.length > 0 ? new RegExp(highlights.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi') : new RegExp('a^', 'gi'); // This regex will never match anything
+
+  console.log("HIGHLIGHTS:", highlights)
+  console.log("REGEX:", regex)
   // const hexColor = /(#[0-9a-f]{3,6})\b/gi
   const decorations: Decoration[] = []
 
@@ -15,13 +38,12 @@ function findColors(doc: Node, data: string[]): DecorationSet {
     }
 
     Array.from(node.text.matchAll(regex)).forEach(match => {
-      const color = match[0]
       const index = match.index || 0
       const from = position + index
       const to = from + color.length
       const decoration = Decoration.inline(from, to, {
-        class: 'concept',
-        // style: `--color: ${color}`,
+        class: 'concept-highlight',
+        style: `--concept-highlight-color-border: ${color}; --concept-highlight-color: ${rgbToRgba(color)}`,
       })
 
       decorations.push(decoration)
@@ -39,7 +61,7 @@ declare module '@tiptap/core' {
        * @param attributes The highlight attributes
        * @example editor.commands.setHighlight({ color: 'red' })
        */
-      updateData: (attributes?: { data: string[] }) => ReturnType,
+      updateData: (attributes?: { highlights: any, color: string }) => ReturnType,
 
     }
   }
@@ -50,9 +72,10 @@ export const ColorHighlighter = Extension.create({
 
     addCommands() {
       return {
-        updateData: ({ data }) => ({ commands }) => {
-          console.log("NEW DATA:", data)
-          this.storage.data = data
+        updateData: ({ highlights, color }) => ({ commands }) => {
+          console.log("NEW HIGHLIGHT DATA:", highlights)
+          this.storage.highlights = highlights
+          this.storage.color = color
           return true
         },
       }
@@ -61,7 +84,8 @@ export const ColorHighlighter = Extension.create({
 
     addStorage() {
       return {
-        data: this.options?.data || []
+        highlights: this.options?.highlights || [],
+        color: this.options?.color || "rgb(130, 162, 223)"
       }
     },
 
@@ -69,15 +93,16 @@ export const ColorHighlighter = Extension.create({
     
     addOptions(){
       return {
-        data: []
+        highlights: [],
+        color: "rgb(130, 162, 223)"
       }
     },
     
   
     addProseMirrorPlugins() {
-      console.log("DATA:", this.storage.data)
+      console.log("PROSE MIRROR HIGHLIGHTS:", this.storage.highlights)
 
-      const findColorsWithStorage = (doc) => findColors(doc, this.storage.data)
+      const findColorsWithStorage = (doc) => findColors(doc, this.storage.highlights, this.storage.color)
 
       return [
         new Plugin({
