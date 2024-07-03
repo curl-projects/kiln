@@ -7,6 +7,7 @@ import { ConversationMessage } from './ConversationMessage';
 import { useMutation } from '@tanstack/react-query'
 import { talkToFish } from "@pages/content/ui/ServerFuncs/api"
 import ContentEditable from 'react-contenteditable'
+import _ from 'lodash';
 
 // const AIIconWrapperStyle = {
 //     display: 'flex',
@@ -101,7 +102,7 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
     const { mutate, error, isPending } = useMutation({
         mutationFn: async () => {
             try{
-        
+            
 
             console.log("MESSAGES:", editor.getShapeAndDescendantIds([worldModel.id]))
 
@@ -115,10 +116,12 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
             console.log("CONCEPTS:", concepts.map(c => { return {name: c.props.text, description: c.props.description}}))
             console.log("MEDIA:", media.map(m => { return {text: m.props.text }}))
 
-            
+            const fishQueryData = _.cloneDeep(fishQuery)
+            setFishQuery("")
+
             const data = await talkToFish({
             setMessages: setMessages,
-            userInput: fishQuery,
+            userInput: fishQueryData,
             messages: messages,
             worldModel: {
                 concepts: concepts.map(c => { return {name: c.props.text, description: c.props.description}}),
@@ -126,7 +129,6 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                 },
             })  
 
-            setFishQuery("")
 
             return data
         } catch(error){
@@ -428,6 +430,10 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
             <textarea 
                 ref={textAreaRef}
                 placeholder="Ask a question"
+                value={fishQuery}
+                onChange={(e)=>{
+                    setFishQuery(e.target.value)
+                }}
                 style={{
                     height: 'auto', // Allow the height to adjust automatically
                     minHeight: '30px', // Minimum height for the textarea
@@ -456,8 +462,6 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                         mutate()
                     }
                     else{
-
-                        setFishQuery(e.target.value);
                         e.target.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
                         e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
                     }
