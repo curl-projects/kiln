@@ -10,6 +10,7 @@ import { Paragraph } from '@tiptap/extension-paragraph';
 import { Text } from '@tiptap/extension-text';
 import { Node } from "@tiptap/core";
 import Placeholder from '@tiptap/extension-placeholder'
+import { IoMdClose } from "react-icons/io";
 
 const OneLiner = Node.create({
 	name: "oneLiner",
@@ -24,6 +25,21 @@ export function SearchShapeConcept({ concept, editor, idx }) {
     const [isHovered, setIsHovered] = useState(false);
 
     console.log("SHAPE TEXT:", shape.props, shape.props.text)
+
+
+    return(
+        <span style={{
+            fontWeight: 550,
+            display: 'inline',
+            backgroundImage: generateLinearGradient(shape.props.colors),
+            backgroundClip: "text",
+            color: "rgba(0, 0, 0, 0)",
+            letterSpacing: '-0.00em',
+            lineHeight: '21px',
+            fontSize: '14px',
+            marginLeft: '4px',
+        }}>{shape.props.text ? shape.props.text : "Unknown"}</span>
+    )
 
 
     const textEditor = useEditor({
@@ -132,7 +148,6 @@ export function SearchShapeConcept({ concept, editor, idx }) {
                         letterSpacing: '-0.00em',
                         lineHeight: '21px',
                         fontSize: '14px',
-                        whiteSpace: 'nowrap',
                     }}
                 />
                 {isHovered && (
@@ -148,8 +163,22 @@ export function SearchShapeConcept({ concept, editor, idx }) {
     )
 }
 
+function rgbToHex(rgb) {
+    // Extract the numbers from the RGB string
+    const result = rgb.match(/\d+/g);
+    
+    // Convert the numbers to hexadecimal and pad with zeros if necessary
+    const hex = result.map(num => {
+        let hexValue = parseInt(num, 10).toString(16);
+        return hexValue.length === 1 ? "0" + hexValue : hexValue;
+    }).join('');
+    
+    return `#${hex}`;
+}
 
-function generateLinearGradient(colors) {
+  
+function generateLinearGradient(inputColors) {
+    const colors = inputColors.map(color => rgbToHex(color))
 	if (colors.length < 1) {
 	  console.error('At least one color is required to create a gradient.');
 	  return '';

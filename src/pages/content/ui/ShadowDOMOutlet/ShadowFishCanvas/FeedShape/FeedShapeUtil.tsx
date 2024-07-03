@@ -38,6 +38,7 @@ export const feedShapeProps = {
 	h: T.nonZeroNumber,
 	name: T.string,
     searchQuery: T.string,
+    concepts: T.any,
 }
 
 export type RecordPropsType<Config extends Record<string, T.Validatable<any>>> = Expand<{
@@ -72,7 +73,7 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
 	override canCrop = () => true
 
 	override getDefaultProps(): FeedModelShape['props'] {
-		return { w: 160 * 2, h: 90 * 2, name: '', searchQuery: ""}
+		return { w: 160 * 2, h: 90 * 2, name: '', searchQuery: "", concepts: []}
 	}
 
 	override getGeometry(shape: FeedModelShape): Geometry2d {
@@ -100,13 +101,24 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
 
         const { isPending, isError, mutate, data } = useMutation({
 			mutationFn: async () => {    
-                const results = await handleFeedSearch(shape.props.searchQuery)
-                setQueryResults(results)
+                try{
+                    const results = await handleFeedSearch(shape.props.searchQuery, shape.props.concepts)
+                    console.log("FEED RESULTS:", results)
+                    setQueryResults(results)
+
+                    return results
+                }
+
+                catch(error){
+                    throw new Error(error)
+                }
+                
             }
 
 		})
 
         useEffect(() => {
+            console.log("FEED SEARCH QUERY:", shape.props.searchQuery)
             if(shape.props.searchQuery){
                 console.log("MUTATION!")
                 mutate()
@@ -144,19 +156,6 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
                     justifyContent: 'center',
                     gap: '10px',					
                 }}>
-                    
-                    <p 
-                    style={{
-                        fontFamily: 'monospace',
-                        letterSpacing: '0.1em',
-                        color: isPending ? "#BBAACC" : "#8C1D18",
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        margin: 0,
-                        fontSize: '20px',
-                    }}>{isPending ? "Finding Media" : "Error"}
-                    </p>
-
                     {isPending && <DefaultSpinner />}
 
                 </div>
@@ -169,9 +168,9 @@ export class FeedShapeUtil extends BaseBoxShapeUtil<FeedModelShape> {
                     width: bounds.width,
 					height: bounds.height,
                     borderRadius: "12px",
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: '1px solid #DDDDDA',
-                    boxShadow: "0px 36px 21px rgba(77, 77, 77, 0.15)",
+                    // backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    // border: '1px solid #DDDDDA',
+                    // boxShadow: "0px 36px 21px rgba(77, 77, 77, 0.15)",
                     overflow: "scroll",
                     display: 'flex',
                     paddingTop: searchBox.props.h, 

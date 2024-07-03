@@ -608,17 +608,18 @@ export class WorldModelShapeUtil extends BaseBoxShapeUtil<TLWorldModelShape> {
 				const conceptBinding: any = this.editor.getBindingsFromShape(dragShape, 'mediaConcept')[0]
 
 
-				this.editor.deleteBinding(conceptBinding.id)
+				if(conceptBinding){
+					this.editor.deleteBinding(conceptBinding.id)
 
-				// if a copy of the concept exists, change its opacity to 1 
-				for(let child of remainingChildren){
-					if(child.props.text === dragShape.props.text){
-						this.editor.updateShape({...child, opacity: 1})
+					// if a copy of the concept exists, change its opacity to 1 
+					for(let child of remainingChildren){
+						if(child.props.text === dragShape.props.text){
+							this.editor.updateShape({...child, opacity: 1})
+						}
 					}
-				}
-
-				console.log("CONCEPT DRAGGED OUT", dragShape)
-				
+	
+					console.log("CONCEPT DRAGGED OUT", dragShape)
+				}	
 			}
 		}
 

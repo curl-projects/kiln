@@ -27,8 +27,10 @@ export function FeedCard({result, idx, editor, worldModel}){
                     props: {
                         w: ref.current.clientWidth,
                         h: ref.current.clientHeight,
+                        url: result.url || "",
+                        title: result.title || "",
                         // text: JSON.stringify("Hey")
-                        text: result.text
+                        text: result.simulatedMedia
                     }
                 })
             // editor.reparentShapes([shapeId], worldModel.id)
@@ -103,7 +105,7 @@ export function FeedCard({result, idx, editor, worldModel}){
                     letterSpacing: '-0.00em',
                     lineHeight: '21px',
                     fontSize: '14px',
-                }}>{result.text}</p>
+                }}>{result.simulatedMedia}</p>
             </div>
         </div>
     )

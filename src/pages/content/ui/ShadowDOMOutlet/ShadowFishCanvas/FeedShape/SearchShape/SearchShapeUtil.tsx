@@ -29,9 +29,8 @@ import { handleFeedSearch } from '@pages/content/ui/ServerFuncs/api'
 import { IoMdSearch } from "react-icons/io";
 import { SearchShapeConcept } from "./SearchShapeConcept"
 
-import { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useRef, useState, useEffect } from 'react'
 import classNames from 'classnames'
-import { useRef } from 'react';
 
 export function last<T>(arr: readonly T[]): T | undefined {
 	return arr[arr.length - 1]
@@ -98,13 +97,34 @@ export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
         const [searchInput, setSearchInput] = useState(shape.props.name || "")
         const [isInputFocused, setIsInputFocused] = useState(false)
 
-        const handleSearch = useCallback(() => {
+        const boxContainerRef: any = useRef();
+
+        const handleSearch = () => {
             const feedBinding = this.editor.getBindingsFromShape(shape, 'searchFeedBinding')[0]
+            // get bound concepts
+
+            console.log("FEED BINDING:", feedBinding)
             if (feedBinding) {
-                const feed = this.editor.getShape(feedBinding.toId)
-                this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: searchInput }})
+                if(conceptChildren?.length !== 0){
+                    const feed = this.editor.getShape(feedBinding.toId)
+                    console.log("CONCEPT CHILDREN:", conceptChildren)
+                    const result = "Articles about " + conceptChildren.map(concept => `${concept.props.plainText} (${concept.props.description})`).join(', ');
+
+                    this.editor.updateShape({id: feed.id, type: feed.type, 
+                        props: { 
+                            searchQuery: result,
+                            concepts: conceptChildren.map(concept => { return {name: concept.props.plainText, description: concept.props.description }}),
+                        }
+                    
+                    })
+                }
+                else{
+                    const feed = this.editor.getShape(feedBinding.toId)
+                    this.editor.updateShape({id: feed.id, type: feed.type, props: { searchQuery: searchInput }})
+                }
+                
             }
-        }, [searchInput])
+        }
 
         useEffect(() => {
             if (shape.props.name !== searchInput) {
@@ -112,65 +132,122 @@ export class SearchShapeUtil extends BaseBoxShapeUtil<SearchShape> {
             }
         }, [shape.props.name])
 
+        useEffect(() => {
+            const handleResize = () => {
+              if (boxContainerRef.current?.clientHeight) {
+                this.editor.updateShape({
+                  type: shape.type,
+                  id: shape.id,
+                  props: {
+                    // w: boxContainerRef.current?.clientWidth,
+                    h: boxContainerRef.current.clientHeight
+                  }
+                });
+              }
+            };
+        
+            const resizeObserver = new ResizeObserver(handleResize);
+            if (boxContainerRef.current) {
+              resizeObserver.observe(boxContainerRef.current);
+            }
+        
+            return () => {
+              if (boxContainerRef.current) {
+                resizeObserver.unobserve(boxContainerRef.current);
+              }
+              resizeObserver.disconnect();
+            };
+          }, [boxContainerRef.current, this.editor, shape]);
+        
 return (
-            <HTMLContainer className="kiln-feed-search-box">
+            <div 
+            ref={boxContainerRef}
+            className="kiln-feed-search-box"
+                onMouseEnter={()=>{
+                    console.log("Feed Entered")
+                        this.editor.setEditingShape(shape)
+                }}
+            
+            >
                 <div 
                     style={{
                         position: 'relative',
                         width: '100%',
-                        height: '100%',
+                        height: 'fit-content',
                         display: 'flex',
                         alignItems: 'center',
                         padding: '0 10px',
                     }}
                 >
                     {!isInputFocused && searchInput === "" && (
-                        <p style={{
-                            position: 'absolute',
+                        <p
+                        style={{
                             fontWeight: 600,
                             fontSize: '12px',
                             color: "#63635E",
-                            display: "flex",
-                            alignItems: 'center',
                             margin: 0,
-                            pointerEvents: 'none',
-                        }}>
-                            Articles about
-                            {(conceptChildren && conceptChildren.length !== 0)
-                                ? conceptChildren.map((concept, idx) => 
-                                    <SearchShapeConcept key={idx} concept={concept} editor={this.editor}/>)
-                                : <span style={{marginLeft: '3px', color: "rgba(100, 99, 99, 0.4)"}}>...anything! Drag concepts in to search.</span>
-                            }
-                        </p>
+                        }}
+                        onPointerDown={() => setIsInputFocused(true)}
+                    >
+                        Articles about
+                        {(conceptChildren && conceptChildren.length !== 0)
+                            ? conceptChildren.map((concept, idx) => {
+                                const isLast = idx === conceptChildren.length - 1;
+                                const isSecondLast = idx === conceptChildren.length - 2;
+                                const commaOrAnd = isLast ? '' : (isSecondLast ? ' and' : ',');
+                    
+                                return (
+                                    <React.Fragment key={idx}>
+                                        <SearchShapeConcept concept={concept} editor={this.editor} />
+                                        {commaOrAnd}
+                                    </React.Fragment>
+                                );
+                            })
+                            : <span style={{marginLeft: '3px', color: "rgba(100, 99, 99, 0.4)"}}>...anything! Drag concepts in to search.</span>
+                        }
+                    </p>
+                    
                     )}
-                    <input 
-                        type="text" 
+                    <textarea 
                         value={searchInput} 
                         onChange={(e) => {
                             setSearchInput(e.target.value)
+                            e.target.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+                            e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight    
                             this.editor.updateShape({
                                 id: shape.id,
                                 type: 'search',
                                 props: { name: e.target.value }
                             })
                         }}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        onKeyPress={(e) => {
+                            stopEventPropagation;
+                            e.stopPropagation();
+                            e.key === 'Enter' && handleSearch()}
+                        }
                         onFocus={() => setIsInputFocused(true)}
                         onBlur={() => setIsInputFocused(false)}
                         placeholder={isInputFocused ? "Enter search query" : ""}
+                        rows={1} // Initial number of rows
                         style={{
-                            width: '100%',
-                            height: '40px',
+                            width: isInputFocused ? 'fit-content' : "0%",
+                            minWidth: isInputFocused ? '100%' : "0%",
+                            height: 'auto', // Allow the height to adjust automatically
+                            minHeight: '20px', // Minimum height for the textarea
                             border: 'none',
                             outline: 'none',
                             fontWeight: 600,
                             fontSize: '12px',
                             color: "#63635E",
                             background: 'transparent',
+                            resize: 'none', // Prevent manual resizing, if desired
+                            overflow: 'hidden', // Hide scrollbars 
                         }}
                     />
                     <div 
-                        onClick={handleSearch}
+                        onPointerDown={() => {
+                            console.log("CLICKED!")
+                            handleSearch()}}
                         style={{
                             height: "100%",
                             width: '20px',
@@ -184,7 +261,7 @@ return (
                         <IoMdSearch/>
                     </div>
                 </div>
-            </HTMLContainer>
+            </div>
         )
     }
 

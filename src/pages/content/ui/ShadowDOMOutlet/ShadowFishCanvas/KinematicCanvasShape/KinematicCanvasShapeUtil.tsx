@@ -212,7 +212,8 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 					style={{
 						position: 'absolute',
 						borderRadius: '100%',
-						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors }).flat())]),
+						backgroundColor: 'transparent',
+						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => concept.colors ).flat())]),
 						height: '14px',
 						width: '14px',
 						top: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).y,

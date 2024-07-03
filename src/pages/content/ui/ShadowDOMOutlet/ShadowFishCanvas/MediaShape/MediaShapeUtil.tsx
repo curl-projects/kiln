@@ -47,6 +47,8 @@ const mediaShapeProps = {
 	plainText: T.string,
 	concepts: T.array,
 	view: T.string,
+	url: T.any,
+	title: T.any,
 	// highlightText: T.any,
 }
 
@@ -59,6 +61,8 @@ type MediaShape = TLBaseShape<
 		plainText: string
 		concepts: any
 		view: string
+		url: any
+		title: any
 		// highlightText: any,
 	}
 >
@@ -80,6 +84,8 @@ getDefaultProps(): MediaShape['props'] {
 			h: 300,	
 			text: "",
 			plainText: "", 
+			url: "",
+			title: "",
 			concepts: [
 				// {"type": "concept", "text": JSON.stringify("Human Computer Interaction")},
 				// {"type": "concept", "text": JSON.stringify("The Self & Media")}
@@ -275,12 +281,38 @@ getDefaultProps(): MediaShape['props'] {
 		// 	enabled: false,
 		// })
 		
+		useEffect(() => {
+            const handleResize = () => {
+              if (shapeRef.current?.clientHeight) {
+                this.editor.updateShape({
+                  type: shape.type,
+                  id: shape.id,
+                  props: {
+                    // w: shapeRef.current?.clientWidth,
+                    h: shapeRef.current.clientHeight
+                  }
+                });
+              }
+            };
+        
+            const resizeObserver = new ResizeObserver(handleResize);
+            if (shapeRef.current) {
+              resizeObserver.observe(shapeRef.current);
+            }
+        
+            return () => {
+              if (shapeRef.current) {
+                resizeObserver.unobserve(shapeRef.current);
+              }
+              resizeObserver.disconnect();
+            };
+          }, [shapeRef.current, this.editor, shape]);
 
 		
 		return (
-			<HTMLContainer 
+			<div 
 				id={shape.id}
-				
+				ref={shapeRef}
 				style={{
 					pointerEvents: 'all',
 				}}
@@ -296,7 +328,6 @@ getDefaultProps(): MediaShape['props'] {
 					padding: '28px 24px',
 					position: 'relative',
 				}}
-				ref={shapeRef}
 				>
 					{shape.props.view === 'concepts' && (isPending || isError) &&
 					<div 
@@ -338,7 +369,12 @@ getDefaultProps(): MediaShape['props'] {
 							maxWidth: "90%",
 							opacity: shape.props.view === 'concepts' ? 0.2 : 1,
 
-						}}>Original Thought</p>
+						}}>
+						{shape.props.url && shape.props.title
+						? <a target="_blank" href={shape.props.url}>{shape.props.title}</a>
+						: "Original Thought"
+						}
+						</p>
 						<div style={{flex: 1}}/>
 						<div className="tl-media-concept-toggle" onPointerDown={()=>{
 							console.log("Fetching inferred concepts")
@@ -410,7 +446,7 @@ getDefaultProps(): MediaShape['props'] {
 					/>
 				</SVGContainer> */}
 				
-			</HTMLContainer>
+			</div>
 		)
 	}
 
@@ -456,16 +492,18 @@ getDefaultProps(): MediaShape['props'] {
 				const conceptBinding: any = this.editor.getBindingsFromShape(dragShape, 'mediaConcept')[0]
 
 
-				this.editor.deleteBinding(conceptBinding.id)
+				if(conceptBinding){
+					this.editor.deleteBinding(conceptBinding.id)
 
-				// if a copy of the concept exists, change its opacity to 1 
-				for(let child of remainingChildren){
-					if(child.props.text === dragShape.props.text){
-						this.editor.updateShape({...child, opacity: 1})
+					// if a copy of the concept exists, change its opacity to 1 
+					for(let child of remainingChildren){
+						if(child.props.text === dragShape.props.text){
+							this.editor.updateShape({...child, opacity: 1})
+						}
 					}
+	
+					console.log("CONCEPT DRAGGED OUT", dragShape)
 				}
-
-				console.log("CONCEPT DRAGGED OUT", dragShape)
 				
 			}
 		}

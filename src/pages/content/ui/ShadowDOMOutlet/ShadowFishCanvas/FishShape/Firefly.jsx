@@ -103,6 +103,9 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
             try{
             
             textAreaRef.current.value = "";
+            textAreaRef.current.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+            textAreaRef.current.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
+
 
             console.log("MESSAGES:", editor.getShapeAndDescendantIds([worldModel.id]))
 

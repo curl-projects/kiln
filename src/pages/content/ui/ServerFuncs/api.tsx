@@ -75,8 +75,9 @@ export interface ExaResponse {
     results: ExaResult[];
 }
 
-export const searchExa = async (query: string): Promise<ExaResponse> => {
-    const response = await axios.post<ExaResponse>(`${API_BASE_URL}/searchExa`, { query });
+export const searchExa = async (query: string, concepts: Concept[]): Promise<ExaResponse> => {
+    console.log("QUERY:", query)
+    const response = await axios.post<ExaResponse>(`${API_BASE_URL}/searchExaWithConcepts`, { query, concepts });
     return response.data;
 };
 
@@ -288,7 +289,7 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
 
 // const [query, setQuery] = useState('hottest ai startups');
 // const [results, setResults] = useState<ExaResult[]>([]);
-export const handleFeedSearch = async (query) => {
+export const handleFeedSearch = async (query, concepts) => {
     // if (cache[query]) {
     //     setResults(cache[query]);
     //     console.log('cache hit');
@@ -296,7 +297,7 @@ export const handleFeedSearch = async (query) => {
     // }
 
     try {
-        const data = await searchExa(query);
+        const data = await searchExa(query, concepts);
         const fetchedResults = data.results || [];
 
         //  set results, then augment
