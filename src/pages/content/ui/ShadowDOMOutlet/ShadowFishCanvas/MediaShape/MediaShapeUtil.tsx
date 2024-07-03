@@ -253,6 +253,7 @@ getDefaultProps(): MediaShape['props'] {
 
 		// DATA FETCHING
 
+
 		const { isPending, isError, mutate, data } = useMutation({
 			mutationFn: async () => await fetchInferredConcepts(this.editor, shape, [{ text: shape.props.plainText }]),
 			onSuccess: () => {
@@ -265,6 +266,10 @@ getDefaultProps(): MediaShape['props'] {
 				})
 			}
 		})
+
+		useEffect(()=>{
+			console.log("IS PENDING", isPending)
+		}, [isPending])
 		// const { data, refetch, isPendinCg, isError } = useQuery({
 		// 	queryKey: ['concept-data', this.editor, shape, shape.props.plainText ],
 		// 	queryFn: async () => {
@@ -329,19 +334,20 @@ getDefaultProps(): MediaShape['props'] {
 					position: 'relative',
 				}}
 				>
-					{shape.props.view === 'concepts' && (isPending || isError) &&
+					{(shape.props.view === 'concepts' && isPending) &&
 					<div 
-					className='kiln-concept-positions'
+					// className='kiln-concept-positions'
 					style={{
 						position: 'absolute',
 						top: '50%',
 						left: '50%',
 						borderRadius: '100%',
-						backgroundImage: isPending ? generateLinearGradient(["rgb(130, 162, 223)"]) : generateLinearGradient(["#8C1D18"]),
-						height: '14px',
-						width: '14px',
-						zIndex: '100000',
+						// backgroundImage: isPending ? generateLinearGradient(["rgb(130, 162, 223)"]) : generateLinearGradient(["#8C1D18"]),
+						height: 'fit-content',
+						width: 'fit-content',
+						zIndex: 1000,
 					}}>
+						<DefaultSpinner />
 					</div>
 					}
 					<div style={{
@@ -350,7 +356,7 @@ getDefaultProps(): MediaShape['props'] {
 						justifyContent: 'flex-start',
 						alignItems: 'center',
 					}}>
-						<svg style={{ flexShrink: 0, opacity: shape.props.view === 'concepts' ? 0.2 : 1, }} width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<svg style={{ flexShrink: 0, opacity: shape.props.view === 'concepts' ? 0.1 : 1, }} width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path fillRule="evenodd" clipRule="evenodd" d="M5.36588 1.59401C2.8065 1.59401 0.731709 3.66881 0.731709 6.22819C0.731709 8.78754 2.8065 10.8623 5.36588 10.8623C7.92528 10.8623 10.0001 8.78754 10.0001 6.22819C10.0001 3.66881 7.92528 1.59401 5.36588 1.59401ZM0 6.22819C0 3.26469 2.40239 0.862305 5.36588 0.862305C8.32935 0.862305 10.7318 3.26469 10.7318 6.22819C10.7318 9.19168 8.32935 11.5941 5.36588 11.5941C2.40239 11.5941 0 9.19168 0 6.22819Z" fill="#191400" fillOpacity="0.207843"/>
 							<path fillRule="evenodd" clipRule="evenodd" d="M10.2444 6.55373H0.488281V5.90332H10.2444V6.55373Z" fill="#191400" fillOpacity="0.207843"/>
 							<path fillRule="evenodd" clipRule="evenodd" d="M5.04005 11.1064V1.35021H5.69046V11.1064H5.04005ZM7.70274 6.22827C7.70274 4.46181 7.06748 2.71427 5.8221 1.5588L6.20918 1.1416C7.59266 2.42516 8.27185 4.33619 8.27185 6.22827C8.27185 8.12037 7.59266 10.0314 6.20918 11.315L5.8221 10.8977C7.06748 9.7423 7.70274 7.99475 7.70274 6.22827ZM2.51953 6.22829C2.51953 4.33894 3.17658 2.4289 4.51791 1.14467L4.91148 1.55575C3.70532 2.71057 3.08864 4.45908 3.08864 6.22829C3.08865 7.9975 3.70534 9.74604 4.9115 10.9008L4.51792 11.3119C3.1766 10.0277 2.51954 8.11765 2.51953 6.22829Z" fill="#191400" fillOpacity="0.207843"/>
@@ -418,7 +424,7 @@ getDefaultProps(): MediaShape['props'] {
 							letterSpacing: '-0.00em',
 							lineHeight: '21px',
 							fontSize: '14px',
-							opacity: shape.props.view === 'concepts' ? 0.2 : 1,
+							opacity: shape.props.view === 'concepts' ? 0.1 : 1,
 						}}
 					/>
 					{/* <input

@@ -22,12 +22,12 @@ export function ConversationMessage({ text, name, setConversationMessage }){
             display: 'flex',
             flexDirection: "column",
             alignSelf: name === 'Me' ? 'flex-start' : 'flex-end',
-            gap: '8px',
+            gap: '4px',
             // overflow: 'hidden', // Hide scrollbars
             fontFamily: "monospace",
 
         }}>
-            <div style={{
+            <div style={{ 
                 fontWeight: 600,
                 fontSize: '12px',
                 color: "#FEAD82",
@@ -37,7 +37,7 @@ export function ConversationMessage({ text, name, setConversationMessage }){
                 display: 'flex',
                 alignItems: 'center',
             }}>
-                <p>{name}</p>
+                <p style={{margin: 0}}>{name}</p>
                 <div style={{ flex: 1}}/>
                 <div 
                 style={{

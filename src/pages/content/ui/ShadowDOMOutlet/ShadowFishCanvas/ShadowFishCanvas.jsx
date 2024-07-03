@@ -352,6 +352,7 @@ export default function ShadowCanvas({ parsedContent, article }) {
             x: center.x+250,
             y: center.y,
             props: {
+              view: 'concepts',
               text: htmlSource.data,
               plainText: htmlSource.data,
             },

@@ -68,7 +68,7 @@ const OneLiner = Node.create({
 export const conceptColors = [
 	'rgb(187, 170, 204)',
 	'rgb(130, 162, 223)',
-	'rgb(208, 228, 150)',
+	// 'rgb(208, 228, 150)',
 	"rgb(126,196,207)",
 	"rgb(209,207,226)",
 

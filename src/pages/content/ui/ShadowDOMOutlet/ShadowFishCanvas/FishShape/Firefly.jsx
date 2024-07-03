@@ -101,11 +101,7 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
     const { mutate, error, isPending } = useMutation({
         mutationFn: async () => {
             try{
-            
-            textAreaRef.current.value = "";
-            textAreaRef.current.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
-            textAreaRef.current.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
-
+        
 
             console.log("MESSAGES:", editor.getShapeAndDescendantIds([worldModel.id]))
 
@@ -476,9 +472,14 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     cursor: "pointer",
                     fontSize: '20px',
                 }}
-                onPointerDown={()=>{
+                onPointerDown={(e)=>{
                     console.log("Mutating")
                     mutate()
+
+                    textAreaRef.current.value = "";
+                    textAreaRef.current.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+                    textAreaRef.current.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
+        
                 }}
                 >
                     {fishQuery && <IoMdSearch/>}
