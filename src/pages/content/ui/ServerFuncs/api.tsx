@@ -242,7 +242,6 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
             
             for(let mediaConcept of mappedConcepts){
                 
-
                 console.log("MEDIA CONCEPT:", mediaConcept)
                 editor.batch(() => {
                     const  proportionX = getRandomNumber(0.2, 0.8), proportionY = getRandomNumber(0.2, 0.8)
@@ -253,6 +252,7 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                     y: 0,
                     props: {
                         text: mediaConcept.text,
+                        plainText: mediaConcept.text,
                         colors: mediaConcept.colors,
                         description: mediaConcept.description
                     }

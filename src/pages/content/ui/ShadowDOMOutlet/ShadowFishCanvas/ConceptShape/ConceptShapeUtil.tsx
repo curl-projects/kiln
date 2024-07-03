@@ -226,13 +226,13 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 				>
 					
 				{
-				// isHovered && 
-				shape.props.description && (
+				isHovered &&  shape.props.description && (
 				// <Fade cascade direction='up' duration={250} >
 					<div style={{
 						position: 'absolute',
 						bottom: '120%',
 						left: '50%',
+						zIndex: '100000',
 						transform: 'translateX(-50%)',
 						width: "100%",
 						maxWidth: "300px",
@@ -492,7 +492,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 
 				const positions = positionShapesOnCircle(worldEncapCircle.x, worldEncapCircle.y, encapCircleR+80, conceptArray.length)
 
-				
+				console.log("CONCEPT:", concept)
 				console.log("MIN DISTANCE SHAPE:", minDistanceShape)
 
 				this.editor.updateShape({
@@ -500,7 +500,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					type: conceptParent.type,
 					props: {
 						mergedConcepts: [
-							{name: concept.props.plainText, description: concept.description || "", colors: concept.props.colors}, 
+							{name: concept.props.plainText, description: concept.props.description || "", colors: concept.props.colors}, 
 							{name: minDistanceShape.shape.props.plainText, description: minDistanceShape.shape.props.description || "", colors: minDistanceShape.shape.props.colors}],
 						mergedConceptsPositions: positions,
 					}

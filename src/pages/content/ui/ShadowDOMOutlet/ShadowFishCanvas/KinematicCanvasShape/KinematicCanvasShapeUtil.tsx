@@ -112,6 +112,9 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 			if(shape.props.mergedConcepts && shape.props.mergedConcepts.length !== 0){
 				mutate(shape.props.mergedConcepts, {
 					onSuccess: (data) => {
+						console.log("COLORS:", [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])])
+						console.log("MERGED COLORS:", shape.props.mergedConcepts)
+						console.log("DATA:", data.merged_concepts)
 						data.merged_concepts.map((el, idx) => {
 							let newShapeId = createShapeId()
 							this.editor.createShape({
@@ -119,9 +122,10 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 								type: "concept",
 								x: shape.props.mergedConceptsPositions[idx].x, // convert to world space and convert from top left to center
 								y: shape.props.mergedConceptsPositions[idx].y, // convert to world space and convert from top left to center
-								opacity: 0.5,
+								opacity: 0.8,
 								props: {
 									text: el.name,
+									plainText: el.name,
 									temporary: true,
 									description: el.description,
 									colors: [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])],
@@ -204,7 +208,7 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 					style={{
 						position: 'absolute',
 						borderRadius: '100%',
-						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors}))],),
+						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors }))],),
 						height: '14px',
 						width: '14x',
 						top: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).y,
