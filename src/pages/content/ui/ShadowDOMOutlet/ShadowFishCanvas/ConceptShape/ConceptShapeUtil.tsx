@@ -32,13 +32,15 @@ import { Text } from '@tiptap/extension-text';
 import { Node } from "@tiptap/core";
 import Placeholder from '@tiptap/extension-placeholder'
 
+import { Fade } from "react-awesome-reveal"
+
 const conceptShapeProps = {
 	w: T.number,
 	h: T.number,
 	text: T.any,
 	plainText: T.any,
 	activated: T.boolean,
-	description: T.string,
+	description: T.any,
 	temporary: T.boolean,
 	colors: T.array,
 }
@@ -53,7 +55,7 @@ type ConceptShape = TLBaseShape<
 		activated: boolean,
 		temporary: boolean,
 		colors: any,
-		description: string,
+		description: any,
 	}
 >
 
@@ -67,10 +69,9 @@ export const conceptColors = [
 	'rgb(187, 170, 204)',
 	'rgb(130, 162, 223)',
 	'rgb(208, 228, 150)',
-	'rgb(150, 228, 209)',
-	'rgb(22, 101, 82)',
-	'rgb(54, 67, 15)',
-	'rgb(255, 45, 85)'
+	"rgb(126,196,207)",
+	"rgb(209,207,226)",
+
 ]
 
 
@@ -141,7 +142,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 			activated: false,
 			temporary: false,
 			colors: [conceptColors[Math.floor(Math.random() * conceptColors.length)]],
-			description: "",
+			description: "No description",
 		}
 	
 	}
@@ -206,6 +207,7 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 		  }, [this.editor, editor])
 
 	
+		const [isHovered, setIsHovered] = useState(false)
 
 		return (
 			<HTMLContainer 
@@ -219,7 +221,39 @@ export class ConceptShapeUtil extends BaseBoxShapeUtil<ConceptShape> {
 					width: 'fit-content',
 					position: 'relative'
 				}}
+				onMouseEnter={() => setIsHovered(true)}
+				onMouseLeave={() => setIsHovered(false)}
 				>
+					
+				{
+				// isHovered && 
+				shape.props.description && (
+				// <Fade cascade direction='up' duration={250} >
+					<div style={{
+						position: 'absolute',
+						bottom: '120%',
+						left: '50%',
+						transform: 'translateX(-50%)',
+						width: "100%",
+						maxWidth: "300px",
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: "#F9F9F8",
+						color: "rgba(77, 77, 77, 0.5)",
+						border: "1px solid rgba(77, 77, 77, 0.1)",
+						borderRadius: "12px",
+						padding: "8px",
+						marginBottom: "4px",
+						boxShadow: "0px 36px 42px -4px rgba(77, 77, 77, 0.15)",
+						
+					}}>
+						{shape.props.description}
+					</div>
+				// </Fade>
+				)}
+
+				
 				{shape.props.activated && <div style={{
 					position: 'absolute',
 					top: '50%',

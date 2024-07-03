@@ -156,7 +156,6 @@ p.is-editor-empty:first-child::before {
 .concept-highlight {
   background: var(--concept-highlight-color);
   border-bottom: 1px solid var(--concept-highlight-color-border);
-  opacity: 0.3;
   margin-bottom: -1px;
 }
 
@@ -345,5 +344,6 @@ p.is-editor-empty:first-child::before {
 	100% {
 		transform: scale(0.95);
 		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    color: rgb(22, 101, 82)
 	}
 }

@@ -32,6 +32,7 @@ export type FishShape = TLBaseShape<
 		destination: any,
 		currentAngle: number,
 		pathPoints: any,
+		rotateColor: any,
 	}
 >
 
@@ -45,6 +46,7 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 		destination: T.any, 
 		currentAngle: T.number,
 		pathPoints: T.any,
+		rotateColor: T.any,
     }
 
 	getDefaultProps(): FishShape['props'] {
@@ -55,6 +57,7 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			destination: undefined,
 			currentAngle: 0,
 			pathPoints: [],
+			rotateColor: `${Math.floor(Math.random() * 360)}deg`
 		}
 	}
 	override isAspectRatioLocked = (_shape: FishShape) => true
@@ -267,8 +270,9 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 			   	angle={shape.props.currentAngle} 
 				worldModel={worldModel}
 				worldModelBounds={worldModelBounds}
-				scale={(worldModel && worldModel.props?.viewMode) === 'fish' ? 1 : 0.5}
+				scale={(worldModel && worldModel.props?.viewMode) === 'fish' ? 1 : 0.01}
 				isMoving={isMoving}
+				rotateColor={shape.props.rotateColor}
 			   />
 			   <div style={{
 			   }}>
@@ -319,143 +323,3 @@ export class FishShapeUtil extends ShapeUtil<FishShape> {
 	// 	return resizeBox(shape, info)
 	// }
 }
-
-
-        // console.log("HI!", shape.props.children)
-
-		// const { transformX, transformY } = transform
-
-		// // config
-	
-
-		// const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
-		// const [pathPoints, setPathPoints] = useState([]);
-		// const [currentAngle, setCurrentAngle] = useState(Math.atan2(transformY, transformX) * 180 / Math.PI);
-		// const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 }); // Store the last position to calculate the distance
-		// const [isMoving, setIsMoving] = useState(false);
-
-		// useEffect(() => {
-		// 	if (transformX !== lastPosition.x || transformY !== lastPosition.y){
-		// 		const newPathPoints = calculatePathPoints(currentPosition.x, currentPosition.y, transformX, transformY, amplitudeFactor);
-		// 		setPathPoints(newPathPoints);
-		// 		setLastPosition({ x: transformX, y: transformY });
-		// 		setIsMoving(true);  // Set moving to true when new path points are calculated
-		// 	}
-		// }, [transform]);
-
-		// useEffect(() => {
-		// 	let animationFrameId;
-		// 	let startTime;
-		// 	let startAngle = currentAngle;
-	
-		// 	const moveFish = (timestamp) => {
-		// 		if (!startTime) startTime = timestamp;
-		// 		const elapsed = timestamp - startTime;
-	
-		// 		if (pathPoints.length > 0) {
-		// 			const totalDistance = calculateTotalDistance(pathPoints);
-		// 			const dynamicDuration = totalDistance / distanceFactor;
-		// 			const progress = elapsed / (dynamicDuration / speedFactor);
-		// 			const currentPointIndex = Math.floor(progress * pathPoints.length);
-		// 			if (currentPointIndex < pathPoints.length) {
-		// 				const nextPoint = pathPoints[currentPointIndex];
-		// 				setCurrentPosition(nextPoint);
-		// 				const nextAngle = nextPoint.angle;
-		// 				const interpolatedAngle = lerpAngle(startAngle, nextAngle, 0.1);
-		// 				setCurrentAngle(interpolatedAngle);
-		// 				startAngle = interpolatedAngle;
-		// 				animationFrameId = requestAnimationFrame(moveFish);
-		// 			} else {
-		// 				const orientationTarget = finalOrientationTarget || { x: transformX, y: transformY };
-		// 				const finalOrientationAngle = Math.atan2(orientationTarget.y - transformY, orientationTarget.x - transformX) * 180 / Math.PI;
-	
-		// 				const shortestFinalAngle = findShortestRotationPath(currentAngle, finalOrientationAngle);
-	
-		// 				if (fireflyRef.current) {
-		// 					fireflyRef.current.style.transition = 'transform 0.5s ease-in-out';
-		// 					setCurrentAngle(shortestFinalAngle);
-		// 				}
-	
-		// 				setTimeout(() => {
-		// 					if (fireflyRef.current) {
-		// 						fireflyRef.current.style.transition = '';
-		// 					}
-		// 				}, 500);
-	
-		// 				setIsMoving(false); // Set moving to false when animation ends
-		// 				cancelAnimationFrame(animationFrameId);
-		// 			}
-		// 		} else {
-		// 			setIsMoving(false); // Set moving to false if there are no path points
-		// 			cancelAnimationFrame(animationFrameId);
-		// 		}
-		// 	};
-	
-		// 	if (pathPoints.length > 0) {
-		// 		animationFrameId = requestAnimationFrame(moveFish);
-		// 	}
-	
-		// 	return () => cancelAnimationFrame(animationFrameId);
-		// }, [pathPoints]);
-	
-		// const calculatePathPoints = (startX, startY, endX, endY, amplitudeFactor) => {
-		// 	const deltaX = endX - startX;
-		// 	const deltaY = endY - startY;
-		// 	const totalDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-	
-		// 	const numPeriods = Math.floor(totalDistance / baseWavelength);
-		// 	const remainingDistance = totalDistance - numPeriods * baseWavelength;
-		// 	const finalWavelength = remainingDistance;
-	
-		// 	const numPoints = Math.max(100, Math.floor(totalDistance / 10));
-		// 	const newPathPoints = [];
-		// 	let angle = Math.atan2(deltaY, deltaX);
-	
-		// 	for (let i = 0; i <= numPoints; i++) {
-		// 		const progress = i / numPoints;
-		// 		const distanceTraveled = progress * totalDistance;
-		// 		const isLastPeriod = distanceTraveled > numPeriods * baseWavelength;
-		// 		const currentWavelength = isLastPeriod ? finalWavelength : baseWavelength;
-		// 		const currentAmplitude = isLastPeriod ? amplitude * amplitudeFactor : amplitude;
-		// 		const wavePosition = distanceTraveled % baseWavelength;
-		// 		const sinusoidalOffset = currentAmplitude * Math.sin((2 * Math.PI / currentWavelength) * wavePosition);
-	
-		// 		const mainX = startX + progress * deltaX;
-		// 		const mainY = startY + progress * deltaY;
-		// 		const offsetX = sinusoidalOffset * Math.cos(angle + Math.PI / 2);
-		// 		const offsetY = sinusoidalOffset * Math.sin(angle + Math.PI / 2);
-		// 		const x = mainX + offsetX;
-		// 		const y = mainY + offsetY;
-	
-		// 		newPathPoints.push({ x, y, angle: angle * 180 / Math.PI });
-	
-		// 		if (i > 0) {
-		// 			const segmentDeltaX = x - newPathPoints[i - 1].x;
-		// 			const segmentDeltaY = y - newPathPoints[i - 1].y;
-		// 			const segmentAngle = Math.atan2(segmentDeltaY, segmentDeltaX) * 180 / Math.PI;
-		// 			newPathPoints[i - 1].angle = segmentAngle;
-		// 		}
-		// 	}
-	
-		// 	return newPathPoints;
-		// };
-	
-		// const lerpAngle = (start, end, t) => {
-		// 	const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
-		// 	return start + shortestAngle * t;
-		// };
-	
-		// const findShortestRotationPath = (start, end) => {
-		// 	const shortestAngle = ((((end - start) % 360) + 540) % 360) - 180;
-		// 	return start + shortestAngle;
-		// };
-	
-		// const calculateTotalDistance = (points) => {
-		// 	let totalDistance = 0;
-		// 	for (let i = 1; i < points.length; i++) {
-		// 		const deltaX = points[i].x - points[i - 1].x;
-		// 		const deltaY = points[i].y - points[i - 1].y;
-		// 		totalDistance += Math.sqrt(deltaX ** 2 + deltaY ** 2);
-		// 	}
-		// 	return totalDistance;
-		// };

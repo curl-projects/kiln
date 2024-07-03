@@ -23,7 +23,7 @@ export function SearchShapeConcept({ concept, editor, idx }) {
     const buffer = 2
     const [isHovered, setIsHovered] = useState(false);
 
-    console.log("SHAPE TEXT:", shape.props, shape.props.text, JSON.parse(shape.props.text))
+    console.log("SHAPE TEXT:", shape.props, shape.props.text)
 
 
     const textEditor = useEditor({
@@ -35,7 +35,7 @@ export function SearchShapeConcept({ concept, editor, idx }) {
                 placeholder: "Unknown Concept"
             })
         ],
-        content: shape.props.text ? JSON.parse(shape.props.text) : "Unknown",
+        content: shape.props.text ? shape.props.text : "Unknown",
 
 
         onUpdate: ({ editor: textEditor }) => {

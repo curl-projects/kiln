@@ -23,7 +23,6 @@ function rgbToRgba(rgbString, alpha = 0.3) {
 }
 
 
-
 function findColors(doc: Node, highlights: any, color: string): DecorationSet {
   const regex = highlights?.length > 0 ? new RegExp(highlights.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi') : new RegExp('a^', 'gi'); // This regex will never match anything
 

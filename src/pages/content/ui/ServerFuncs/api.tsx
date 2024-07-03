@@ -242,10 +242,10 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
             
             for(let mediaConcept of mappedConcepts){
                 
+
+                console.log("MEDIA CONCEPT:", mediaConcept)
                 editor.batch(() => {
-
                     const  proportionX = getRandomNumber(0.2, 0.8), proportionY = getRandomNumber(0.2, 0.8)
-
                     editor.createShape({
                     id: mediaConceptIds[index],
                     type: mediaConcept.type,
@@ -254,6 +254,7 @@ export const fetchInferredConcepts = async (editor, shape, media: Media[]) => {
                     props: {
                         text: mediaConcept.text,
                         colors: mediaConcept.colors,
+                        description: mediaConcept.description
                     }
                     })
   
@@ -320,6 +321,7 @@ export const handleFeedSearch = async (query) => {
     };
 
 export const talkToFish = async ({ userInput, messages, worldModel, setMessages }) => {
+    console.log("TALKING TO FISH", userInput)
         if (!userInput.trim()) return;
 
         const newMessages = [...messages, { role: 'user' as const, content: userInput }];
@@ -330,7 +332,7 @@ export const talkToFish = async ({ userInput, messages, worldModel, setMessages 
         console.log(newMessages)
 
         try {
-            await fetchEventSource('http://0.0.0.0:8000/talkToFish', {
+            await fetchEventSource(`${API_BASE_URL}/talkToFish`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

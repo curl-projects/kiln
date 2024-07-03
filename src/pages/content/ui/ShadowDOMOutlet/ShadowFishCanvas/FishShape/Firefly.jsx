@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { IoMdSearch } from "react-icons/io";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FishHeading } from "./FishHeading"
-import { stopEventPropagation } from '@tldraw/editor'
+import { stopEventPropagation, useEditor } from '@tldraw/editor'
 import { ConversationMessage } from './ConversationMessage';
 import { useMutation } from '@tanstack/react-query'
 import { talkToFish } from "@pages/content/ui/ServerFuncs/api"
+import ContentEditable from 'react-contenteditable'
 
 // const AIIconWrapperStyle = {
 //     display: 'flex',
@@ -71,11 +72,15 @@ const getVerticalTranslation = (angle) => {
 };
 
 
-export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform, notMoving, scale, worldModel, worldModelBounds  }) {
+export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType, transform, notMoving, scale, worldModel, worldModelBounds, rotateColor  }) {
 
     const svgRef = useRef(null);
+    const textAreaRef = useRef(null)
     const [fishQuery, setFishQuery] = useState("")
     const [messages, setMessages] = useState([])
+    const editor = useEditor();
+
+    
 
     useEffect(() => {
         const svgElement = svgRef.current;
@@ -93,47 +98,59 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
     }, [isMoving]);
 
     // TODO: fix the connection to the backend, and maybe replace with EventSource API ?
-    const { mutate, error } = useMutation({
-        mutationFn: async () => await talkToFish({
+    const { mutate, error, isPending } = useMutation({
+        mutationFn: async () => {
+            try{
+            
+            textAreaRef.current.value = "";
+
+            console.log("MESSAGES:", editor.getShapeAndDescendantIds([worldModel.id]))
+
+            const concepts = [...editor.getShapeAndDescendantIds([worldModel.id])].map(id => editor.getShape(id)).filter(shape => shape.type === 'concept')
+            const media = [...editor.getShapeAndDescendantIds([worldModel.id])].map(id => editor.getShape(id)).filter(shape => shape.type === 'media')
+
+
+            console.log("CONCEPTS 1:", concepts)
+            console.log("MEDIA 1", media)
+
+            console.log("CONCEPTS:", concepts.map(c => { return {name: c.props.text, description: c.props.description}}))
+            console.log("MEDIA:", media.map(m => { return {text: m.props.text }}))
+
+            
+            const data = await talkToFish({
             setMessages: setMessages,
             userInput: fishQuery,
-            messages: [],
+            messages: messages,
             worldModel: {
-                concepts: [],
-                media: []
-            },
+                concepts: concepts.map(c => { return {name: c.props.text, description: c.props.description}}),
+                media: media.map(m => { return {text: m.props.plainText }})
+                },
+            })  
 
-        }),
+            setFishQuery("")
+
+            return data
+        } catch(error){
+            throw new Error(error)
+        }
+    
+    }
     });
 
-    // useEffect(()=>{
-    //     if(mutate){
-    //         mutate()
-    //         setFishQuery("")
-    //     }
-    // }, [mutate])
+    useEffect(()=>{
+        error && console.error("Error:", error)
+    }, [error])
 
-    
-    const hueMap = {
-        'optimist': '90deg', // green
-        'critic': '270deg', // pink
-        'researcher': '180deg', // blue
-        'planner': '0deg', // orange
-    }
 
-    const colorMap = {
-        'optimist': '#6BC076', // green
-        'critic': '#E295DE', // pink
-        'researcher': '#6BB8DD', // blue
-        'planner': '#E6A07A', // orange
-    }
-
+    useEffect(()=>{
+        console.log("IS PENDING:", isPending)
+    }, [isPending])
 
     return (
         <>
         <div ref={fireflyRef} style={{ height: '65px', width: 'fit-content', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `rotate(${angle}deg)`}}>
             {/* <div style={{...outerAITextWrapperStyle, transform: `rotate(${-angle}deg) translateY(${-getVerticalTranslation(angle)}px)`}}> */}
-            <svg ref={svgRef} style={{ filter: `hue-rotate(${hueMap[fishType] || '0deg'}`, transition: "width 0.2s ease-in-out, height 0.2s ease-in-out" }} width={`${65*scale}`} height={`${42*scale}`} viewBox={`0 0 65 42`} fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg ref={svgRef} style={{filter: `hue-rotate(${rotateColor || '0deg'}`, transition: "width 0.2s ease-in-out, height 0.2s ease-in-out" }} width={`${65*scale}`} height={`${42*scale}`} viewBox={`0 0 65 42`} fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* <path className="animated-path" d="M 0 21 L 65 21" stroke="#FBF7F5" strokeWidth="1.77348"/> */}
                 <g opacity="0.05" filter="url(#filter0_f_177_76)">
                     <circle cx="44.8545" cy="20.3702" r="15.3702" fill="#FBF7F5" />
@@ -405,45 +422,13 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     isMoving={isMoving}
                 />     
             }
-                {/* <AnimatePresence>
-                    {!isMoving && (
-                        <motion.div
-                            style={{ ...AITextWrapperStyle}}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            variants={variants}
-                            transition={{
-                                hidden: { duration: 0.3 },
-                                visible: { duration: 0.3 },
-                                exit: { duration: 0.3 }
-                            }}>
-                            <div style={AITextNameWrapperStyle}>
-                                <p style={{...AITextNameStyle, color: colorMap[fishType]}}>
-                                    {
-                                        {
-                                        'optimist': 'The Optimist', // green
-                                        'critic': 'The Critic', // pink
-                                        'researcher': 'The Researcher', // blue
-                                        'planner': 'The Planner', // orange
-                                        }[fishType]
-                                    }
-                                </p> 
-                            </div>
-                            <p style={AITextStyle}>
-                                {aiState}
-                            </p>
-                        </motion.div>
-                    )}
-                </AnimatePresence> */}
-            {/* </div> */}
         </div>
         {worldModel.props.viewMode === 'fish' && !isMoving &&
         <>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <textarea 
+                ref={textAreaRef}
                 placeholder="Ask a question"
-                onKeyDown={stopEventPropagation}
                 style={{
                     height: 'auto', // Allow the height to adjust automatically
                     minHeight: '30px', // Minimum height for the textarea
@@ -462,14 +447,21 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     fontSize: '12px',
                     color: "#63635E",
                     resize: 'none', // Prevent manual resizing, if desired
-                    overflow: 'hidden', // Hide scrollbars
+                    overflow: 'hidden', // Hide scrollbars 
                 }}
                 rows={1} // Initial number of rows
-                onInput={(e) => {
-                    const { value } = e.target;
-                    setFishQuery(value);
-                    e.target.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
-                    e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
+                onKeyDown={(e) => {
+                    stopEventPropagation;
+                    e.stopPropagation();
+                    if(e.key === 'Enter'){
+                        mutate()
+                    }
+                    else{
+
+                        setFishQuery(e.target.value);
+                        e.target.style.height = 'auto'; // Reset height to auto to get the correct scrollHeight
+                        e.target.style.height = `${e.target.scrollHeight}px`; // Set height to scrollHeight            
+                    }
                 }}
                 />
                 <div style={{
@@ -482,22 +474,23 @@ export default function Firefly({ angle, fireflyRef, isMoving, aiState, fishType
                     fontSize: '20px',
                 }}
                 onPointerDown={()=>{
-                    setFishQuery("")
-                    setConversationMessage('Hey! Nice to meet you!')
+                    console.log("Mutating")
+                    mutate()
                 }}
                 >
                     {fishQuery && <IoMdSearch/>}
                 </div>
 
         </div>
-            {conversationMessage &&
-                <ConversationMessage 
-                    text={conversationMessage}
-                    setConversationMessage={setConversationMessage}
-                    name={worldModel.props.name}
-                
-                />
-            }
+            {messages?.length !== 0 &&
+            messages.map((message, idx) => 
+            <ConversationMessage 
+                    key={idx}
+                    text={message.content}
+                    setConversationMessage={setMessages}
+                    name={message.role === 'user' ? 'Me' : worldModel.props.name}
+            />
+            )}
         </>
         }
         

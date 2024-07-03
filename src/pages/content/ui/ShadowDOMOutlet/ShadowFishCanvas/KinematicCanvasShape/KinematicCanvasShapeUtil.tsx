@@ -121,8 +121,9 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 								y: shape.props.mergedConceptsPositions[idx].y, // convert to world space and convert from top left to center
 								opacity: 0.5,
 								props: {
-									text: JSON.stringify(el.name),
+									text: el.name,
 									temporary: true,
+									description: el.description,
 									colors: [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])],
 								}
 							})
@@ -176,6 +177,25 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 
 					/>
 				</SVGContainer>
+				{[... new Set(this.editor.getSortedChildIdsForParent(shape.id).map(id => this.editor.getShape(id)).filter(shape => shape.type === 'concept').map(concept => concept.props.colors).flat())].map(color => 
+						<div 
+						className='kiln-kinematic-canvas-background'
+						style={{
+							height: shape.props.h*1.2,
+							width: shape.props.w*1.2,
+							backgroundColor: color,
+							filter: 'blur(120px)',
+							opacity: 0.3,
+							position: 'absolute',
+							top: '50%',
+							left: '50%',
+							transform: "translate(-50%, -50%)",
+							borderRadius: "100%",
+							zIndex: -1,
+						}} />
+				)
+				
+				}
 				{isPending &&
 					shape.props.mergedConceptsPositions.map((position, idx) => 
 					<div 
@@ -191,7 +211,6 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 						left: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).x,
 						zIndex: '100000',
 					}}>
-						<DefaultSpinner />
 					</div>
 					)
 				}

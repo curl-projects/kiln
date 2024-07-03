@@ -21,67 +21,74 @@ export default function App() {
   
   function tearDownContainer(){
     const shadowDOM = document.getElementById('shadowDOMWrapper')
-    if(shadowDOM){shadowDOM.style.zIndex = '10000000'}
-
+    if (shadowDOM) {
+      shadowDOM.style.zIndex = '10000000'
+    }
+  
     let pageContainer = document.getElementById("kiln-page-container")
   
-    if(pageContainer){
+    if (pageContainer) {
       while (pageContainer.firstChild) {
-         document.body.insertBefore(pageContainer.firstChild, pageContainer);
+        document.body.insertBefore(pageContainer.firstChild, pageContainer)
       }
-    
+  
       // Remove the pageContainer element
-      pageContainer.remove();
+      pageContainer.remove()
     }
   }
   
   function setUpContainer(){
-    const newPageContainer = document.createElement("span");
-      newPageContainer.id = 'kiln-page-container'
-    
-      for(let childNode of document.body.children){
-        if (childNode.id !== 'goals-extension-content-view-root') {
-          newPageContainer.appendChild(childNode)
-        }
+    const newPageContainer = document.createElement("span")
+    newPageContainer.id = 'kiln-page-container'
+  
+    // Create a static array of child nodes
+    const bodyChildren = Array.from(document.body.children)
+  
+    for (let childNode of bodyChildren) {
+      if (childNode.id !== 'goals-extension-content-view-root') {
+        newPageContainer.appendChild(childNode)
       }
-
-      document.body.appendChild(newPageContainer);
-    
-      Object.assign(newPageContainer.style, {
-        position: 'fixed',
-        border: '2px solid #DAD9D6', // the last border style will be applied
-        height: '84vh',
-        width: '44vw',
-        overflow: 'scroll',
-        left: '24px',
-        background: window.getComputedStyle(document.body).background,
-        top: '50%',
-        pointerEvents: 'all',
-        transform: 'translateY(-50%)',
-        zIndex: '100000000',
-        borderRadius: '8px',
-        boxShadow: '0px 36px 42px -4px rgba(77, 77, 77, 0.45)'
-    });
-
+    }
+  
+    document.body.appendChild(newPageContainer)
+  
+    Object.assign(newPageContainer.style, {
+      position: 'fixed',
+      border: '2px solid #DAD9D6',
+      height: '84vh',
+      width: '44vw',
+      overflow: 'scroll',
+      left: '24px',
+      background: window.getComputedStyle(document.body).background,
+      top: '50%',
+      pointerEvents: 'all',
+      transform: 'translateY(-50%)',
+      zIndex: '100000000',
+      borderRadius: '8px',
+      boxShadow: '0px 36px 42px -4px rgba(77, 77, 77, 0.45)'
+    })
+  
     const shadowDOM = document.getElementById('shadowDOMWrapper')
-    if(shadowDOM){
+    if (shadowDOM) {
       shadowDOM.style.zIndex = '0'
     }
   }
+  
 
-  // useEffect(()=>{
-  //   (async () => {
-  //     const data: any = chrome.runtime.sendMessage({ action: 'retrieveCanvasMode'})
-  //     if(data?.canvasMode){
-  //       setCanvasMode(data.canvasMode) 
-  //     }
-  //   })()
-  // }, [])
+  useEffect(()=>{
+    (async () => {
+      const data: any = await chrome.runtime.sendMessage({ action: 'retrieveMixed'})
+      console.log("DATA:", data)
+      if(data?.data?.kilnMixedCanvas){
+        setCanvasMode('mixed') 
+      }
+    })()
+  }, [])
 
-  // useEffect(()=>{
-  //   console.log("SENDING MESSAGE")
-  //   chrome.runtime.sendMessage({ action: "saveCanvasMode", canvasMode: canvasMode})
-  // }, [canvasMode])
+  useEffect(()=>{
+    console.log("SENDING CANVAS MESSAGE")
+    canvasMode && chrome.runtime.sendMessage({ action: "saveMixed", canvasMode: canvasMode})
+  }, [canvasMode])
 
   useEffect(()=>{
     
@@ -236,7 +243,6 @@ export default function App() {
           </div>
         </div>
       }
-      <CaptureHighlight />
       </div>
   );
 }

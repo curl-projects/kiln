@@ -39,7 +39,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import { Concept, Media, inferConcepts, systemPrompt, fetchInferredConcepts } from "@pages/content/ui/ServerFuncs/api"
 import { LuRefreshCcwDot } from "react-icons/lu";
 import { useMutation, useQuery } from '@tanstack/react-query'
-
+import { generateLinearGradient } from '@pages/content/ui/ShadowDOMOutlet/ShadowFishCanvas/ConceptShape/ConceptShapeUtil';
 const mediaShapeProps = {
 	w: T.number,
 	h: T.number,
@@ -175,7 +175,8 @@ getDefaultProps(): MediaShape['props'] {
 			onSelectionUpdate: ({ editor }) => {
 			  stopEventPropagation;
 			}
-		  }, []);
+		  }, [shape.props.concepts]);
+
 
 		  useEffect(() => {
 			if (editor && shape.props.concepts?.length !== 0) {
@@ -183,6 +184,8 @@ getDefaultProps(): MediaShape['props'] {
 				highlights: shape.props.concepts.map(concept => concept.highlight),
 				color: shape.props?.concepts[0]?.colors[0] || "rgb(130, 162, 223)"
 			})
+
+			editor?.commands.setContent(shape.props.text);
 			}
 		  }, [shape.props.concepts, editor]);
 
@@ -245,10 +248,18 @@ getDefaultProps(): MediaShape['props'] {
 		// DATA FETCHING
 
 		const { isPending, isError, mutate, data } = useMutation({
-			mutationFn: async () => await fetchInferredConcepts(this.editor, shape, [{ text: shape.props.plainText }])
-
+			mutationFn: async () => await fetchInferredConcepts(this.editor, shape, [{ text: shape.props.plainText }]),
+			onSuccess: () => {
+				this.editor.updateShape({
+					id: shape.id,
+					type: shape.type,
+					props: {
+						view: 'concepts'
+					}
+				})
+			}
 		})
-		// const { data, refetch, isPending, isError } = useQuery({
+		// const { data, refetch, isPendinCg, isError } = useQuery({
 		// 	queryKey: ['concept-data', this.editor, shape, shape.props.plainText ],
 		// 	queryFn: async () => {
 		// 		try{
@@ -288,32 +299,18 @@ getDefaultProps(): MediaShape['props'] {
 				ref={shapeRef}
 				>
 					{shape.props.view === 'concepts' && (isPending || isError) &&
-					<div style={{
+					<div 
+					className='kiln-concept-positions'
+					style={{
 						position: 'absolute',
 						top: '50%',
 						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						display: 'flex',
-						alignItems: 'center',
-						whiteSpace: 'nowrap',
-						justifyContent: 'center',
-						gap: '10px',					
+						borderRadius: '100%',
+						backgroundImage: isPending ? generateLinearGradient(["rgb(130, 162, 223)"]) : generateLinearGradient(["#8C1D18"]),
+						height: '14px',
+						width: '14x',
+						zIndex: '100000',
 					}}>
-						
-						<p 
-						style={{
-							fontFamily: 'monospace',
-							letterSpacing: '0.1em',
-							color: isPending ? "#BBAACC" : "#8C1D18",
-							fontWeight: 700,
-							textTransform: 'uppercase',
-							margin: 0,
-							fontSize: '20px',
-						}}>{isPending ? "Analysing Concepts" : "Error"}
-						</p>
-
-						{isPending && <DefaultSpinner />}
-
 					</div>
 					}
 					<div style={{

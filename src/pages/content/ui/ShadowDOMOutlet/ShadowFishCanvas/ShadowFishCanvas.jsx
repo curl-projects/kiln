@@ -340,6 +340,24 @@ export default function ShadowCanvas({ parsedContent, article }) {
               editor.setSelectedShapes([])
           }
       });
+
+      editor.registerExternalContentHandler('text', async ({ point, sources }) => {
+        const htmlSource = sources?.find((s) => s.type === 'text')
+  
+        if (htmlSource) {
+          const center = point ?? editor.getViewportPageBounds().center
+  
+          editor.createShape({
+            type: 'media',
+            x: center.x+250,
+            y: center.y,
+            props: {
+              text: htmlSource.data,
+              plainText: htmlSource.data,
+            },
+          })
+        }
+      })
       
   
 
@@ -391,10 +409,6 @@ export default function ShadowCanvas({ parsedContent, article }) {
                 props: {
                   w: shape.props.w
                 }
-              })
-
-              editor.registerExternalContentHandler('text', async ({ point, sources }) => {
-                console.log("HI")
               })
 
               editor.reparentShapes([searchId], shape.id)

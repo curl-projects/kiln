@@ -14,16 +14,14 @@ export function handleDoubleClickOnCanvas(info: TLClickEventInfo) {
 
     function worldModelFishMode(shape){
         if(shape.type === 'fish'){
-        const worldModelBinding = this.editor.getBindingsFromShape(shape, 'fishWorldModel')[0]
-        const worldModel: any = worldModelBinding ? this.editor.getShape(worldModelBinding.toId) : undefined
+        const worldModelBinding = this.editor?.getBindingsFromShape(shape, 'fishWorldModel')[0]
+        const worldModel: any = worldModelBinding ? this.editor?.getShape(worldModelBinding.toId) : undefined
 
         return worldModel && worldModel.props.viewMode === 'fish'
         }
         else{
             return false
-        }
-
-        
+        }   
     }
 
     // check if there's a selected fish

@@ -21,6 +21,7 @@ export function ConversationMessage({ text, name, setConversationMessage }){
             color: "#63635E",
             display: 'flex',
             flexDirection: "column",
+            alignSelf: name === 'Me' ? 'flex-start' : 'flex-end',
             gap: '8px',
             // overflow: 'hidden', // Hide scrollbars
             fontFamily: "monospace",

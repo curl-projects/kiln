@@ -29,6 +29,7 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(error
 
 // Message listeners
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
     if(message.action === 'save'){
         console.log("SAVED!");
         chrome.storage.local.set({
@@ -45,6 +46,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         return true; // Keep the sendResponse callback valid
     }
+
+    if(message.action === 'saveMixed'){
+        console.log("SAVED CANVAS LOCATION!", message.canvasMode);
+        if(message.canvasMode === 'mixed'){
+            chrome.storage.local.set({
+                'kilnMixedCanvas': true,
+            }, () => {
+                sendResponse({ status: 'success' });
+            });
+        }
+        else{
+            chrome.storage.local.set({
+                'kilnMixedCanvas': false,
+            }, () => {
+                sendResponse({ status: 'success' });
+            });
+        }
+    
+        return true; // Keep the sendResponse callback valid
+    } else if(message.action === 'retrieveMixed'){
+        console.log("RETRIEVED!");
+        chrome.storage.local.get(['kilnMixedCanvas'], (response) => {
+            console.log("RESPONSE:", response);
+            sendResponse({ status: 'success', data: response });
+        });
+        return true; // Keep the sendResponse callback valid
+    }
+
 });
 
 function storeObjectInChromeStorage(dataObject) {
