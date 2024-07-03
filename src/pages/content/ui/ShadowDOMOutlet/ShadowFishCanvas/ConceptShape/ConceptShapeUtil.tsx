@@ -107,6 +107,8 @@ export const conceptColors = [
 	  // If there is only one color, create a gradient with the same color
 	  return `linear-gradient(to right, ${colors[0]}, ${colors[0]})`;
 	}
+
+	console.log("COLORS:", colors)
   
 	const numColors = colors.length;
 	const interval = 100 / (numColors - 1);
@@ -118,6 +120,8 @@ export const conceptColors = [
 	
 	// Remove the trailing comma and space, and add closing parenthesis
 	gradient = gradient.slice(0, -2) + ')';
+
+	console.log("OUTPUT GRADIENT:", gradient)
 	
 	return gradient;
   }

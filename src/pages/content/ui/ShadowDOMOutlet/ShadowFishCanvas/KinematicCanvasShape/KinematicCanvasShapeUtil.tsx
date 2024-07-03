@@ -97,8 +97,12 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 			})
 			})
 
+		// useEffect(()=>{
+		// 	console.log(" MUTATION SUCCESS COLORS:", [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])])
+		// 	console.log("MERGED COLORS:", shape.props.mergedConcepts)	
+		// }, [isPending])
+
 		useEffect(()=>{
-			console.log("MERGED CONCEPT POSITIONS:", shape.props.mergedConceptsPositions)
 			if(shape.props.mergedConceptsPositions?.length !== 0){
 				for(let i in shape.props.mergedConceptsPositions){
 					console.log("X:", this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[i].x, y: shape.props.mergedConceptsPositions[i].y}).x)
@@ -112,7 +116,6 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 			if(shape.props.mergedConcepts && shape.props.mergedConcepts.length !== 0){
 				mutate(shape.props.mergedConcepts, {
 					onSuccess: (data) => {
-						console.log("COLORS:", [...new Set([...shape.props.mergedConcepts[0].colors, ...shape.props.mergedConcepts[1].colors])])
 						console.log("MERGED COLORS:", shape.props.mergedConcepts)
 						console.log("DATA:", data.merged_concepts)
 						data.merged_concepts.map((el, idx) => {
@@ -181,8 +184,9 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 
 					/>
 				</SVGContainer>
-				{[... new Set(this.editor.getSortedChildIdsForParent(shape.id).map(id => this.editor.getShape(id)).filter(shape => shape.type === 'concept').map(concept => concept.props.colors).flat())].map(color => 
-						<div 
+				{[...new Set(this.editor.getSortedChildIdsForParent(shape.id).map(id => this.editor.getShape(id)).filter(shape => shape.type === 'concept').map(concept => concept.props.colors).flat())].map((color, idx) => 
+						<div
+						key={idx}
 						className='kiln-kinematic-canvas-background'
 						style={{
 							height: shape.props.h*1.2,
@@ -208,9 +212,9 @@ export class KinematicCanvasShapeUtil extends BaseBoxShapeUtil<KinematicCanvasMo
 					style={{
 						position: 'absolute',
 						borderRadius: '100%',
-						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors }))],),
+						backgroundImage: generateLinearGradient([...new Set(shape.props.mergedConcepts.map(concept => { concept.colors }).flat())]),
 						height: '14px',
-						width: '14x',
+						width: '14px',
 						top: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).y,
 						left: this.editor.getPointInShapeSpace(shape.id, {x: shape.props.mergedConceptsPositions[idx].x, y: shape.props.mergedConceptsPositions[idx].y}).x,
 						zIndex: '100000',

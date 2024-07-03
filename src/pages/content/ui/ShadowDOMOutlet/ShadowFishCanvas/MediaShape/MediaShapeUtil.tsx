@@ -308,7 +308,7 @@ getDefaultProps(): MediaShape['props'] {
 						borderRadius: '100%',
 						backgroundImage: isPending ? generateLinearGradient(["rgb(130, 162, 223)"]) : generateLinearGradient(["#8C1D18"]),
 						height: '14px',
-						width: '14x',
+						width: '14px',
 						zIndex: '100000',
 					}}>
 					</div>
